@@ -239,6 +239,25 @@ for (const file of [...templates, ...walk(path.join(root, "lang"), (f) => f.ends
 }
 console.log("sem emojis na interface");
 
+// Compatibilidade v13/v14: o que muda entre as versões só pode ser tocado em helpers/compat.mjs.
+const versionBound = [
+  { pattern: /messageMode\s*:\s*[^,}\n]*\}\s*\)/, hint: "ChatMessage.create com messageMode: use createChatMessage (helpers/compat.mjs)" },
+  { pattern: /\b(?:Actors|Items)\.(?:un)?registerSheet\b/, hint: "registro de ficha: use registerDocumentSheet/unregisterCoreSheets (helpers/compat.mjs)" },
+  { pattern: /get\(\s*"core"\s*,\s*"(?:messageMode|rollMode)"/, hint: "leitura do modo de mensagem: use userMessageMode (helpers/compat.mjs)" },
+  { pattern: /CONFIG\.ChatMessage\??\.modes|CONFIG\.Dice\??\.rollModes/, hint: "lista de modos: use messageModeList (helpers/compat.mjs)" }
+];
+for (const file of mjs.filter((f) => rel(f).startsWith("module/"))) {
+  if (rel(file) === "module/helpers/compat.mjs") continue;
+  const code = read(file);
+  for (const { pattern, hint } of versionBound) {
+    if (pattern.test(code)) errors.push(`${rel(file)}: ${hint}`);
+  }
+}
+const manifestCompat = system.compatibility ?? {};
+if (!(Number(manifestCompat.minimum) >= 13)) errors.push("system.json: compatibility.minimum deve ser 13 ou maior");
+if (manifestCompat.verified) warnings.push(`system.json declara compatibility.verified=${manifestCompat.verified}; confirme que foi aberto num Foundry real`);
+console.log(`compatibilidade declarada: minimum ${manifestCompat.minimum}`);
+
 /* -------------------------------------------- */
 
 console.log("");

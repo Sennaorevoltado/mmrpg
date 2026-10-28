@@ -3,26 +3,16 @@
  */
 
 import { MMRPG } from "../config.mjs";
+import { userMessageMode, messageModeList } from "../helpers/compat.mjs";
 
-/** Modo de mensagem padrão do usuário. */
+/** Modo de mensagem padrão do usuário (nomes internos: public, gm, blind, self). */
 export function defaultMessageMode() {
-  try {
-    if (game.settings.settings.has("core.messageMode")) return game.settings.get("core", "messageMode");
-  } catch (err) {
-    /* usa o padrão */
-  }
-  return "public";
+  return userMessageMode();
 }
 
 /** Modos de mensagem disponíveis, no formato de lista de opções. */
 export function messageModeChoices() {
-  const modes = CONFIG.ChatMessage?.modes ?? { public: "CHAT.MODES.public", gm: "CHAT.MODES.gm", blind: "CHAT.MODES.blind", self: "CHAT.MODES.self" };
-  return Object.entries(modes)
-    .filter(([key]) => key !== "ic")
-    .map(([key, value]) => ({
-      value: key,
-      label: game.i18n.localize(typeof value === "string" ? value : (value?.label ?? key))
-    }));
+  return messageModeList();
 }
 
 /**

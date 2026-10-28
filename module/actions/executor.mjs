@@ -12,6 +12,7 @@ import { defaultMessageMode, promptRollConfig } from "./roll-config.mjs";
 import { makeCard, postCard, renderCheckCard } from "./card.mjs";
 import { requestApply } from "./apply.mjs";
 import { MMRPG } from "../config.mjs";
+import { createChatMessage } from "../helpers/compat.mjs";
 
 /** O clique pede execução direta, sem diálogo? (Shift) */
 function isFastForward(event) {
@@ -193,13 +194,13 @@ export async function rollAbilityCheck(actor, abilityKey, { event, fastForward, 
     subtitle: game.i18n.localize(kind === "attack" ? "MMRPG.Roll.attack" : "MMRPG.Roll.check"),
     roll
   });
-  return ChatMessage.create(
+  return createChatMessage(
     {
       speaker: ChatMessage.getSpeaker({ actor, token: sourceToken(actor) }),
       content,
       rolls: [roll]
     },
-    { messageMode: config.messageMode }
+    config.messageMode
   );
 }
 

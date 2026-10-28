@@ -1,6 +1,6 @@
-# Marvel Multiverse RPG (não oficial) para Foundry VTT v14
+# Marvel Multiverse RPG (não oficial) para Foundry VTT
 
-Sistema de fã para jogar **Marvel Multiverse RPG** no Foundry VTT v14. Foi organizado a partir da ideia de que *quase todo poder é um ataque ou um teste de atributo que aplica dano ou um efeito*: cada poder, arma ou equipamento carrega uma **lista de ações**, e cada ação descreve sozinha a rolagem, o dano/cura, os efeitos e o custo.
+Sistema de fã para jogar **Marvel Multiverse RPG** no Foundry VTT **v14** (alvo principal) e **v13** (experimental, desde a v0.1.1). Foi organizado a partir da ideia de que *quase todo poder é um ataque ou um teste de atributo que aplica dano ou um efeito*: cada poder, arma ou equipamento carrega uma **lista de ações**, e cada ação descreve sozinha a rolagem, o dano/cura, os efeitos e o custo.
 
 > **Este sistema não traz conteúdo dos livros.** Não há poderes, traços, tags, origens ou ocupações prontos. Você cria o seu material ou **importa um arquivo seu** (veja [docs/IMPORTACAO.md](docs/IMPORTACAO.md)). O arquivo [examples/exemplo-conteudo.json](examples/exemplo-conteudo.json) é inventado e só mostra o formato.
 
@@ -8,14 +8,14 @@ Projeto não oficial, sem vínculo com a Marvel, a Disney ou a Foundry Gaming. C
 
 ## Estado do projeto: leia antes de usar
 
-Este sistema foi escrito **sem acesso a um Foundry v14 de verdade**. O que foi feito para reduzir o risco:
+Este sistema foi escrito **sem acesso a um Foundry de verdade, nem v14 nem v13**. O que foi feito para reduzir o risco:
 
-- Mais de 70 testes automáticos (`npm test`): regras do d616, formato de importação e um **Foundry simulado** que carrega o sistema inteiro, usa ações, posta e aplica cartões, renderiza fichas e janelas.
+- Mais de 100 testes automáticos (`npm test`): regras do d616, formato de importação e um **Foundry simulado** que carrega o sistema inteiro, usa ações, posta e aplica cartões, renderiza fichas e janelas. A bateria roda duas vezes, uma com o simulador na geração 14 e outra na 13.
 - Um validador estático (`npm run validate`): confere o manifesto, a sintaxe, os templates, as ligações `data-action` ↔ código, as traduções e a ausência de emojis.
 
 Isso pega erros de código e de dados, mas **não substitui um teste num mundo real**. A primeira rodada de testes no Foundry, na ordem:
 
-1. Criar um mundo v14, ativar o sistema e olhar o console (F12) por erros ao carregar.
+1. Criar um mundo, ativar o sistema e olhar o console (F12) por erros ao carregar.
 2. Criar um Personagem e um NPC; abrir as fichas; editar atributos e recursos.
 3. Criar um Poder, abrir o **editor de ação**, usar a ação com um alvo marcado (tecla T) e conferir o cartão no chat.
 4. Clicar em **Aplicar** como GM e depois como jogador (o pedido passa pelo GM via socket).
@@ -25,13 +25,26 @@ Isso pega erros de código e de dados, mas **não substitui um teste num mundo r
 
 Se algo quebrar, o erro do console e o passo em que aconteceu bastam para corrigir.
 
+### Foundry v13 (experimental)
+
+O manifesto declara `minimum: 13`. As diferenças de API entre as duas versões estão concentradas em [module/helpers/compat.mjs](module/helpers/compat.mjs):
+
+| Assunto | v14 | v13 |
+|---|---|---|
+| Visibilidade das mensagens (público, GM, cego, privado) | `messageMode` | `rollMode` (`publicroll`, `gmroll`, `blindroll`, `selfroll`) |
+| Registro de fichas | coleções (`Actors.registerSheet`) | `DocumentSheetConfig`; a ficha padrão do núcleo é a antiga (AppV1) e também é retirada |
+| Gabarito de área | Região | Gabarito clássico (`MeasuredTemplate`) |
+| Modificações de efeito | `type` | `mode` numérico (o sistema grava os dois) |
+
+Os pontos abaixo só um teste real confirma, tanto na v13 quanto na v14: arrastar itens da barra lateral para a ficha, a aparência (CSS) das fichas e janelas, e o comportamento das durações de efeito. Se você usa só a v14, nada muda para você.
+
 ## Instalação
 
 **Por pasta (mais simples para testar):** copie esta pasta inteira para `Data/systems/mmrpg` do seu Foundry e reinicie. O nome da pasta precisa ser `mmrpg`.
 
 **Por zip:** rode `npm run package` e extraia `dist/mmrpg-<versão>.zip` em `Data/systems/mmrpg`.
 
-**Por URL de manifesto:** depois de publicar o projeto no GitHub e criar uma tag (`git tag v0.1.0 && git push --tags`), o workflow em `.github/workflows/release.yml` gera o release com `system.json` e o zip. A URL a colar em *Instalar sistema* é
+**Por URL de manifesto:** depois de publicar o projeto no GitHub e criar uma tag (`git tag v0.1.1 && git push --tags`), o workflow em `.github/workflows/release.yml` gera o release com `system.json` e o zip. A URL a colar em *Instalar sistema* é
 `https://github.com/<usuário>/<repositório>/releases/latest/download/system.json`.
 
 ## O que o sistema faz

@@ -101,7 +101,8 @@ O Foundry simulado implementa só o necessário: campos de dados com validação
 
 ## 7. Limites conhecidos
 
-- Escrito e testado sem um Foundry v14 real (veja o README).
+- Escrito e testado sem um Foundry real, v14 ou v13 (veja o README).
 - Gabarito de área: posicionado no token do atacante, sem interação.
 - Efeitos "desde o começo/fim do turno" não são automatizados: use duração em rodadas ou remova à mão.
-- A compatibilidade declarada é `minimum: 14`. Nenhuma versão foi marcada como *verificada* no manifesto.
+- A compatibilidade declarada é `minimum: 13`. Nenhuma versão foi marcada como *verificada* no manifesto, porque nenhuma foi aberta num Foundry real.
+- As diferenças entre v13 e v14 ficam em `module/helpers/compat.mjs` (modo de mensagem, registro de fichas, helpers de Handlebars). Código novo que dependa da versão deve passar por ali, e `tests/foundry-v13.test.mjs` roda a bateria de integração com o simulador na geração 13.

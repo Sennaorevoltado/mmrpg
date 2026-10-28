@@ -3,6 +3,7 @@
  */
 
 import { MMRPG } from "../config.mjs";
+import { registerHelperIfMissing } from "./compat.mjs";
 
 export const TEMPLATE_PATHS = [
   "actor/parts/header.hbs",
@@ -40,6 +41,17 @@ export const TEMPLATE_PATHS = [
 
 /** Registra os helpers. */
 export function registerHandlebarsHelpers() {
+  // Comparações que os templates usam. O núcleo já as traz; só entram se faltarem.
+  registerHelperIfMissing("eq", (a, b) => a === b);
+  registerHelperIfMissing("ne", (a, b) => a !== b);
+  registerHelperIfMissing("lt", (a, b) => a < b);
+  registerHelperIfMissing("gt", (a, b) => a > b);
+  registerHelperIfMissing("lte", (a, b) => a <= b);
+  registerHelperIfMissing("gte", (a, b) => a >= b);
+  registerHelperIfMissing("not", (a) => !a);
+  registerHelperIfMissing("and", (...args) => args.slice(0, -1).every(Boolean));
+  registerHelperIfMissing("or", (...args) => args.slice(0, -1).some(Boolean));
+
   Handlebars.registerHelper("mmrpgSigned", (value) => {
     const n = Math.trunc(Number(value) || 0);
     return n >= 0 ? `+${n}` : `${n}`;

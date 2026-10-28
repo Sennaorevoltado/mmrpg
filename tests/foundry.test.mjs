@@ -18,6 +18,8 @@ const { rollAbilityCheck } = await import("../module/actions/executor.mjs");
 const { rerollDie, placeTemplate } = await import("../module/actions/listeners.mjs");
 const { importItems, exportItems } = await import("../module/helpers/importer.mjs");
 const { parseContent } = await import("../module/helpers/content-format.mjs");
+const compat = await import("../module/helpers/compat.mjs");
+const { defaultMessageMode, messageModeChoices } = await import("../module/actions/roll-config.mjs");
 
 await Hooks.callAll("init");
 await Hooks.callAll("ready");
@@ -53,6 +55,71 @@ test("hook init registra classes, modelos, fichas, condições e configurações
   assert.equal(env.settings.get("mmrpg", "autoApply"), false);
   assert.ok(game.mmrpg.useItem && game.mmrpg.rollAbility && game.mmrpg.openImporter);
   assert.ok(env.settings.menus.has("mmrpg.importer"));
+});
+
+test(`fichas registradas pela API da v${env.generation}`, () => {
+  const mine = env.registeredSheets.filter((s) => s.scope === "mmrpg");
+  assert.equal(mine.length, 3);
+  const via = env.generation >= 14 ? "collection" : "config";
+  assert.ok(mine.every((s) => s.via === via), `todas pela API "${via}"`);
+  assert.deepEqual(env.deprecatedSheetCalls, [], "não usa a API de registro antiga na v13");
+  const retired = env.unregisteredSheets.map((s) => s.name);
+  assert.ok(retired.includes("ActorSheetV2") && retired.includes("ItemSheetV2"), "tira as fichas V2 do núcleo");
+  if (env.generation < 14) {
+    assert.ok(retired.includes("LegacyActorSheet") && retired.includes("LegacyItemSheet"), "v13: tira também as fichas antigas (AppV1)");
+  }
+});
+
+test("modo de mensagem: lista, padrão do usuário e criação do cartão", async () => {
+  assert.equal(compat.foundryGeneration(), env.generation);
+
+  // Lista de modos: nomes internos, sem "ic", com rótulos localizados.
+  const choices = messageModeChoices();
+  assert.deepEqual(choices.map((c) => c.value), ["public", "gm", "blind", "self"]);
+  assert.ok(choices.every((c) => typeof c.label === "string" && c.label.length));
+
+  // Padrão do usuário, lido da configuração do núcleo da versão.
+  const key = env.generation >= 14 ? "messageMode" : "rollMode";
+  const names = env.generation >= 14
+    ? { public: "public", gm: "gm", blind: "blind", self: "self", ic: "ic" }
+    : { public: "publicroll", gm: "gmroll", blind: "blindroll", self: "selfroll" };
+  const original = env.settings.get("core", key);
+  for (const [internal, native] of Object.entries(names)) {
+    env.settings.set("core", key, native);
+    assert.equal(defaultMessageMode(), internal === "ic" ? "public" : internal, `padrão para ${native}`);
+  }
+  env.settings.set("core", key, original);
+
+  // Criação: cada modo resulta na visibilidade certa nas duas versões.
+  game.messages.clear?.();
+  for (const mode of ["public", "gm", "blind", "self"]) {
+    const msg = await compat.createChatMessage({ content: "x" }, mode);
+    assert.equal(msg.effectiveMode, mode, `visibilidade ${mode}`);
+    if (env.generation >= 14) assert.equal(msg.messageMode, mode);
+    else assert.equal(msg.messageMode, undefined, "v13 não usa messageMode");
+  }
+  // Nomes da v13 também são aceitos (módulos e macros antigos).
+  assert.equal((await compat.createChatMessage({ content: "x" }, "gmroll")).effectiveMode, "gm");
+  // Sem modo: usa o do usuário.
+  assert.equal((await compat.createChatMessage({ content: "x" })).effectiveMode, "public");
+  // Modo desconhecido nunca vaza: vira público.
+  assert.equal((await compat.createChatMessage({ content: "x" }, "qualquer")).effectiveMode, "public");
+});
+
+test("o cartão de ação e o teste de atributo respeitam o modo escolhido", async () => {
+  const { hero, villain, power } = await makeScene();
+  game.user.targets = new Set([target(villain)]);
+  const { DialogV2 } = foundry.applications.api;
+  for (const mode of ["blind", "self", "gm"]) {
+    DialogV2.answer = { edge: "normal", bonus: 0, messageMode: mode };
+    rig(2, 3, 2);
+    const card = await power.use("golpe");
+    assert.equal(card.effectiveMode, mode, `cartão ${mode}`);
+    rig(2, 3, 2);
+    const check = await rollAbilityCheck(hero, "mle");
+    assert.equal(check.effectiveMode, mode, `teste ${mode}`);
+  }
+  DialogV2.answer = null;
 });
 
 test("todos os modelos de dados têm valores iniciais válidos", async () => {
@@ -275,7 +342,7 @@ test("usar com diálogo respeita a escolha do jogador", async () => {
   const msg = await power.use("golpe");
   DialogV2.answer = null;
   assert.ok(msg);
-  assert.equal(msg.messageMode, "gm");
+  assert.equal(msg.effectiveMode, "gm");
   assert.equal(msg.rolls[0].edgeMode, 1);
   assert.equal(msg.rolls[0].modifier, hero.system.abilities.mle.attack + 2);
   assert.equal(msg.rolls[0].canReroll, true);
@@ -366,7 +433,7 @@ test("área de efeito vira Região no v14 e gabarito nas versões sem Regiões",
   await placeTemplate(msg);
   assert.equal(created.at(-1).name, "MeasuredTemplate");
 
-  delete game.release;
+  game.release = { generation: env.generation };
   delete CONFIG.Region;
   canvas.scene = null;
 });

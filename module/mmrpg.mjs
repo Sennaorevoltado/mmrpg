@@ -1,5 +1,5 @@
 /**
- * Marvel Multiverse RPG — sistema não oficial para Foundry VTT v14.
+ * Marvel Multiverse RPG — sistema não oficial para Foundry VTT (v14; v13 experimental).
  *
  * Ponto de entrada: registra classes, modelos de dados, fichas, hooks e a API pública.
  */
@@ -17,6 +17,7 @@ import ActionEditor from "./apps/action-editor.mjs";
 import ContentImporter from "./apps/importer.mjs";
 import TeamManeuverApp from "./apps/team-maneuver.mjs";
 import { registerHandlebarsHelpers, preloadTemplates } from "./helpers/handlebars.mjs";
+import { registerDocumentSheet, unregisterCoreSheets, foundryGeneration } from "./helpers/compat.mjs";
 import { registerSettings } from "./helpers/settings.mjs";
 import { registerStatusEffects } from "./helpers/status-effects.mjs";
 import { registerCombatHooks } from "./helpers/combat.mjs";
@@ -26,11 +27,8 @@ import { registerApplyHandler } from "./actions/apply.mjs";
 import { activateCardListeners } from "./actions/listeners.mjs";
 import { rollAbilityCheck } from "./actions/executor.mjs";
 
-const { Actors, Items } = foundry.documents.collections;
-const { ActorSheetV2, ItemSheetV2 } = foundry.applications.sheets;
-
 Hooks.once("init", () => {
-  console.log(`${MMRPG.id} | iniciando o sistema Marvel Multiverse RPG\n${MMRPG.ascii}`);
+  console.log(`${MMRPG.id} | iniciando o sistema Marvel Multiverse RPG (Foundry v${foundryGeneration()})\n${MMRPG.ascii}`);
 
   CONFIG.MMRPG = MMRPG;
 
@@ -67,20 +65,20 @@ Hooks.once("init", () => {
   registerHotbar();
   registerCombatHooks();
 
-  // Fichas
-  Actors.unregisterSheet("core", ActorSheetV2);
-  Actors.registerSheet(MMRPG.id, CharacterSheet, {
+  // Fichas (a ficha padrão do núcleo e a forma de registrar mudam entre a v13 e a v14)
+  unregisterCoreSheets("Actor");
+  registerDocumentSheet("Actor", MMRPG.id, CharacterSheet, {
     types: ["character"],
     makeDefault: true,
     label: "MMRPG.Sheet.character"
   });
-  Actors.registerSheet(MMRPG.id, NpcSheet, {
+  registerDocumentSheet("Actor", MMRPG.id, NpcSheet, {
     types: ["npc"],
     makeDefault: true,
     label: "MMRPG.Sheet.npc"
   });
-  Items.unregisterSheet("core", ItemSheetV2);
-  Items.registerSheet(MMRPG.id, MMRPGItemSheet, {
+  unregisterCoreSheets("Item");
+  registerDocumentSheet("Item", MMRPG.id, MMRPGItemSheet, {
     makeDefault: true,
     label: "MMRPG.Sheet.item"
   });

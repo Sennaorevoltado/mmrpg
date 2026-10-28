@@ -7,6 +7,7 @@
 
 import { MMRPG } from "../config.mjs";
 import { resolveAction, toInt } from "../rules/index.mjs";
+import { createChatMessage } from "../helpers/compat.mjs";
 
 export const FLAG_SCOPE = MMRPG.id;
 export const FLAG_CARD = "card";
@@ -208,5 +209,5 @@ export async function postCard({ card, roll, speaker, messageMode }) {
     rolls: roll ? [roll] : [],
     flags: { [FLAG_SCOPE]: { [FLAG_CARD]: card } }
   };
-  return ChatMessage.create(data, { messageMode });
+  return createChatMessage(data, messageMode);
 }

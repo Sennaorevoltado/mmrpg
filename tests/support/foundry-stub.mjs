@@ -577,12 +577,55 @@ class Combatant {}
 
 class ChatMessage {
   static documentName = "ChatMessage";
+  /** Chamadas à API da v13 feitas em uma v14 (e vice-versa), para os testes. */
+  static apiLog = [];
   static getSpeaker({ actor } = {}) {
     return { actor: actor?.id ?? null, alias: actor?.name ?? "" };
   }
+  static getWhisperRecipients(name) {
+    // Outro usuário GM, para distinguir "só o GM" de "só eu" nos testes.
+    return name === "GM" ? [{ id: "gm-mesa" }] : [];
+  }
+  /** v13: aplica o modo de rolagem (publicroll, gmroll, blindroll, selfroll) aos dados. */
+  static applyRollMode(data, rollMode) {
+    if (game.release.generation >= 14) throw new Error("applyRollMode não existe na v14 simulada");
+    ChatMessage.apiLog.push(`applyRollMode:${rollMode}`);
+    if (rollMode === "publicroll") {
+      data.whisper = [];
+      data.blind = false;
+    } else if (rollMode === "gmroll") {
+      data.whisper = ChatMessage.getWhisperRecipients("GM").map((u) => u.id);
+      data.blind = false;
+    } else if (rollMode === "blindroll") {
+      data.whisper = ChatMessage.getWhisperRecipients("GM").map((u) => u.id);
+      data.blind = true;
+    } else if (rollMode === "selfroll") {
+      data.whisper = [game.user.id];
+      data.blind = false;
+    } else {
+      throw new Error(`modo de rolagem inválido na v13: ${rollMode}`);
+    }
+    return data;
+  }
   static async create(data, options = {}) {
+    if (game.release.generation >= 14) {
+      if (options.rollMode !== undefined) throw new Error("rollMode não é a opção da v14");
+      if (options.messageMode && !["public", "gm", "blind", "self", "ic"].includes(options.messageMode)) {
+        throw new Error(`messageMode inválido na v14: ${options.messageMode}`);
+      }
+    } else if (options.messageMode !== undefined) {
+      throw new Error("messageMode não existe na v13");
+    }
     const msg = new ChatMessage(data);
     msg.messageMode = options.messageMode;
+    msg.whisper = data.whisper ?? [];
+    msg.blind = !!data.blind;
+    // Visibilidade efetiva, igual nas duas versões: é o que o jogador de fato vê.
+    if (options.messageMode) msg.effectiveMode = options.messageMode;
+    else if (msg.blind) msg.effectiveMode = "blind";
+    else if (msg.whisper.length === 1 && msg.whisper[0] === game.user.id) msg.effectiveMode = "self";
+    else if (msg.whisper.length) msg.effectiveMode = "gm";
+    else msg.effectiveMode = "public";
     game.messages.set(msg.id, msg);
     return msg;
   }
@@ -753,7 +796,7 @@ function flatten(obj, prefix = "", out = {}) {
  * @param {string} [options.lang="pt-BR"]
  * @returns {object} Ferramentas de teste (chaves de tradução ausentes, notificações, hooks…).
  */
-export function installFoundry({ lang = "pt-BR" } = {}) {
+export function installFoundry({ lang = "pt-BR", generation = Number(process.env.MMRPG_FOUNDRY_GENERATION) || 14 } = {}) {
   const strings = flatten(JSON.parse(fs.readFileSync(path.join(ROOT, "lang", `${lang}.json`), "utf8")));
   const missingKeys = new Set();
   const notices = { warn: [], info: [], error: [] };
@@ -797,10 +840,30 @@ export function installFoundry({ lang = "pt-BR" } = {}) {
   const user = { id: "gm1", isGM: true, isActiveGM: true, color: "#cc2222", targets: new Set(), assignHotbarMacro() {} };
   const registeredSheets = [];
 
+  // API de registro de fichas. Na v13 simulada a forma antiga (Actors.registerSheet) fica
+  // registrada em `deprecatedSheetCalls`, para o teste provar que o sistema não depende dela.
+  const deprecatedSheetCalls = [];
+  const unregisteredSheets = [];
   const sheetRegistry = (documentName) => ({
-    registerSheet: (scope, cls, opts) => registeredSheets.push({ documentName, scope, cls, opts }),
-    unregisterSheet: () => {}
+    registerSheet: (scope, cls, opts) => {
+      if (generation < 14) deprecatedSheetCalls.push({ documentName, scope, name: cls.name });
+      registeredSheets.push({ documentName, scope, cls, opts, via: "collection" });
+    },
+    unregisterSheet: (scope, cls) => {
+      if (generation < 14) deprecatedSheetCalls.push({ documentName, scope, name: cls?.name, unregister: true });
+      unregisteredSheets.push({ documentName, scope, name: cls?.name, via: "collection" });
+    }
   });
+  const DocumentSheetConfig = {
+    registerSheet: (documentClass, scope, cls, opts) => {
+      registeredSheets.push({ documentName: documentClass.documentName ?? documentClass.name, scope, cls, opts, via: "config" });
+    },
+    unregisterSheet: (documentClass, scope, cls) => {
+      unregisteredSheets.push({ documentName: documentClass.documentName ?? documentClass.name, scope, name: cls?.name, via: "config" });
+    }
+  };
+  class LegacyActorSheet {}
+  class LegacyItemSheet {}
 
   Handlebars.registerHelper; // garante uso do módulo importado
   registerCoreHelpers();
@@ -831,6 +894,7 @@ export function installFoundry({ lang = "pt-BR" } = {}) {
     data: { fields: { DataField, StringField, HTMLField, NumberField, BooleanField, ObjectField, SchemaField, ArrayField, EmbeddedDataField } },
     dice: { terms: { Die } },
     documents: { collections: { Actors: sheetRegistry("Actor"), Items: sheetRegistry("Item") } },
+    ...(generation < 14 ? { appv1: { sheets: { ActorSheet: LegacyActorSheet, ItemSheet: LegacyItemSheet } } } : {}),
     applications: {
       api: { ApplicationV2, HandlebarsApplicationMixin, DialogV2 },
       sheets: { ActorSheetV2, ItemSheetV2 },
@@ -839,7 +903,7 @@ export function installFoundry({ lang = "pt-BR" } = {}) {
         FormDataExtended
       },
       handlebars: { renderTemplate, loadTemplates },
-      apps: { FilePicker: { implementation: class FilePicker { browse() {} } } }
+      apps: { FilePicker: { implementation: class FilePicker { browse() {} } }, DocumentSheetConfig }
     }
   };
 
@@ -851,8 +915,28 @@ export function installFoundry({ lang = "pt-BR" } = {}) {
     Dice: { terms: { d: Die }, rolls: [] },
     statusEffects: [],
     specialStatusEffects: {},
-    ChatMessage: {}
+    ...(generation >= 14
+      ? {
+          ChatMessage: {
+            modes: {
+              public: { label: "CHAT.MODES.public" },
+              gm: { label: "CHAT.MODES.gm" },
+              blind: { label: "CHAT.MODES.blind" },
+              self: { label: "CHAT.MODES.self" },
+              ic: { label: "CHAT.MODES.ic" }
+            }
+          }
+        }
+      : { ChatMessage: {} })
   };
+  if (generation < 14) {
+    g.CONFIG.Dice.rollModes = {
+      publicroll: { label: "CHAT.RollPublic" },
+      gmroll: { label: "CHAT.RollPrivate" },
+      blindroll: { label: "CHAT.RollBlind" },
+      selfroll: { label: "CHAT.RollSelf" }
+    };
+  }
   g.CONST = {
     ACTIVE_EFFECT_MODES: { MULTIPLY: 1, ADD: 2, DOWNGRADE: 3, UPGRADE: 4, OVERRIDE: 5 },
     TOKEN_DISPLAY_MODES: { OWNER: 40 },
@@ -875,7 +959,12 @@ export function installFoundry({ lang = "pt-BR" } = {}) {
     }
   };
 
+  // Configurações do núcleo que o sistema lê, com os nomes de cada versão.
+  if (generation >= 14) settings.register("core", "messageMode", { default: "public" });
+  else settings.register("core", "rollMode", { default: "publicroll" });
+
   g.game = {
+    release: { generation },
     i18n,
     settings,
     user,
@@ -902,7 +991,7 @@ export function installFoundry({ lang = "pt-BR" } = {}) {
   g.fromUuid = async (uuid) => REGISTRY.get(uuid) ?? null;
   g.fromUuidSync = (uuid) => REGISTRY.get(uuid) ?? null;
 
-  return { missingKeys, notices, hooks, socketHandlers, emitted, registeredSheets, REGISTRY, user, settings };
+  return { missingKeys, notices, hooks, socketHandlers, emitted, registeredSheets, unregisteredSheets, deprecatedSheetCalls, generation, REGISTRY, user, settings };
 }
 
 export { Handlebars, Die, Roll, Actor, Item, ChatMessage, ApplicationV2, DialogV2, TypeDataModel, DataModel };

@@ -1,0 +1,37 @@
+<section class="mmrpg-resources">
+  <div class="mmrpg-resource health">
+    <div class="mmrpg-resource-title">{{localize "MMRPG.Resource.health"}}</div>
+    <div class="mmrpg-bar"><div class="mmrpg-bar-fill" style="width: {{healthPercent}}%"></div></div>
+    <div class="mmrpg-resource-fields">
+      <input type="number" name="system.health.value" value="{{source.health.value}}" step="1" {{#unless editable}}disabled{{/unless}}>
+      <span>/</span>
+      <input type="number" name="system.health.max" value="{{source.health.max}}" step="1" {{#unless editable}}disabled{{/unless}}>
+    </div>
+    <label class="mmrpg-field inline">
+      <span>{{localize "MMRPG.Sheet.reduction"}}</span>
+      <input type="number" name="system.health.reduction" value="{{source.health.reduction}}" min="0" step="1" {{#unless editable}}disabled{{/unless}}>
+    </label>
+  </div>
+  <div class="mmrpg-resource focus">
+    <div class="mmrpg-resource-title">{{localize "MMRPG.Resource.focus"}}</div>
+    <div class="mmrpg-bar"><div class="mmrpg-bar-fill" style="width: {{focusPercent}}%"></div></div>
+    <div class="mmrpg-resource-fields">
+      <input type="number" name="system.focus.value" value="{{source.focus.value}}" step="1" {{#unless editable}}disabled{{/unless}}>
+      <span>/</span>
+      <input type="number" name="system.focus.max" value="{{source.focus.max}}" step="1" {{#unless editable}}disabled{{/unless}}>
+    </div>
+    <label class="mmrpg-field inline">
+      <span>{{localize "MMRPG.Sheet.reduction"}}</span>
+      <input type="number" name="system.focus.reduction" value="{{source.focus.reduction}}" min="0" step="1" {{#unless editable}}disabled{{/unless}}>
+    </label>
+  </div>
+  <div class="mmrpg-resource karma">
+    <div class="mmrpg-resource-title">{{localize "MMRPG.Resource.karma"}}</div>
+    <div class="mmrpg-bar"><div class="mmrpg-bar-fill" style="width: {{karmaPercent}}%"></div></div>
+    <div class="mmrpg-resource-fields">
+      <input type="number" name="system.karma.value" value="{{source.karma.value}}" min="0" step="1" {{#unless editable}}disabled{{/unless}}>
+      <span>/</span>
+      <input type="number" name="system.karma.max" value="{{source.karma.max}}" min="0" step="1" {{#unless editable}}disabled{{/unless}}>
+    </div>
+  </div>
+</section>

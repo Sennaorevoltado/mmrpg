@@ -1,0 +1,51 @@
+{
+  "id": "mmrpg",
+  "title": "Marvel Multiverse RPG (não oficial)",
+  "description": "Sistema não oficial de Marvel Multiverse RPG para Foundry VTT v14. Não inclui conteúdo dos livros: importe o seu próprio.",
+  "version": "0.1.0",
+  "compatibility": {
+    "minimum": "14"
+  },
+  "authors": [
+    {
+      "name": "Comunidade"
+    }
+  ],
+  "license": "MIT",
+  "esmodules": [
+    "module/mmrpg.mjs"
+  ],
+  "styles": [
+    "styles/mmrpg.css"
+  ],
+  "languages": [
+    {
+      "lang": "pt-BR",
+      "name": "Português (Brasil)",
+      "path": "lang/pt-BR.json"
+    },
+    {
+      "lang": "en",
+      "name": "English",
+      "path": "lang/en.json"
+    }
+  ],
+  "documentTypes": {
+    "Actor": {
+      "character": {},
+      "npc": {}
+    },
+    "Item": {
+      "power": {},
+      "trait": {},
+      "tag": {},
+      "origin": {},
+      "occupation": {},
+      "weapon": {},
+      "gear": {}
+    }
+  },
+  "socket": true,
+  "primaryTokenAttribute": "health",
+  "secondaryTokenAttribute": "focus"
+}

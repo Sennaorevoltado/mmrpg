@@ -1,0 +1,19 @@
+<div class="mmrpg-detail-grid">
+  <label class="mmrpg-field wide">
+    <span>{{localize "MMRPG.Item.examples"}}</span>
+    <input type="text" name="system.examples" value="{{source.examples}}" {{#unless editable}}disabled{{/unless}}>
+  </label>
+  <label class="mmrpg-field">
+    <span>{{localize "MMRPG.Item.suggestedOccupation"}}</span>
+    <input type="text" name="system.suggestedOccupation" value="{{source.suggestedOccupation}}" {{#unless editable}}disabled{{/unless}}>
+  </label>
+  <label class="mmrpg-field">
+    <span>{{localize "MMRPG.Item.minimumRank"}}</span>
+    <input type="number" name="system.minimumRank" value="{{source.minimumRank}}" min="0" step="1" {{#unless editable}}disabled{{/unless}}>
+  </label>
+  <label class="mmrpg-field wide">
+    <span>{{localize "MMRPG.Item.limitation"}}</span>
+    <input type="text" name="system.limitation" value="{{source.limitation}}" {{#unless editable}}disabled{{/unless}}>
+  </label>
+</div>
+{{> "systems/mmrpg/templates/item/grants.hbs"}}

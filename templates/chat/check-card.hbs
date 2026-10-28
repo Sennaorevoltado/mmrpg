@@ -1,0 +1,10 @@
+<div class="mmrpg-card mmrpg-check-card">
+  <header class="mmrpg-card-header">
+    <img src="{{actor.img}}" alt="">
+    <div>
+      <h3>{{title}}</h3>
+      <span class="mmrpg-muted">{{actor.name}}{{#if subtitle}} · {{subtitle}}{{/if}}</span>
+    </div>
+  </header>
+  {{> "systems/mmrpg/templates/dice/roll.hbs" roll}}
+</div>

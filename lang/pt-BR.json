@@ -1,0 +1,483 @@
+{
+  "MMRPG": {
+    "Ability": {
+      "agl": {
+        "abbr": "AGI",
+        "long": "Agilidade"
+      },
+      "ego": {
+        "abbr": "EGO",
+        "long": "Ego"
+      },
+      "log": {
+        "abbr": "LOG",
+        "long": "Lógica"
+      },
+      "mle": {
+        "abbr": "CAC",
+        "long": "Corpo a Corpo"
+      },
+      "res": {
+        "abbr": "RES",
+        "long": "Resiliência"
+      },
+      "vig": {
+        "abbr": "VIG",
+        "long": "Vigilância"
+      }
+    },
+    "Action": {
+      "activation": "Ativação",
+      "add": "Adicionar ação",
+      "addEffect": "Adicionar efeito",
+      "areaShape": "Forma da área",
+      "areaSize": "Tamanho da área",
+      "attackKind": "Tipo de ataque",
+      "copy": "cópia",
+      "damage": "Dano",
+      "damageAbility": "Atributo (vazio = o da rolagem)",
+      "damageResource": "Recurso atingido",
+      "description": "Descrição",
+      "difficulty": "Dificuldade",
+      "duplicate": "Duplicar",
+      "edge": "Edge / Trouble",
+      "effectChanges": "Modificações (Active Effect)",
+      "effectName": "Nome do efeito",
+      "effectNote": "Nota no chat",
+      "effectRounds": "Duração (rodadas, 0 = manual)",
+      "effectStatus": "Condição aplicada",
+      "effectTarget": "Quem recebe",
+      "effectWhen": "Quando dispara",
+      "effects": "Efeitos",
+      "element": "Elemento",
+      "fantasticFactor": "Fator do Fantástico",
+      "flat": "Bônus fixo",
+      "healing": "Cura",
+      "healingMode": "Cálculo da cura",
+      "healingResource": "Recurso curado",
+      "healingTarget": "Quem é curado",
+      "hint": "Cada ação descreve uma rolagem, o que ela causa e o que custa. O personagem escolhe a ação ao usar o item.",
+      "multiplierBonus": "Bônus no multiplicador",
+      "name": "Nome da ação",
+      "nameHint": "Vazio = nome do item",
+      "noEffects": "Nenhum efeito.",
+      "none": "Este item ainda não tem ações.",
+      "rangeDistance": "Alcance máximo (unidades da cena, 0 = sem aviso)",
+      "rangeText": "Alcance (texto)",
+      "removeEffect": "Remover efeito",
+      "rollAbility": "Atributo da rolagem",
+      "rollBonus": "Bônus na rolagem",
+      "rollMode": "Rolagem",
+      "sameAsRoll": "Mesmo da rolagem",
+      "targetCount": "Máximo de alvos (0 = sem limite)",
+      "targetDefense": "Defesa do alvo",
+      "targetType": "Alvo",
+      "unnamed": "Ação sem nome",
+      "usesMax": "Usos máximos (0 = ilimitado)",
+      "usesValue": "Usos restantes"
+    },
+    "ActionEditor": {
+      "cost": "Custo e usos",
+      "general": "Geral",
+      "missing": "Esta ação não existe mais.",
+      "roll": "Rolagem",
+      "rollHint": "Ataque soma o valor de ataque do atributo; teste soma o bônus fora de combate. Edge e Trouble da ficha e do diálogo se anulam.",
+      "targeting": "Alvo e alcance",
+      "title": "Ação — {name}",
+      "usesHint": "O custo é cobrado ao usar. Usos limitados são restaurados na ficha do personagem."
+    },
+    "ActionRoll": {
+      "attack": "Ataque contra defesa",
+      "check": "Teste contra dificuldade",
+      "none": "Sem rolagem"
+    },
+    "Activation": {
+      "action": "Ação",
+      "attack": "Ataque",
+      "free": "Ação livre",
+      "other": "Outro",
+      "passive": "Passivo",
+      "reaction": "Reação"
+    },
+    "Area": {
+      "circle": "Círculo",
+      "cone": "Cone",
+      "ray": "Linha",
+      "rect": "Retângulo"
+    },
+    "AttackKind": {
+      "area": "Em área",
+      "close": "Corpo a corpo",
+      "ranged": "À distância"
+    },
+    "Card": {
+      "against": "contra",
+      "applied": "Aplicado",
+      "apply": "Aplicar",
+      "applyAll": "Aplicar tudo",
+      "area": "Área de efeito",
+      "damageTo": "de dano em",
+      "defense": "Defesa",
+      "difficulty": "Dificuldade",
+      "elementFantastic": "Efeito elemental do Fantástico",
+      "failure": "Falha",
+      "healTo": "de cura em",
+      "hit": "Acerta",
+      "miss": "Erra",
+      "noTargets": "Nenhum alvo marcado: valor de dano sem defesa do alvo.",
+      "placeTemplate": "Colocar gabarito",
+      "reduction": "redução",
+      "self": "Em si mesmo",
+      "success": "Sucesso",
+      "uses": "Usos"
+    },
+    "ChangeType": {
+      "add": "Somar",
+      "downgrade": "No máximo",
+      "multiply": "Multiplicar",
+      "override": "Substituir",
+      "upgrade": "Pelo menos"
+    },
+    "Dialog": {
+      "bonus": "Bônus ou penalidade",
+      "deleteItem": "Excluir \"{name}\"?",
+      "deleteTitle": "Excluir item",
+      "edgeInherited": "Já vem da ficha",
+      "edgeMode": "Edge / Trouble",
+      "roll": "Rolar",
+      "shiftHint": "Segure Shift ao clicar para rolar sem este diálogo.",
+      "visibility": "Visibilidade"
+    },
+    "Edge": {
+      "edge": "Vantagem (Edge)",
+      "edgeShort": "Edge",
+      "normal": "Normal",
+      "trouble": "Desvantagem (Trouble)",
+      "troubleShort": "Trouble"
+    },
+    "Effect": {
+      "generic": "Efeito",
+      "timed": "com duração"
+    },
+    "EffectTarget": {
+      "self": "Si mesmo",
+      "targets": "Alvos"
+    },
+    "EffectWhen": {
+      "always": "Sempre",
+      "failure": "Em caso de falha",
+      "fantastic": "Em resultado Fantástico",
+      "hit": "Ao acertar (ou passar no teste)",
+      "miss": "Ao errar (ou falhar no teste)",
+      "success": "Em caso de sucesso"
+    },
+    "Element": {
+      "air": "Ar",
+      "chemical": "Químico",
+      "earth": "Terra",
+      "electricity": "Eletricidade",
+      "energy": "Energia",
+      "fire": "Fogo",
+      "force": "Força",
+      "hellfire": "Fogo Infernal",
+      "ice": "Gelo",
+      "iron": "Ferro",
+      "none": "Nenhum",
+      "sound": "Som",
+      "swarm": "Enxame",
+      "toxin": "Toxina",
+      "water": "Água"
+    },
+    "HealingMode": {
+      "flat": "Valor fixo",
+      "marvel": "Dado Marvel × multiplicador"
+    },
+    "Importer": {
+      "done": "Importação concluída: {created} criados, {updated} atualizados, {skipped} ignorados.",
+      "dupCreate": "Criar cópia",
+      "dupSkip": "Ignorar",
+      "dupUpdate": "Atualizar o existente",
+      "export": "Exportar itens do mundo",
+      "exportTitle": "Exportar",
+      "file": "Arquivo de conteúdo (.json)",
+      "hint": "Importe e exporte o seu próprio conteúdo (poderes, traços, tags, origens…).",
+      "importTitle": "Importar",
+      "intro": "Este sistema não traz conteúdo dos livros. Monte um arquivo no formato descrito em docs/IMPORTACAO.md com o seu próprio material e importe aqui.",
+      "onDuplicate": "Se já existir um item com o mesmo tipo e nome",
+      "open": "Importar conteúdo",
+      "pickTypes": "Marque ao menos um tipo.",
+      "report": "Criados: {created}. Atualizados: {updated}. Ignorados: {skipped}.",
+      "run": "Importar",
+      "title": "Importar e exportar conteúdo",
+      "unresolved": "Concessão sem item correspondente"
+    },
+    "Info": {
+      "targetLimit": "Esta ação aceita no máximo {count} alvos; usando os primeiros.",
+      "templatePlaced": "Gabarito colocado no mapa; arraste para ajustar.",
+      "usesReset": "Usos restaurados."
+    },
+    "Item": {
+      "category": "Categoria",
+      "duration": "Duração",
+      "effectsHint": "Efeitos marcados como transferidos valem para o personagem que possui o item.",
+      "examples": "Exemplos",
+      "grants": "Concede",
+      "grantsHint": "Arraste traços, tags e poderes para cá. Eles são criados na ficha quando o item é adicionado a um personagem.",
+      "level": "Nível",
+      "limitation": "Limitação",
+      "minimumRank": "Rank mínimo",
+      "multiple": "Pode ser escolhido mais de uma vez",
+      "noGrants": "Nada concedido.",
+      "powerSet": "Conjunto de poderes",
+      "prerequisites": "Pré-requisitos",
+      "price": "Preço",
+      "quantity": "Quantidade",
+      "range": "Alcance",
+      "rarity": "Raridade",
+      "reach": "Alcance corpo a corpo",
+      "recommendedRank": "Rank recomendado",
+      "restriction": "Restrição",
+      "source": "Fonte",
+      "suggestedOccupation": "Ocupação sugerida",
+      "transfer": "Transferido",
+      "unlinked": "sem vínculo",
+      "weaponKind": "Tipo de arma"
+    },
+    "Movement": {
+      "climb": "Escalada",
+      "flight": "Voo",
+      "glide": "Planar",
+      "jump": "Salto",
+      "levitation": "Levitação",
+      "run": "Corrida",
+      "swim": "Natação",
+      "swingline": "Balanço"
+    },
+    "MovementMode": {
+      "double": "Dobro da corrida",
+      "fixed": "Valor fixo",
+      "full": "Igual à corrida",
+      "half": "Metade da corrida",
+      "rank": "Base × Rank",
+      "triple": "Triplo da corrida"
+    },
+    "PowerSet": {
+      "basic": "Básicos",
+      "elementalControl": "Controle Elemental",
+      "healing": "Cura",
+      "illusion": "Ilusão",
+      "luck": "Sorte",
+      "magic": "Magia",
+      "martialArts": "Artes Marciais",
+      "meleeWeapons": "Armas Corpo a Corpo",
+      "narrative": "Narrativos",
+      "omniversalTravel": "Viagem Omniversal",
+      "phasing": "Intangibilidade",
+      "plasticity": "Plasticidade",
+      "powerControl": "Controle de Poder",
+      "rangedWeapons": "Armas à Distância",
+      "resize": "Mudança de Tamanho",
+      "shieldBearer": "Portador de Escudo",
+      "sixthSense": "Sexto Sentido",
+      "spiderPowers": "Poderes de Aranha",
+      "superSpeed": "Super-Velocidade",
+      "superStrength": "Super-Força",
+      "tactics": "Tática",
+      "telekinesis": "Telecinese",
+      "telepathy": "Telepatia",
+      "teleportation": "Teletransporte",
+      "translation": "Tradução",
+      "weatherControl": "Controle do Clima"
+    },
+    "Resource": {
+      "focus": "Foco",
+      "health": "Saúde",
+      "karma": "Karma"
+    },
+    "Roll": {
+      "attack": "Ataque",
+      "check": "Teste",
+      "fantastic": "Fantástico",
+      "private": "Rolagem oculta",
+      "rerollDie": "Re-rolar este dado",
+      "rerolled": "Re-rolado",
+      "ultimate": "Ultimate"
+    },
+    "Settings": {
+      "autoApply": {
+        "hint": "Aplica dano, cura e efeitos aos alvos assim que a ação é rolada, sem clicar em Aplicar.",
+        "name": "Aplicar resultados automaticamente"
+      },
+      "autoDefeat": {
+        "hint": "Marca o NPC como derrotado quando a Saúde chega a 0 ou menos.",
+        "name": "Derrotar NPCs com 0 de Saúde"
+      }
+    },
+    "Sheet": {
+      "add": "Adicionar",
+      "addPower": "Adicionar poder",
+      "attack": "Ataque",
+      "base": "Base de operações",
+      "biography": "Biografia",
+      "category": "Categoria",
+      "changeImage": "Trocar imagem",
+      "character": "Ficha de personagem",
+      "conditions": "Condições",
+      "damage": "Dano",
+      "defense": "Defesa",
+      "delete": "Excluir",
+      "edit": "Editar",
+      "effects": "Efeitos",
+      "empty": "Nada por aqui.",
+      "equipped": "Em uso",
+      "eyes": "Olhos",
+      "features": "Marcas distintivas",
+      "gear": "Equipamentos",
+      "gender": "Gênero",
+      "hair": "Cabelo",
+      "height": "Altura",
+      "initiative": "Iniciativa",
+      "initiativeBonus": "Bônus de iniciativa",
+      "item": "Ficha de item",
+      "modifiers": "Modificadores",
+      "modifiersHint": "Bônus fixos que somam aos valores calculados. Efeitos ativos também podem alterar estes campos.",
+      "movement": "Movimento",
+      "movementActive": "Ativo",
+      "movementBase": "Base",
+      "movementBonus": "Bônus",
+      "movementMode": "Cálculo",
+      "movementType": "Tipo",
+      "movementValue": "Total",
+      "multiplier": "Multiplicador",
+      "name": "Nome",
+      "noPowers": "Nenhum poder ainda.",
+      "noncombat": "Fora de combate",
+      "notes": "Anotações",
+      "npc": "Ficha de NPC",
+      "occupation": "Ocupação",
+      "origin": "Origem",
+      "personality": "Personalidade",
+      "rank": "Rank",
+      "reach": "Alcance",
+      "realName": "Nome verdadeiro",
+      "reduction": "Redução de dano",
+      "resetUses": "Restaurar usos limitados",
+      "rollAttack": "Rolar ataque",
+      "rollCheck": "Rolar teste",
+      "rollInitiative": "Rolar iniciativa",
+      "size": "Tamanho",
+      "tags": "Tags",
+      "team": "Equipe",
+      "teams": "Equipes",
+      "toggle": "Ligar/desligar",
+      "traits": "Traços",
+      "useAction": "Usar",
+      "weapons": "Armas",
+      "weight": "Peso"
+    },
+    "Size": {
+      "average": "Médio",
+      "big": "Grande",
+      "gargantuan": "Colossal",
+      "gigantic": "Gigantesco",
+      "huge": "Enorme",
+      "little": "Pequenino",
+      "microscopic": "Microscópico",
+      "miniature": "Miniatura",
+      "small": "Pequeno",
+      "tiny": "Minúsculo",
+      "titanic": "Titânico"
+    },
+    "Status": {
+      "blinded": "Cego",
+      "burning": "Em chamas",
+      "corroding": "Corroendo",
+      "dead": "Derrotado",
+      "deafened": "Surdo",
+      "frightened": "Amedrontado",
+      "none": "Nenhuma",
+      "paralyzed": "Paralisado",
+      "pinned": "Imobilizado",
+      "poisoned": "Envenenado",
+      "prone": "Caído",
+      "slowed": "Lento",
+      "stunned": "Atordoado",
+      "surprised": "Surpreso"
+    },
+    "Tabs": {
+      "actions": "Ações",
+      "bio": "Biografia",
+      "description": "Descrição",
+      "details": "Detalhes",
+      "effects": "Efeitos",
+      "gear": "Equipamento",
+      "main": "Principal",
+      "mods": "Modificadores",
+      "notes": "Anotações",
+      "powers": "Poderes",
+      "traits": "Traços e tags"
+    },
+    "TargetType": {
+      "area": "Área",
+      "self": "O próprio personagem",
+      "targets": "Alvos marcados"
+    },
+    "TeamManeuver": {
+      "card": "Nível {level} — {cost} de Foco por integrante",
+      "cardRank": "Rank médio recomendado: {min} a {max}",
+      "defensive": {
+        "name": "Manobra defensiva"
+      },
+      "intro": "Cada integrante paga o custo em Foco. Marque os tokens da equipe no mapa. O texto da regra fica no seu livro.",
+      "lacking": "Foco insuficiente: {names}.",
+      "level": "Nível",
+      "levelLabel": "Nível {level} — {cost} de Foco cada (Rank médio {min} a {max})",
+      "members": "Integrantes",
+      "notOwner": "Sem permissão sobre: {names}.",
+      "offensive": {
+        "name": "Manobra ofensiva"
+      },
+      "rally": {
+        "name": "Reagrupar"
+      },
+      "title": "Manobra de equipe",
+      "type": "Tipo",
+      "use": "Usar ({cost} de Foco cada)"
+    },
+    "Warn": {
+      "alreadyApplied": "Este cartão já teve efeitos aplicados; não dá para re-rolar.",
+      "gmOnly": "Apenas o GM pode abrir esta janela.",
+      "itemNotFound": "Item não encontrado ou sem personagem.",
+      "noAction": "Este item não tem ação.",
+      "noActor": "O item precisa estar na ficha de um personagem.",
+      "noGM": "Nenhum GM ativo para aplicar o resultado.",
+      "noResource": "{resource} insuficiente.",
+      "noToken": "Nenhum token deste personagem na cena.",
+      "noUses": "Sem usos restantes.",
+      "notGrantable": "Só traços, tags e poderes podem ser concedidos.",
+      "outOfRange": "{name} está a {distance}, além do alcance ({range}).",
+      "selectToken": "Selecione ao menos um token."
+    },
+    "WeaponKind": {
+      "close": "Corpo a corpo",
+      "other": "Outra",
+      "ranged": "À distância",
+      "thrown": "Arremesso"
+    }
+  },
+  "TYPES": {
+    "Actor": {
+      "character": "Personagem",
+      "npc": "NPC"
+    },
+    "Item": {
+      "gear": "Equipamento",
+      "occupation": "Ocupação",
+      "origin": "Origem",
+      "power": "Poder",
+      "tag": "Tag",
+      "trait": "Traço",
+      "weapon": "Arma"
+    }
+  }
+}

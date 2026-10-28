@@ -1,0 +1,171 @@
+{
+  "format": "mmrpg-content",
+  "version": 1,
+  "source": "Exemplo inventado para mostrar o formato. Não vem de nenhum livro.",
+  "items": [
+    {
+      "type": "trait",
+      "name": "Traço de Exemplo",
+      "folder": "Exemplo/Traços",
+      "system": {
+        "description": "<p>Texto de demonstração. Troque pelo seu próprio.</p>",
+        "restriction": ""
+      }
+    },
+    {
+      "type": "tag",
+      "name": "Tag de Exemplo",
+      "folder": "Exemplo/Tags",
+      "system": {
+        "description": "<p>Texto de demonstração.</p>",
+        "restriction": "",
+        "rarity": ""
+      }
+    },
+    {
+      "type": "origin",
+      "name": "Origem de Exemplo",
+      "folder": "Exemplo/Origens",
+      "system": {
+        "description": "<p>Ao entrar na ficha, esta origem cria também o traço e o poder abaixo (ligados pelo tipo e pelo nome).</p>",
+        "grants": [
+          { "type": "trait", "name": "Traço de Exemplo" },
+          { "type": "power", "name": "Raio de Exemplo" }
+        ]
+      }
+    },
+    {
+      "type": "occupation",
+      "name": "Ocupação de Exemplo",
+      "folder": "Exemplo/Ocupações",
+      "system": {
+        "description": "<p>Texto de demonstração.</p>",
+        "grants": [{ "type": "tag", "name": "Tag de Exemplo" }]
+      }
+    },
+    {
+      "type": "power",
+      "name": "Raio de Exemplo",
+      "folder": "Exemplo/Poderes",
+      "system": {
+        "powerSet": "basic",
+        "description": "<p>Ataque à distância que causa dano e deixa o alvo lento se acertar.</p>",
+        "actions": [
+          {
+            "name": "Disparar",
+            "activation": "attack",
+            "target": { "type": "targets", "count": 1, "range": "à vista", "distance": 0 },
+            "roll": { "mode": "attack", "ability": "agl", "kind": "ranged", "targetDefense": "agl" },
+            "damage": { "enabled": true, "ability": "", "multiplierBonus": 0, "flat": 0, "resource": "health", "element": "energy" },
+            "cost": { "focus": 1 },
+            "effects": [
+              { "name": "Atingido", "when": "hit", "target": "targets", "status": "slowed", "rounds": 2 }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "type": "power",
+      "name": "Respirar Fundo",
+      "folder": "Exemplo/Poderes",
+      "system": {
+        "powerSet": "healing",
+        "description": "<p>Cura fixa em si mesmo, com limite de usos.</p>",
+        "actions": [
+          {
+            "name": "Recuperar",
+            "activation": "action",
+            "target": { "type": "self" },
+            "roll": { "mode": "none" },
+            "healing": { "enabled": true, "mode": "flat", "resource": "health", "target": "self", "flat": 4 },
+            "uses": { "max": 3 }
+          }
+        ]
+      }
+    },
+    {
+      "type": "power",
+      "name": "Teste de Foco",
+      "folder": "Exemplo/Poderes",
+      "system": {
+        "powerSet": "basic",
+        "description": "<p>Teste de atributo contra dificuldade fixa; no sucesso, concede um bônus temporário via Active Effect.</p>",
+        "actions": [
+          {
+            "name": "Concentrar",
+            "activation": "action",
+            "target": { "type": "self" },
+            "roll": { "mode": "check", "ability": "log", "difficulty": 9 },
+            "effects": [
+              {
+                "name": "Concentrado",
+                "when": "success",
+                "target": "self",
+                "rounds": 3,
+                "changes": [{ "key": "system.abilities.mle.attackBonus", "type": "add", "value": "1" }]
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "type": "power",
+      "name": "Onda de Exemplo",
+      "folder": "Exemplo/Poderes",
+      "system": {
+        "powerSet": "basic",
+        "description": "<p>Ataque em área: o cartão oferece um botão para posicionar o gabarito no mapa.</p>",
+        "actions": [
+          {
+            "name": "Onda",
+            "activation": "attack",
+            "target": { "type": "area" },
+            "area": { "shape": "cone", "size": 20 },
+            "roll": { "mode": "attack", "ability": "ego", "kind": "area", "targetDefense": "agl" },
+            "damage": { "enabled": true, "resource": "health", "element": "" },
+            "cost": { "focus": 2 }
+          }
+        ]
+      }
+    },
+    {
+      "type": "weapon",
+      "name": "Arma de Exemplo",
+      "folder": "Exemplo/Armas",
+      "system": {
+        "description": "<p>Arma de demonstração.</p>",
+        "kind": "close",
+        "quantity": 1,
+        "actions": [
+          {
+            "name": "Golpear",
+            "activation": "attack",
+            "roll": { "mode": "attack", "ability": "mle", "kind": "close", "targetDefense": "agl" },
+            "damage": { "enabled": true }
+          }
+        ]
+      }
+    },
+    {
+      "type": "gear",
+      "name": "Equipamento de Exemplo",
+      "folder": "Exemplo/Equipamentos",
+      "system": {
+        "description": "<p>Equipamento de demonstração com uma ação que só cura.</p>",
+        "quantity": 2,
+        "actions": [
+          {
+            "name": "Usar",
+            "activation": "action",
+            "target": { "type": "self" },
+            "roll": { "mode": "none" },
+            "healing": { "enabled": true, "mode": "flat", "resource": "health", "target": "self", "flat": 3 },
+            "uses": { "max": 2 }
+          }
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,47 @@
+<section class="mmrpg-abilities">
+  {{#each abilities}}
+    <div class="mmrpg-ability" data-ability="{{key}}">
+      <div class="mmrpg-ability-head">
+        <button type="button" class="mmrpg-ability-name" data-action="rollAbility" data-ability="{{key}}" data-kind="noncom" title="{{localize 'MMRPG.Sheet.rollCheck'}}">
+          {{label}}
+        </button>
+        <span class="mmrpg-muted">{{abbr}}</span>
+      </div>
+      <input class="mmrpg-ability-value" type="number" name="system.abilities.{{key}}.value" value="{{source.value}}" step="1" {{#unless ../editable}}disabled{{/unless}}>
+      <dl class="mmrpg-ability-derived">
+        <div>
+          <dt>{{localize "MMRPG.Sheet.defense"}}</dt>
+          <dd>{{defense}}</dd>
+        </div>
+        <div>
+          <dt>{{localize "MMRPG.Sheet.noncombat"}}</dt>
+          <dd>{{mmrpgSigned noncom}}</dd>
+        </div>
+        {{#if isAttack}}
+          <div>
+            <dt>{{localize "MMRPG.Sheet.attack"}}</dt>
+            <dd>
+              <button type="button" class="mmrpg-roll-button small" data-action="rollAbility" data-ability="{{key}}" data-kind="attack" title="{{localize 'MMRPG.Sheet.rollAttack'}}">
+                <i class="fa-solid fa-dice"></i> {{mmrpgSigned attack}}
+              </button>
+            </dd>
+          </div>
+        {{/if}}
+        <div>
+          <dt>{{localize "MMRPG.Sheet.multiplier"}}</dt>
+          <dd>×{{multiplier}}</dd>
+        </div>
+      </dl>
+      <div class="mmrpg-edge-toggles">
+        <label title="{{localize 'MMRPG.Edge.edge'}}">
+          <input type="checkbox" name="system.abilities.{{key}}.edge" {{#if source.edge}}checked{{/if}} {{#unless ../editable}}disabled{{/unless}}>
+          <span>{{localize "MMRPG.Edge.edgeShort"}}</span>
+        </label>
+        <label title="{{localize 'MMRPG.Edge.trouble'}}">
+          <input type="checkbox" name="system.abilities.{{key}}.trouble" {{#if source.trouble}}checked{{/if}} {{#unless ../editable}}disabled{{/unless}}>
+          <span>{{localize "MMRPG.Edge.troubleShort"}}</span>
+        </label>
+      </div>
+    </div>
+  {{/each}}
+</section>

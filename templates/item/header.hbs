@@ -1,0 +1,15 @@
+<header class="mmrpg-header item-header">
+  <div class="mmrpg-portrait small">
+    <img src="{{item.img}}" alt="{{item.name}}" data-action="editImage" data-edit="img" title="{{localize 'MMRPG.Sheet.changeImage'}}">
+  </div>
+  <div class="mmrpg-header-main">
+    <input class="mmrpg-name" type="text" name="name" value="{{item.name}}" placeholder="{{localize 'MMRPG.Sheet.name'}}" {{#unless editable}}disabled{{/unless}}>
+    <div class="mmrpg-header-row">
+      <span class="mmrpg-chip">{{typeLabel}}</span>
+      <label class="mmrpg-field inline grow">
+        <span>{{localize "MMRPG.Item.source"}}</span>
+        <input type="text" name="system.source" value="{{source.source}}" {{#unless editable}}disabled{{/unless}}>
+      </label>
+    </div>
+  </div>
+</header>

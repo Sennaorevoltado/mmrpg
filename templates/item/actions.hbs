@@ -1,0 +1,53 @@
+<section class="mmrpg-actions-list">
+  <header class="mmrpg-section-head">
+    <h3>{{localize "MMRPG.Tabs.actions"}}</h3>
+    {{#if editable}}
+      <button type="button" class="mmrpg-icon-button" data-action="addAction" title="{{localize 'MMRPG.Action.add'}}">
+        <i class="fa-solid fa-plus"></i>
+      </button>
+    {{/if}}
+  </header>
+  <p class="mmrpg-muted">{{localize "MMRPG.Action.hint"}}</p>
+  {{#if actions.length}}
+    <ul class="mmrpg-item-list">
+      {{#each actions}}
+        <li class="mmrpg-item">
+          <div class="mmrpg-item-main">
+            <div class="mmrpg-item-title">
+              <a class="mmrpg-item-name" data-action="editAction" data-action-id="{{id}}">{{label}}</a>
+              <span class="mmrpg-muted">{{activation}}</span>
+            </div>
+            <div class="mmrpg-badges">
+              <span class="mmrpg-chip">{{rollSummary}}</span>
+              {{#if damage}}<span class="mmrpg-chip">{{localize "MMRPG.Action.damage"}}</span>{{/if}}
+              {{#if healing}}<span class="mmrpg-chip">{{localize "MMRPG.Action.healing"}}</span>{{/if}}
+              {{#if effects}}<span class="mmrpg-chip">{{localize "MMRPG.Action.effects"}} {{effects}}</span>{{/if}}
+              {{#if costs}}<span class="mmrpg-chip cost">{{costs}}</span>{{/if}}
+              {{#if uses}}<span class="mmrpg-chip">{{localize "MMRPG.Card.uses"}} {{uses}}</span>{{/if}}
+            </div>
+          </div>
+          <div class="mmrpg-item-controls">
+            {{#if ../isEmbedded}}
+              <button type="button" class="mmrpg-icon-button" data-action="useAction" data-action-id="{{id}}" title="{{localize 'MMRPG.Sheet.useAction'}}">
+                <i class="fa-solid fa-bolt"></i>
+              </button>
+            {{/if}}
+            <button type="button" class="mmrpg-icon-button" data-action="editAction" data-action-id="{{id}}" title="{{localize 'MMRPG.Sheet.edit'}}">
+              <i class="fa-solid fa-pen-to-square"></i>
+            </button>
+            {{#if ../editable}}
+              <button type="button" class="mmrpg-icon-button" data-action="duplicateAction" data-action-id="{{id}}" title="{{localize 'MMRPG.Action.duplicate'}}">
+                <i class="fa-solid fa-copy"></i>
+              </button>
+              <button type="button" class="mmrpg-icon-button" data-action="removeAction" data-action-id="{{id}}" title="{{localize 'MMRPG.Sheet.delete'}}">
+                <i class="fa-solid fa-trash"></i>
+              </button>
+            {{/if}}
+          </div>
+        </li>
+      {{/each}}
+    </ul>
+  {{else}}
+    <p class="mmrpg-empty">{{localize "MMRPG.Action.none"}}</p>
+  {{/if}}
+</section>

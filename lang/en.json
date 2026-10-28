@@ -1,0 +1,483 @@
+{
+  "MMRPG": {
+    "Ability": {
+      "agl": {
+        "abbr": "AGL",
+        "long": "Agility"
+      },
+      "ego": {
+        "abbr": "EGO",
+        "long": "Ego"
+      },
+      "log": {
+        "abbr": "LOG",
+        "long": "Logic"
+      },
+      "mle": {
+        "abbr": "MLE",
+        "long": "Melee"
+      },
+      "res": {
+        "abbr": "RES",
+        "long": "Resilience"
+      },
+      "vig": {
+        "abbr": "VIG",
+        "long": "Vigilance"
+      }
+    },
+    "Action": {
+      "activation": "Activation",
+      "add": "Add action",
+      "addEffect": "Add effect",
+      "areaShape": "Area shape",
+      "areaSize": "Area size",
+      "attackKind": "Attack kind",
+      "copy": "copy",
+      "damage": "Damage",
+      "damageAbility": "Ability (blank = roll's)",
+      "damageResource": "Resource hit",
+      "description": "Description",
+      "difficulty": "Difficulty",
+      "duplicate": "Duplicate",
+      "edge": "Edge / Trouble",
+      "effectChanges": "Changes (Active Effect)",
+      "effectName": "Effect name",
+      "effectNote": "Chat note",
+      "effectRounds": "Duration (rounds, 0 = manual)",
+      "effectStatus": "Condition applied",
+      "effectTarget": "Who receives",
+      "effectWhen": "When it triggers",
+      "effects": "Effects",
+      "element": "Element",
+      "fantasticFactor": "Fantastic factor",
+      "flat": "Flat bonus",
+      "healing": "Healing",
+      "healingMode": "Healing calculation",
+      "healingResource": "Resource healed",
+      "healingTarget": "Who is healed",
+      "hint": "Each action describes a roll, what it causes and what it costs. The character picks the action when using the item.",
+      "multiplierBonus": "Multiplier bonus",
+      "name": "Action name",
+      "nameHint": "Blank = item name",
+      "noEffects": "No effects.",
+      "none": "This item has no actions yet.",
+      "rangeDistance": "Max range (scene units, 0 = no warning)",
+      "rangeText": "Range (text)",
+      "removeEffect": "Remove effect",
+      "rollAbility": "Roll ability",
+      "rollBonus": "Roll bonus",
+      "rollMode": "Roll",
+      "sameAsRoll": "Same as roll",
+      "targetCount": "Max targets (0 = unlimited)",
+      "targetDefense": "Target defense",
+      "targetType": "Target",
+      "unnamed": "Unnamed action",
+      "usesMax": "Max uses (0 = unlimited)",
+      "usesValue": "Uses left"
+    },
+    "ActionEditor": {
+      "cost": "Cost & uses",
+      "general": "General",
+      "missing": "This action no longer exists.",
+      "roll": "Roll",
+      "rollHint": "Attacks add the ability's attack value; checks add the non-combat bonus. Edge and Trouble from the sheet and the dialog cancel each other.",
+      "targeting": "Target & range",
+      "title": "Action — {name}",
+      "usesHint": "Cost is paid on use. Limited uses are restored from the character sheet."
+    },
+    "ActionRoll": {
+      "attack": "Attack vs. defense",
+      "check": "Check vs. difficulty",
+      "none": "No roll"
+    },
+    "Activation": {
+      "action": "Action",
+      "attack": "Attack",
+      "free": "Free action",
+      "other": "Other",
+      "passive": "Passive",
+      "reaction": "Reaction"
+    },
+    "Area": {
+      "circle": "Circle",
+      "cone": "Cone",
+      "ray": "Line",
+      "rect": "Rectangle"
+    },
+    "AttackKind": {
+      "area": "Area",
+      "close": "Close",
+      "ranged": "Ranged"
+    },
+    "Card": {
+      "against": "against",
+      "applied": "Applied",
+      "apply": "Apply",
+      "applyAll": "Apply all",
+      "area": "Area of effect",
+      "damageTo": "damage to",
+      "defense": "Defense",
+      "difficulty": "Difficulty",
+      "elementFantastic": "Fantastic elemental effect",
+      "failure": "Failure",
+      "healTo": "healing to",
+      "hit": "Hit",
+      "miss": "Miss",
+      "noTargets": "No target selected: damage shown without target reduction.",
+      "placeTemplate": "Place template",
+      "reduction": "reduction",
+      "self": "On self",
+      "success": "Success",
+      "uses": "Uses"
+    },
+    "ChangeType": {
+      "add": "Add",
+      "downgrade": "Downgrade (at most)",
+      "multiply": "Multiply",
+      "override": "Override",
+      "upgrade": "Upgrade (at least)"
+    },
+    "Dialog": {
+      "bonus": "Bonus or penalty",
+      "deleteItem": "Delete \"{name}\"?",
+      "deleteTitle": "Delete item",
+      "edgeInherited": "Already from the sheet",
+      "edgeMode": "Edge / Trouble",
+      "roll": "Roll",
+      "shiftHint": "Hold Shift when clicking to roll without this dialog.",
+      "visibility": "Visibility"
+    },
+    "Edge": {
+      "edge": "Edge",
+      "edgeShort": "Edge",
+      "normal": "Normal",
+      "trouble": "Trouble",
+      "troubleShort": "Trouble"
+    },
+    "Effect": {
+      "generic": "Effect",
+      "timed": "timed"
+    },
+    "EffectTarget": {
+      "self": "Self",
+      "targets": "Targets"
+    },
+    "EffectWhen": {
+      "always": "Always",
+      "failure": "On failure",
+      "fantastic": "On Fantastic result",
+      "hit": "On hit (or passed check)",
+      "miss": "On miss (or failed check)",
+      "success": "On success"
+    },
+    "Element": {
+      "air": "Air",
+      "chemical": "Chemical",
+      "earth": "Earth",
+      "electricity": "Electricity",
+      "energy": "Energy",
+      "fire": "Fire",
+      "force": "Force",
+      "hellfire": "Hellfire",
+      "ice": "Ice",
+      "iron": "Iron",
+      "none": "None",
+      "sound": "Sound",
+      "swarm": "Swarm",
+      "toxin": "Toxin",
+      "water": "Water"
+    },
+    "HealingMode": {
+      "flat": "Flat value",
+      "marvel": "Marvel die × multiplier"
+    },
+    "Importer": {
+      "done": "Import finished: {created} created, {updated} updated, {skipped} skipped.",
+      "dupCreate": "Create a copy",
+      "dupSkip": "Skip",
+      "dupUpdate": "Update the existing one",
+      "export": "Export world items",
+      "exportTitle": "Export",
+      "file": "Content file (.json)",
+      "hint": "Import and export your own content (powers, traits, tags, origins…).",
+      "importTitle": "Import",
+      "intro": "This system ships no book content. Build a file in the format described in docs/IMPORTACAO.md with your own material and import it here.",
+      "onDuplicate": "If an item with the same type and name exists",
+      "open": "Import content",
+      "pickTypes": "Select at least one type.",
+      "report": "Created: {created}. Updated: {updated}. Skipped: {skipped}.",
+      "run": "Import",
+      "title": "Import & export content",
+      "unresolved": "Grant with no matching item"
+    },
+    "Info": {
+      "targetLimit": "This action accepts at most {count} targets; using the first ones.",
+      "templatePlaced": "Template placed on the map; drag to adjust.",
+      "usesReset": "Uses restored."
+    },
+    "Item": {
+      "category": "Category",
+      "duration": "Duration",
+      "effectsHint": "Effects flagged as transferred apply to the character who owns the item.",
+      "examples": "Examples",
+      "grants": "Grants",
+      "grantsHint": "Drag traits, tags and powers here. They are created on the sheet when this item is added to a character.",
+      "level": "Level",
+      "limitation": "Limitation",
+      "minimumRank": "Minimum Rank",
+      "multiple": "Can be taken more than once",
+      "noGrants": "Nothing granted.",
+      "powerSet": "Power set",
+      "prerequisites": "Prerequisites",
+      "price": "Price",
+      "quantity": "Quantity",
+      "range": "Range",
+      "rarity": "Rarity",
+      "reach": "Reach",
+      "recommendedRank": "Recommended Rank",
+      "restriction": "Restriction",
+      "source": "Source",
+      "suggestedOccupation": "Suggested occupation",
+      "transfer": "Transferred",
+      "unlinked": "unlinked",
+      "weaponKind": "Weapon kind"
+    },
+    "Movement": {
+      "climb": "Climb",
+      "flight": "Flight",
+      "glide": "Glide",
+      "jump": "Jump",
+      "levitation": "Levitation",
+      "run": "Run",
+      "swim": "Swim",
+      "swingline": "Swingline"
+    },
+    "MovementMode": {
+      "double": "Double run",
+      "fixed": "Fixed",
+      "full": "Same as run",
+      "half": "Half of run",
+      "rank": "Base × Rank",
+      "triple": "Triple run"
+    },
+    "PowerSet": {
+      "basic": "Basic",
+      "elementalControl": "Elemental Control",
+      "healing": "Healing",
+      "illusion": "Illusion",
+      "luck": "Luck",
+      "magic": "Magic",
+      "martialArts": "Martial Arts",
+      "meleeWeapons": "Melee Weapons",
+      "narrative": "Narrative",
+      "omniversalTravel": "Omniversal Travel",
+      "phasing": "Phasing",
+      "plasticity": "Plasticity",
+      "powerControl": "Power Control",
+      "rangedWeapons": "Ranged Weapons",
+      "resize": "Resize",
+      "shieldBearer": "Shield Bearer",
+      "sixthSense": "Sixth Sense",
+      "spiderPowers": "Spider-Powers",
+      "superSpeed": "Super-Speed",
+      "superStrength": "Super-Strength",
+      "tactics": "Tactics",
+      "telekinesis": "Telekinesis",
+      "telepathy": "Telepathy",
+      "teleportation": "Teleportation",
+      "translation": "Translation",
+      "weatherControl": "Weather Control"
+    },
+    "Resource": {
+      "focus": "Focus",
+      "health": "Health",
+      "karma": "Karma"
+    },
+    "Roll": {
+      "attack": "Attack",
+      "check": "Check",
+      "fantastic": "Fantastic",
+      "private": "Hidden roll",
+      "rerollDie": "Re-roll this die",
+      "rerolled": "Re-rolled",
+      "ultimate": "Ultimate"
+    },
+    "Settings": {
+      "autoApply": {
+        "hint": "Applies damage, healing and effects to targets as soon as the action is rolled, without clicking Apply.",
+        "name": "Apply results automatically"
+      },
+      "autoDefeat": {
+        "hint": "Marks the NPC as defeated when Health reaches 0 or less.",
+        "name": "Defeat NPCs at 0 Health"
+      }
+    },
+    "Sheet": {
+      "add": "Add",
+      "addPower": "Add power",
+      "attack": "Attack",
+      "base": "Base of operations",
+      "biography": "Biography",
+      "category": "Category",
+      "changeImage": "Change image",
+      "character": "Character sheet",
+      "conditions": "Conditions",
+      "damage": "Damage",
+      "defense": "Defense",
+      "delete": "Delete",
+      "edit": "Edit",
+      "effects": "Effects",
+      "empty": "Nothing here.",
+      "equipped": "Equipped",
+      "eyes": "Eyes",
+      "features": "Distinguishing features",
+      "gear": "Gear",
+      "gender": "Gender",
+      "hair": "Hair",
+      "height": "Height",
+      "initiative": "Initiative",
+      "initiativeBonus": "Initiative bonus",
+      "item": "Item sheet",
+      "modifiers": "Modifiers",
+      "modifiersHint": "Flat bonuses added to the calculated values. Active Effects can also change these fields.",
+      "movement": "Movement",
+      "movementActive": "Active",
+      "movementBase": "Base",
+      "movementBonus": "Bonus",
+      "movementMode": "Calculation",
+      "movementType": "Type",
+      "movementValue": "Total",
+      "multiplier": "Multiplier",
+      "name": "Name",
+      "noPowers": "No powers yet.",
+      "noncombat": "Non-combat",
+      "notes": "Notes",
+      "npc": "NPC sheet",
+      "occupation": "Occupation",
+      "origin": "Origin",
+      "personality": "Personality",
+      "rank": "Rank",
+      "reach": "Reach",
+      "realName": "Real name",
+      "reduction": "Damage reduction",
+      "resetUses": "Restore limited uses",
+      "rollAttack": "Roll attack",
+      "rollCheck": "Roll check",
+      "rollInitiative": "Roll initiative",
+      "size": "Size",
+      "tags": "Tags",
+      "team": "Team",
+      "teams": "Teams",
+      "toggle": "Toggle",
+      "traits": "Traits",
+      "useAction": "Use",
+      "weapons": "Weapons",
+      "weight": "Weight"
+    },
+    "Size": {
+      "average": "Average",
+      "big": "Big",
+      "gargantuan": "Gargantuan",
+      "gigantic": "Gigantic",
+      "huge": "Huge",
+      "little": "Little",
+      "microscopic": "Microscopic",
+      "miniature": "Miniature",
+      "small": "Small",
+      "tiny": "Tiny",
+      "titanic": "Titanic"
+    },
+    "Status": {
+      "blinded": "Blinded",
+      "burning": "Burning",
+      "corroding": "Corroding",
+      "dead": "Defeated",
+      "deafened": "Deafened",
+      "frightened": "Frightened",
+      "none": "None",
+      "paralyzed": "Paralyzed",
+      "pinned": "Pinned",
+      "poisoned": "Poisoned",
+      "prone": "Prone",
+      "slowed": "Slowed",
+      "stunned": "Stunned",
+      "surprised": "Surprised"
+    },
+    "Tabs": {
+      "actions": "Actions",
+      "bio": "Biography",
+      "description": "Description",
+      "details": "Details",
+      "effects": "Effects",
+      "gear": "Gear",
+      "main": "Main",
+      "mods": "Modifiers",
+      "notes": "Notes",
+      "powers": "Powers",
+      "traits": "Traits & tags"
+    },
+    "TargetType": {
+      "area": "Area",
+      "self": "Self",
+      "targets": "Targeted tokens"
+    },
+    "TeamManeuver": {
+      "card": "Level {level} — {cost} Focus per member",
+      "cardRank": "Recommended average Rank: {min} to {max}",
+      "defensive": {
+        "name": "Defensive maneuver"
+      },
+      "intro": "Each member pays the Focus cost. Select the team's tokens on the map. The rule text is in your book.",
+      "lacking": "Not enough Focus: {names}.",
+      "level": "Level",
+      "levelLabel": "Level {level} — {cost} Focus each (average Rank {min} to {max})",
+      "members": "Members",
+      "notOwner": "No permission over: {names}.",
+      "offensive": {
+        "name": "Offensive maneuver"
+      },
+      "rally": {
+        "name": "Rally"
+      },
+      "title": "Team maneuver",
+      "type": "Type",
+      "use": "Use ({cost} Focus each)"
+    },
+    "Warn": {
+      "alreadyApplied": "This card already had effects applied; it can't be re-rolled.",
+      "gmOnly": "Only the GM can open this window.",
+      "itemNotFound": "Item not found or has no character.",
+      "noAction": "This item has no action.",
+      "noActor": "The item must be on a character sheet.",
+      "noGM": "No active GM to apply the result.",
+      "noResource": "Not enough {resource}.",
+      "noToken": "No token for this character in the scene.",
+      "noUses": "No uses left.",
+      "notGrantable": "Only traits, tags and powers can be granted.",
+      "outOfRange": "{name} is {distance} away, beyond range ({range}).",
+      "selectToken": "Select at least one token."
+    },
+    "WeaponKind": {
+      "close": "Close",
+      "other": "Other",
+      "ranged": "Ranged",
+      "thrown": "Thrown"
+    }
+  },
+  "TYPES": {
+    "Actor": {
+      "character": "Character",
+      "npc": "NPC"
+    },
+    "Item": {
+      "gear": "Gear",
+      "occupation": "Occupation",
+      "origin": "Origin",
+      "power": "Power",
+      "tag": "Tag",
+      "trait": "Trait",
+      "weapon": "Weapon"
+    }
+  }
+}

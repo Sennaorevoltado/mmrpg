@@ -1,0 +1,42 @@
+<header class="mmrpg-header">
+  <div class="mmrpg-portrait">
+    <img src="{{actor.img}}" alt="{{actor.name}}" data-action="editImage" data-edit="img" title="{{localize 'MMRPG.Sheet.changeImage'}}">
+  </div>
+  <div class="mmrpg-header-main">
+    <input class="mmrpg-name" type="text" name="name" value="{{actor.name}}" placeholder="{{localize 'MMRPG.Sheet.name'}}" {{#unless editable}}disabled{{/unless}}>
+    <div class="mmrpg-header-row">
+      <label class="mmrpg-field">
+        <span>{{localize "MMRPG.Sheet.rank"}}</span>
+        <input type="number" name="system.rank" value="{{source.rank}}" min="1" step="1" {{#unless editable}}disabled{{/unless}}>
+      </label>
+      <label class="mmrpg-field">
+        <span>{{localize "MMRPG.Sheet.size"}}</span>
+        <select name="system.size" {{#unless editable}}disabled{{/unless}}>
+          {{#each sizeOptions}}
+            <option value="{{value}}" {{#if (eq value ../source.size)}}selected{{/if}}>{{label}}</option>
+          {{/each}}
+        </select>
+      </label>
+      <div class="mmrpg-field initiative">
+        <span>{{localize "MMRPG.Sheet.initiative"}}</span>
+        <button type="button" class="mmrpg-roll-button" data-action="rollInitiative" title="{{localize 'MMRPG.Sheet.rollInitiative'}}">
+          <i class="fa-solid fa-dice"></i> {{mmrpgSigned system.init.total}}
+        </button>
+      </div>
+      {{#if isCharacter}}
+        <div class="mmrpg-field">
+          <span>{{localize "MMRPG.Sheet.team"}}</span>
+          <button type="button" class="mmrpg-roll-button" data-action="teamManeuver" title="{{localize 'MMRPG.TeamManeuver.title'}}">
+            <i class="fa-solid fa-people-group"></i>
+          </button>
+        </div>
+      {{/if}}
+    </div>
+    <div class="mmrpg-header-row mmrpg-movement-summary">
+      {{#each activeMovement}}
+        <span class="mmrpg-chip"><strong>{{label}}</strong> {{value}}</span>
+      {{/each}}
+      <span class="mmrpg-chip"><strong>{{localize "MMRPG.Sheet.reach"}}</strong> {{system.reach}}</span>
+    </div>
+  </div>
+</header>

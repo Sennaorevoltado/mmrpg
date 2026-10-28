@@ -1,0 +1,451 @@
+/* Marvel Multiverse RPG (não oficial) — vermelho, preto e dourado. Sem emojis; ícones Font Awesome. */
+
+.mmrpg,
+.mmrpg-card {
+  --mm-bg: #141110;
+  --mm-surface: #1e1a18;
+  --mm-surface-2: #29231f;
+  --mm-border: #3d342e;
+  --mm-text: #f0ebe2;
+  --mm-muted: #a89f93;
+  --mm-red: #d6262c;
+  --mm-red-dark: #8f1519;
+  --mm-gold: #e8b923;
+  --mm-green: #3fa66b;
+  --mm-blue: #4a8fd8;
+  --mm-radius: 6px;
+  --mm-gap: 0.5rem;
+}
+
+/* ---------- Janelas ---------- */
+
+.mmrpg.application .window-content {
+  background: var(--mm-bg);
+  color: var(--mm-text);
+  padding: 0;
+  overflow: hidden;
+}
+
+.mmrpg.application .window-header {
+  background: var(--mm-red-dark);
+  border-bottom: 2px solid var(--mm-gold);
+  color: #fff;
+}
+
+.mmrpg .mmrpg-sheet {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+}
+
+.mmrpg h3 {
+  margin: 0.75rem 0 0.35rem;
+  font-size: 0.95rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--mm-gold);
+  border: 0;
+}
+
+.mmrpg a { color: var(--mm-gold); cursor: pointer; }
+.mmrpg a:hover { color: #fff; text-shadow: none; }
+
+.mmrpg-muted { color: var(--mm-muted); font-size: 0.85em; }
+.mmrpg-empty { color: var(--mm-muted); font-style: italic; padding: 0.4rem 0; }
+
+/* ---------- Campos ---------- */
+
+.mmrpg input[type="text"],
+.mmrpg input[type="number"],
+.mmrpg select,
+.mmrpg textarea {
+  background: var(--mm-surface);
+  color: var(--mm-text);
+  border: 1px solid var(--mm-border);
+  border-radius: 4px;
+  min-height: 1.9rem;
+}
+
+.mmrpg input:focus,
+.mmrpg select:focus,
+.mmrpg textarea:focus {
+  outline: none;
+  border-color: var(--mm-gold);
+  box-shadow: 0 0 0 1px var(--mm-gold);
+}
+
+.mmrpg input:disabled,
+.mmrpg select:disabled,
+.mmrpg textarea:disabled { opacity: 0.7; }
+
+.mmrpg option { background: var(--mm-surface); color: var(--mm-text); }
+
+.mmrpg-field { display: flex; flex-direction: column; gap: 0.15rem; min-width: 0; }
+.mmrpg-field > span { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--mm-muted); }
+.mmrpg-field.inline { flex-direction: row; align-items: center; gap: 0.4rem; }
+.mmrpg-field.inline > span { font-size: 0.8rem; }
+.mmrpg-field.wide { grid-column: 1 / -1; }
+.mmrpg-field.grow { flex: 1; }
+
+.mmrpg-detail-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: var(--mm-gap);
+}
+
+/* ---------- Cabeçalho ---------- */
+
+.mmrpg-header {
+  display: flex;
+  gap: 0.9rem;
+  padding: 0.8rem 1rem;
+  background: linear-gradient(135deg, var(--mm-red-dark), #2a0d0e 70%);
+  border-bottom: 3px solid var(--mm-gold);
+}
+
+.mmrpg-portrait img {
+  width: 96px;
+  height: 96px;
+  object-fit: cover;
+  border: 2px solid var(--mm-gold);
+  border-radius: var(--mm-radius);
+  cursor: pointer;
+  background: #000;
+}
+.mmrpg-portrait.small img { width: 64px; height: 64px; }
+
+.mmrpg-header-main { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 0.4rem; }
+.mmrpg-header-row { display: flex; flex-wrap: wrap; gap: 0.6rem; align-items: flex-end; }
+
+.mmrpg-name {
+  font-size: 1.5rem !important;
+  font-weight: 800;
+  letter-spacing: 0.03em;
+  background: transparent !important;
+  border: 0 !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.25) !important;
+  border-radius: 0 !important;
+  color: #fff !important;
+  height: auto;
+}
+
+.mmrpg-header .mmrpg-field > span { color: #f3c9ca; }
+
+/* ---------- Abas ---------- */
+
+.mmrpg-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  background: #0d0b0a;
+  border-bottom: 1px solid var(--mm-border);
+}
+
+.mmrpg-tabs a {
+  padding: 0.55rem 0.9rem;
+  color: var(--mm-muted);
+  text-transform: uppercase;
+  font-size: 0.78rem;
+  letter-spacing: 0.06em;
+  border-bottom: 3px solid transparent;
+}
+
+.mmrpg-tabs a.active { color: var(--mm-gold); border-bottom-color: var(--mm-red); background: var(--mm-surface); }
+
+.mmrpg-panels { flex: 1; min-height: 0; overflow-y: auto; padding: 0.8rem 1rem 1.2rem; }
+.mmrpg-panel { display: none; }
+.mmrpg-panel.active { display: block; }
+
+/* ---------- Atributos ---------- */
+
+.mmrpg-abilities {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(215px, 1fr));
+  gap: var(--mm-gap);
+}
+
+.mmrpg-ability {
+  background: var(--mm-surface);
+  border: 1px solid var(--mm-border);
+  border-top: 3px solid var(--mm-red);
+  border-radius: var(--mm-radius);
+  padding: 0.5rem 0.6rem;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 0.3rem 0.6rem;
+  align-items: center;
+}
+
+.mmrpg-ability-head { display: flex; flex-direction: column; }
+.mmrpg-ability-name {
+  background: none;
+  border: 0;
+  padding: 0;
+  color: var(--mm-text);
+  font-weight: 700;
+  text-align: left;
+  cursor: pointer;
+  line-height: 1.2;
+}
+.mmrpg-ability-name:hover { color: var(--mm-gold); }
+
+.mmrpg-ability-value {
+  width: 3.4rem;
+  text-align: center;
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--mm-gold) !important;
+}
+
+.mmrpg-ability-derived { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.2rem 0.6rem; margin: 0; }
+.mmrpg-ability-derived div { display: flex; justify-content: space-between; align-items: center; }
+.mmrpg-ability-derived dt { font-size: 0.72rem; text-transform: uppercase; color: var(--mm-muted); }
+.mmrpg-ability-derived dd { margin: 0; font-weight: 700; }
+
+.mmrpg-edge-toggles { grid-column: 1 / -1; display: flex; gap: 0.8rem; font-size: 0.75rem; color: var(--mm-muted); }
+.mmrpg-edge-toggles label { display: flex; align-items: center; gap: 0.25rem; cursor: pointer; }
+
+/* ---------- Recursos ---------- */
+
+.mmrpg-resources { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: var(--mm-gap); margin-top: 0.8rem; }
+
+.mmrpg-resource {
+  background: var(--mm-surface);
+  border: 1px solid var(--mm-border);
+  border-radius: var(--mm-radius);
+  padding: 0.5rem 0.6rem;
+}
+
+.mmrpg-resource-title { font-weight: 700; text-transform: uppercase; font-size: 0.78rem; letter-spacing: 0.06em; margin-bottom: 0.3rem; }
+.mmrpg-bar { height: 10px; background: #000; border-radius: 5px; overflow: hidden; border: 1px solid var(--mm-border); }
+.mmrpg-bar-fill { height: 100%; transition: width 0.2s; }
+.mmrpg-resource.health .mmrpg-bar-fill { background: linear-gradient(90deg, var(--mm-red-dark), var(--mm-red)); }
+.mmrpg-resource.focus .mmrpg-bar-fill { background: linear-gradient(90deg, #1f5a99, var(--mm-blue)); }
+.mmrpg-resource.karma .mmrpg-bar-fill { background: linear-gradient(90deg, #a07c10, var(--mm-gold)); }
+
+.mmrpg-resource-fields { display: flex; align-items: center; gap: 0.3rem; margin: 0.35rem 0; }
+.mmrpg-resource-fields input { width: 100%; text-align: center; font-weight: 700; }
+
+/* ---------- Botões ---------- */
+
+.mmrpg button { cursor: pointer; }
+
+.mmrpg-roll-button,
+.mmrpg-wide-button,
+.mmrpg-card button {
+  background: var(--mm-red);
+  color: #fff;
+  border: 1px solid var(--mm-red-dark);
+  border-radius: 4px;
+  padding: 0.25rem 0.6rem;
+  font-weight: 700;
+  line-height: 1.4;
+  box-shadow: none;
+}
+
+.mmrpg-roll-button:hover,
+.mmrpg-wide-button:hover,
+.mmrpg-card button:hover { background: #ee3a40; border-color: var(--mm-gold); color: #fff; }
+.mmrpg-roll-button.small { padding: 0 0.4rem; font-size: 0.85rem; }
+.mmrpg-wide-button { width: 100%; margin-top: 0.5rem; }
+.mmrpg-wide-button.danger { background: transparent; color: #ff8a8e; border-color: var(--mm-red-dark); }
+
+.mmrpg-icon-button {
+  background: transparent;
+  color: var(--mm-muted);
+  border: 1px solid var(--mm-border);
+  border-radius: 4px;
+  width: 1.7rem;
+  height: 1.7rem;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: none;
+}
+.mmrpg-icon-button:hover { color: var(--mm-gold); border-color: var(--mm-gold); background: transparent; }
+.mmrpg-icon-button.is-on { color: var(--mm-gold); border-color: var(--mm-gold); }
+
+.mmrpg-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.05rem 0.5rem;
+  border: 1px solid var(--mm-border);
+  border-radius: 999px;
+  background: var(--mm-surface-2);
+  color: var(--mm-text);
+  font-size: 0.75rem;
+}
+.mmrpg-chip.cost { border-color: var(--mm-blue); color: #a9cdf3; }
+.mmrpg-chip.element { border-color: var(--mm-gold); color: var(--mm-gold); }
+.mmrpg-chip.edge { border-color: var(--mm-green); color: #8fe0b2; }
+.mmrpg-chip.trouble { border-color: var(--mm-red); color: #ff9a9e; }
+.mmrpg-chip.fantastic,
+.mmrpg-chip.ultimate { background: var(--mm-gold); border-color: var(--mm-gold); color: #1a1200; font-weight: 800; }
+.mmrpg-chip.warn { border-color: var(--mm-gold); color: var(--mm-gold); }
+
+/* ---------- Listas de itens ---------- */
+
+.mmrpg-section-head { display: flex; align-items: center; justify-content: space-between; }
+
+.mmrpg-item-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.35rem; }
+
+.mmrpg-item {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.4rem 0.5rem;
+  background: var(--mm-surface);
+  border: 1px solid var(--mm-border);
+  border-left: 3px solid var(--mm-gold);
+  border-radius: var(--mm-radius);
+}
+.mmrpg-item.is-disabled { opacity: 0.55; }
+.mmrpg-item > img { width: 36px; height: 36px; object-fit: cover; border-radius: 4px; border: 0; background: #000; }
+.mmrpg-item-main { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 0.25rem; }
+.mmrpg-item-title { display: flex; align-items: baseline; gap: 0.5rem; flex-wrap: wrap; }
+.mmrpg-item-name { font-weight: 700; }
+.mmrpg-item-actions,
+.mmrpg-badges { display: flex; flex-wrap: wrap; gap: 0.3rem; }
+.mmrpg-item-controls { display: flex; gap: 0.25rem; }
+
+.mmrpg-action-button {
+  background: var(--mm-surface-2);
+  color: var(--mm-text);
+  border: 1px solid var(--mm-border);
+  border-radius: 4px;
+  padding: 0.1rem 0.5rem;
+  font-size: 0.8rem;
+  box-shadow: none;
+}
+.mmrpg-action-button:hover { border-color: var(--mm-gold); color: var(--mm-gold); background: var(--mm-surface-2); }
+.mmrpg-action-button small { color: var(--mm-muted); margin-left: 0.2rem; }
+
+/* ---------- Condições ---------- */
+
+.mmrpg-condition-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 0.35rem; }
+
+.mmrpg-condition {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: var(--mm-surface);
+  color: var(--mm-muted);
+  border: 1px solid var(--mm-border);
+  border-radius: var(--mm-radius);
+  padding: 0.25rem 0.4rem;
+  font-size: 0.8rem;
+  box-shadow: none;
+}
+.mmrpg-condition img { width: 20px; height: 20px; border: 0; filter: grayscale(1); }
+.mmrpg-condition.is-active { color: #fff; border-color: var(--mm-red); background: var(--mm-red-dark); }
+.mmrpg-condition.is-active img { filter: none; }
+
+/* ---------- Tabelas ---------- */
+
+.mmrpg table { width: 100%; border-collapse: collapse; }
+.mmrpg th { text-align: left; font-size: 0.72rem; text-transform: uppercase; color: var(--mm-muted); padding: 0.2rem 0.3rem; }
+.mmrpg td { padding: 0.15rem 0.3rem; }
+.mmrpg td input[type="number"] { width: 4rem; text-align: center; }
+.mmrpg-derived { font-weight: 800; color: var(--mm-gold); text-align: center; }
+
+prose-mirror { display: block; min-height: 4rem; background: var(--mm-surface); border: 1px solid var(--mm-border); border-radius: var(--mm-radius); padding: 0.4rem; }
+
+/* ---------- Editor de ações ---------- */
+
+.mmrpg-action-editor .mmrpg-editor-body { height: 100%; overflow-y: auto; padding: 0.8rem 1rem; }
+.mmrpg fieldset { border: 1px solid var(--mm-border); border-radius: var(--mm-radius); margin: 0 0 0.7rem; padding: 0.5rem 0.7rem 0.7rem; }
+.mmrpg legend { color: var(--mm-gold); font-weight: 700; text-transform: uppercase; font-size: 0.8rem; letter-spacing: 0.05em; padding: 0 0.4rem; }
+.mmrpg .hint { color: var(--mm-muted); font-size: 0.8rem; margin: 0.4rem 0 0; }
+.mmrpg-effect-block { border: 1px dashed var(--mm-border); border-radius: var(--mm-radius); padding: 0.5rem; margin-bottom: 0.5rem; }
+.mmrpg-change-row { display: grid; grid-template-columns: 2fr 1fr 1fr auto; gap: 0.3rem; margin-top: 0.3rem; }
+
+/* ---------- Importador e manobra de equipe ---------- */
+
+.mmrpg-importer-body,
+.mmrpg-team-body { padding: 0.8rem 1rem 1rem; }
+.mmrpg-count-list { list-style: none; padding: 0; display: flex; flex-wrap: wrap; gap: 0.6rem; }
+.mmrpg-check-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 0.3rem; }
+.mmrpg-error { color: #ff8a8e; }
+.mmrpg-warning { color: var(--mm-gold); }
+
+.mmrpg-member-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.25rem; }
+.mmrpg-member-list li { display: flex; align-items: center; gap: 0.5rem; }
+.mmrpg-member-list img { width: 24px; height: 24px; border: 0; border-radius: 3px; }
+.mmrpg-member-list li.is-short { color: #ff8a8e; }
+
+.mmrpg-roll-config .mmrpg-roll-summary { font-weight: 700; color: var(--mm-gold); }
+
+/* ---------- Dados ---------- */
+
+.mmrpg-dice { margin: 0.3rem 0; }
+.mmrpg-dice-flavor { font-weight: 700; margin-bottom: 0.2rem; }
+.mmrpg-dice-row { display: flex; align-items: center; flex-wrap: wrap; gap: 0.35rem; }
+.mmrpg-die-slot { display: flex; flex-direction: column; align-items: center; gap: 0.15rem; }
+.mmrpg-faces { display: flex; gap: 0.15rem; }
+
+.mmrpg-die {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 6px;
+  background: #f0ebe2;
+  color: #141110;
+  font-weight: 900;
+  font-size: 1.1rem;
+  border: 2px solid #141110;
+}
+.mmrpg-die.marvel { background: var(--mm-red); color: #fff; border-color: var(--mm-red-dark); }
+.mmrpg-die.marvel.fantastic { background: var(--mm-gold); color: #1a1200; border-color: #fff; box-shadow: 0 0 8px var(--mm-gold); }
+.mmrpg-die.max { box-shadow: inset 0 0 0 2px var(--mm-gold); }
+.mmrpg-die.discarded { opacity: 0.35; text-decoration: line-through; transform: scale(0.8); }
+
+.mmrpg-reroll { padding: 0 0.4rem !important; font-size: 0.7rem; }
+.mmrpg-dice-op { color: var(--mm-muted); font-weight: 700; }
+.mmrpg-dice-mod { font-weight: 800; }
+.mmrpg-dice-total { font-size: 1.6rem; font-weight: 900; color: var(--mm-gold); background: #000; border-radius: 6px; padding: 0 0.6rem; }
+.mmrpg-dice-notes { display: flex; gap: 0.3rem; flex-wrap: wrap; margin-top: 0.25rem; }
+.mmrpg-dice-private { font-style: italic; color: var(--mm-muted); }
+
+/* ---------- Cartões de chat ---------- */
+
+.mmrpg-card {
+  background: var(--mm-bg);
+  color: var(--mm-text);
+  border: 1px solid var(--mm-border);
+  border-top: 3px solid var(--mm-red);
+  border-radius: var(--mm-radius);
+  padding: 0.5rem 0.6rem;
+}
+.mmrpg-card-header { display: flex; align-items: center; gap: 0.6rem; margin-bottom: 0.3rem; }
+.mmrpg-card-header img { width: 40px; height: 40px; object-fit: cover; border: 1px solid var(--mm-gold); border-radius: 4px; }
+.mmrpg-card-header h3 { margin: 0; font-size: 1rem; color: var(--mm-gold); }
+.mmrpg-card-icon { font-size: 1.6rem; color: var(--mm-gold); }
+.mmrpg-card-tags { display: flex; flex-wrap: wrap; gap: 0.3rem; margin-bottom: 0.3rem; }
+.mmrpg-card-description { font-size: 0.85rem; color: var(--mm-text); margin: 0.3rem 0; }
+.mmrpg-card-roll-title { font-weight: 700; }
+.mmrpg-note { font-size: 0.8rem; color: var(--mm-gold); margin-top: 0.3rem; }
+
+.mmrpg-outcome { font-weight: 800; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 0.05em; }
+.mmrpg-outcome.success { color: #6fd39a; }
+.mmrpg-outcome.failure { color: #ff8a8e; }
+
+.mmrpg-targets { display: flex; flex-direction: column; gap: 0.35rem; margin-top: 0.4rem; }
+.mmrpg-target { background: var(--mm-surface); border: 1px solid var(--mm-border); border-left: 3px solid var(--mm-border); border-radius: 4px; padding: 0.3rem 0.5rem; }
+.mmrpg-target.hit { border-left-color: var(--mm-green); }
+.mmrpg-target.miss { border-left-color: var(--mm-red); opacity: 0.85; }
+.mmrpg-target.self { border-left-color: var(--mm-blue); margin-top: 0.4rem; }
+.mmrpg-target-head { display: flex; align-items: center; gap: 0.4rem; flex-wrap: wrap; }
+.mmrpg-target-head img { width: 24px; height: 24px; border: 0; border-radius: 3px; }
+.mmrpg-line { display: flex; align-items: baseline; gap: 0.4rem; flex-wrap: wrap; }
+.mmrpg-amount { font-size: 1.3rem; font-weight: 900; }
+.mmrpg-line.damage .mmrpg-amount { color: #ff8a8e; }
+.mmrpg-line.healing .mmrpg-amount { color: #6fd39a; }
+.mmrpg-calc { font-size: 0.72rem; color: var(--mm-muted); }
+.mmrpg-done { color: #6fd39a; }
+.mmrpg-buttons,
+.mmrpg-card-footer { display: flex; gap: 0.3rem; margin-top: 0.3rem; flex-wrap: wrap; }
+.mmrpg-card.is-locked .mmrpg-reroll { display: none; }

@@ -1,0 +1,37 @@
+<section class="mmrpg-movement-table">
+  <h3>{{localize "MMRPG.Sheet.movement"}}</h3>
+  <table>
+    <thead>
+      <tr>
+        <th>{{localize "MMRPG.Sheet.movementType"}}</th>
+        <th>{{localize "MMRPG.Sheet.movementActive"}}</th>
+        <th>{{localize "MMRPG.Sheet.movementBase"}}</th>
+        <th>{{localize "MMRPG.Sheet.movementBonus"}}</th>
+        <th>{{localize "MMRPG.Sheet.movementMode"}}</th>
+        <th>{{localize "MMRPG.Sheet.movementValue"}}</th>
+      </tr>
+    </thead>
+    <tbody>
+      {{#each movement}}
+        <tr>
+          <td>{{label}}</td>
+          <td><input type="checkbox" name="system.movement.{{key}}.active" {{#if source.active}}checked{{/if}} {{#unless ../editable}}disabled{{/unless}}></td>
+          <td><input type="number" name="system.movement.{{key}}.base" value="{{source.base}}" min="0" step="1" {{#unless ../editable}}disabled{{/unless}}></td>
+          <td><input type="number" name="system.movement.{{key}}.bonus" value="{{source.bonus}}" step="1" {{#unless ../editable}}disabled{{/unless}}></td>
+          <td>
+            <select name="system.movement.{{key}}.mode" {{#unless ../editable}}disabled{{/unless}}>
+              {{#each ../movementModeOptions}}
+                <option value="{{value}}" {{#if (eq value ../source.mode)}}selected{{/if}}>{{label}}</option>
+              {{/each}}
+            </select>
+          </td>
+          <td class="mmrpg-derived">{{value}}</td>
+        </tr>
+      {{/each}}
+    </tbody>
+  </table>
+  <label class="mmrpg-field inline">
+    <span>{{localize "MMRPG.Sheet.reach"}}</span>
+    <input type="number" name="system.reach" value="{{source.reach}}" min="0" step="1" {{#unless editable}}disabled{{/unless}}>
+  </label>
+</section>

@@ -1,0 +1,40 @@
+<div class="dice-roll mmrpg-dice{{#if fantastic}} is-fantastic{{/if}}{{#if ultimate}} is-ultimate{{/if}}">
+  {{#if flavor}}<div class="mmrpg-dice-flavor">{{flavor}}</div>{{/if}}
+  {{#if isPrivate}}
+    <div class="mmrpg-dice-private">{{localize "MMRPG.Roll.private"}}</div>
+  {{else}}
+    <div class="mmrpg-dice-row">
+      {{#each dice}}
+        <div class="mmrpg-die-slot" data-die="{{index}}">
+          <div class="mmrpg-faces">
+            {{#each faces}}
+              <span class="mmrpg-die{{#if ../isMarvel}} marvel{{/if}}{{#if fantastic}} fantastic{{/if}}{{#if max}} max{{/if}}{{#if discarded}} discarded{{/if}}">{{label}}</span>
+            {{/each}}
+          </div>
+          {{#if ../canReroll}}
+            <button type="button" class="mmrpg-reroll" data-mmrpg-control data-mmrpg-action="reroll" data-die="{{index}}" title="{{localize 'MMRPG.Roll.rerollDie'}}">
+              <i class="fa-solid fa-rotate"></i>
+            </button>
+          {{/if}}
+        </div>
+        {{#unless @last}}<span class="mmrpg-dice-op">+</span>{{/unless}}
+      {{/each}}
+      {{#if modifier}}
+        <span class="mmrpg-dice-op">{{#if modifierPositive}}+{{else}}-{{/if}}</span>
+        <span class="mmrpg-dice-mod">{{modifierAbs}}</span>
+      {{/if}}
+      <span class="mmrpg-dice-op">=</span>
+      <span class="mmrpg-dice-total">{{total}}</span>
+    </div>
+    <div class="mmrpg-dice-notes">
+      {{#if edge}}<span class="mmrpg-chip edge">{{localize "MMRPG.Edge.edge"}}</span>{{/if}}
+      {{#if trouble}}<span class="mmrpg-chip trouble">{{localize "MMRPG.Edge.trouble"}}</span>{{/if}}
+      {{#if ultimate}}
+        <span class="mmrpg-chip ultimate">{{localize "MMRPG.Roll.ultimate"}}</span>
+      {{else if fantastic}}
+        <span class="mmrpg-chip fantastic">{{localize "MMRPG.Roll.fantastic"}}</span>
+      {{/if}}
+      {{#if rerolled}}<span class="mmrpg-chip">{{localize "MMRPG.Roll.rerolled"}}</span>{{/if}}
+    </div>
+  {{/if}}
+</div>

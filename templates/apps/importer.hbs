@@ -1,0 +1,58 @@
+<div class="mmrpg-importer-body">
+  <p class="mmrpg-muted">{{localize "MMRPG.Importer.intro"}}</p>
+
+  <fieldset>
+    <legend>{{localize "MMRPG.Importer.importTitle"}}</legend>
+    <div class="form-group">
+      <label>{{localize "MMRPG.Importer.file"}}</label>
+      <div class="form-fields">
+        <input type="file" accept=".json,application/json">
+      </div>
+      {{#if fileName}}<p class="hint">{{fileName}}</p>{{/if}}
+    </div>
+
+    {{#if parsed}}
+      {{#each parsed.errors}}<p class="mmrpg-error"><i class="fa-solid fa-circle-exclamation"></i> {{this}}</p>{{/each}}
+      {{#each parsed.warnings}}<p class="mmrpg-warning"><i class="fa-solid fa-triangle-exclamation"></i> {{this}}</p>{{/each}}
+      {{#if hasItems}}
+        <ul class="mmrpg-count-list">
+          {{#each counts}}<li><strong>{{count}}</strong> {{label}}</li>{{/each}}
+        </ul>
+        <div class="form-group">
+          <label>{{localize "MMRPG.Importer.onDuplicate"}}</label>
+          <div class="form-fields">
+            <select name="onDuplicate">
+              {{#each duplicateOptions}}<option value="{{value}}">{{label}}</option>{{/each}}
+            </select>
+          </div>
+        </div>
+        <button type="button" class="mmrpg-wide-button" data-action="runImport">
+          <i class="fa-solid fa-file-import"></i> {{localize "MMRPG.Importer.run"}}
+        </button>
+      {{/if}}
+    {{/if}}
+
+    {{#if report}}
+      <div class="mmrpg-report">
+        <p>{{localize "MMRPG.Importer.report" created=report.created updated=report.updated skipped=report.skipped}}</p>
+        {{#each report.failed}}<p class="mmrpg-error">{{this}}</p>{{/each}}
+        {{#each report.unresolved}}<p class="mmrpg-warning">{{localize "MMRPG.Importer.unresolved"}}: {{this}}</p>{{/each}}
+      </div>
+    {{/if}}
+  </fieldset>
+
+  <fieldset>
+    <legend>{{localize "MMRPG.Importer.exportTitle"}}</legend>
+    <div class="mmrpg-check-grid">
+      {{#each exportTypes}}
+        <label class="mmrpg-field inline">
+          <input type="checkbox" name="exportType" value="{{type}}" checked>
+          <span>{{label}}</span>
+        </label>
+      {{/each}}
+    </div>
+    <button type="button" class="mmrpg-wide-button" data-action="runExport">
+      <i class="fa-solid fa-file-export"></i> {{localize "MMRPG.Importer.export"}}
+    </button>
+  </fieldset>
+</div>

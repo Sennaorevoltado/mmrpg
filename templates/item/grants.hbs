@@ -1,0 +1,28 @@
+<section class="mmrpg-grants" data-grants-drop>
+  <h3>{{localize "MMRPG.Item.grants"}}</h3>
+  <p class="mmrpg-muted">{{localize "MMRPG.Item.grantsHint"}}</p>
+  {{#if grants.length}}
+    <ul class="mmrpg-item-list">
+      {{#each grants}}
+        <li class="mmrpg-item">
+          <div class="mmrpg-item-main">
+            <div class="mmrpg-item-title">
+              <span class="mmrpg-item-name">{{name}}</span>
+              <span class="mmrpg-muted">{{type}}</span>
+              {{#unless linked}}<span class="mmrpg-chip warn">{{localize "MMRPG.Item.unlinked"}}</span>{{/unless}}
+            </div>
+          </div>
+          {{#if ../editable}}
+            <div class="mmrpg-item-controls">
+              <button type="button" class="mmrpg-icon-button" data-action="removeGrant" data-index="{{index}}" title="{{localize 'MMRPG.Sheet.delete'}}">
+                <i class="fa-solid fa-trash"></i>
+              </button>
+            </div>
+          {{/if}}
+        </li>
+      {{/each}}
+    </ul>
+  {{else}}
+    <p class="mmrpg-empty">{{localize "MMRPG.Item.noGrants"}}</p>
+  {{/if}}
+</section>

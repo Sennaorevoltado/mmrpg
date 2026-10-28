@@ -1,0 +1,35 @@
+<div class="mmrpg-roll-config">
+  {{#if summary}}<p class="mmrpg-roll-summary">{{summary}}</p>{{/if}}
+  <div class="form-group">
+    <label>{{localize "MMRPG.Dialog.edgeMode"}}</label>
+    <div class="form-fields">
+      <select name="edge">
+        {{#each edgeChoices}}
+          <option value="{{@key}}">{{localize this}}</option>
+        {{/each}}
+      </select>
+    </div>
+    {{#if inheritedEdgeLabel}}
+      <p class="hint">{{localize "MMRPG.Dialog.edgeInherited"}}: {{localize inheritedEdgeLabel}}</p>
+    {{/if}}
+  </div>
+  {{#if showBonus}}
+    <div class="form-group">
+      <label>{{localize "MMRPG.Dialog.bonus"}}</label>
+      <div class="form-fields">
+        <input type="number" name="bonus" value="0" step="1">
+      </div>
+    </div>
+  {{/if}}
+  <div class="form-group">
+    <label>{{localize "MMRPG.Dialog.visibility"}}</label>
+    <div class="form-fields">
+      <select name="messageMode">
+        {{#each modes}}
+          <option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>
+        {{/each}}
+      </select>
+    </div>
+  </div>
+  <p class="hint">{{localize "MMRPG.Dialog.shiftHint"}}</p>
+</div>

@@ -1,0 +1,68 @@
+Marvel Multiverse RPG (não oficial) para Foundry VTT
+=====================================================
+
+Este é um projeto de fãs, sem fins lucrativos e sem qualquer vínculo com a Marvel,
+com a Disney ou com a Foundry Gaming LLC. "Marvel", "Marvel Multiverse Role-Playing
+Game" e os nomes de personagens são marcas e obras de seus respectivos titulares. O
+sistema não inclui texto, tabelas ou arte dos livros: quem usa cria ou importa o
+próprio conteúdo.
+
+Este sistema foi escrito do zero para o Foundry VTT v14, mas se apoia em duas obras
+abertas (licença MIT). Os avisos de copyright delas são reproduzidos abaixo, como a
+licença exige.
+
+-----------------------------------------------------------------------------------
+1. Gaia: Prelúdio — https://github.com/LPfontes/gaia-preludio
+   Referência de organização para um sistema não oficial em Foundry v14: regras
+   separadas do restante do código, classes de documentos definidas de antemão,
+   convenções de interface (por exemplo, sem emojis) e estrutura de projeto.
+
+   MIT License
+
+   Copyright (c) 2026 LPfontes
+
+   Permission is hereby granted, free of charge, to any person obtaining a copy
+   of this software and associated documentation files (the "Software"), to deal
+   in the Software without restriction, including without limitation the rights
+   to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+   copies of the Software, and to permit persons to whom the Software is
+   furnished to do so, subject to the following conditions:
+
+   The above copyright notice and this permission notice shall be included in all
+   copies or substantial portions of the Software.
+
+   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+   IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+   FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+   AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+   LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+   OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+   SOFTWARE.
+
+-----------------------------------------------------------------------------------
+2. marvel-multiverse (sistema da comunidade para Foundry VTT)
+   — https://github.com/mjording/marvel-multiverse
+   Referência para a mecânica do d616, as listas de atributos, conjuntos de poderes,
+   elementos e condições, e para o fluxo de ataque, dano e cura.
+
+   MIT License
+
+   Copyright (c) 2024 Rollbones Projects / Foundry Systems & Mods
+
+   Permission is hereby granted, free of charge, to any person obtaining a copy
+   of this software and associated documentation files (the "Software"), to deal
+   in the Software without restriction, including without limitation the rights
+   to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+   copies of the Software, and to permit persons to whom the Software is
+   furnished to do so, subject to the following conditions:
+
+   The above copyright notice and this permission notice shall be included in all
+   copies or substantial portions of the Software.
+
+   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+   IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+   FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+   AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+   LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+   OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+   SOFTWARE.

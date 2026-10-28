@@ -1,0 +1,25 @@
+<div class="mmrpg-detail-grid">
+  <label class="mmrpg-field">
+    <span>{{localize "MMRPG.Item.powerSet"}}</span>
+    <input type="text" name="system.powerSet" value="{{source.powerSet}}" list="mmrpg-power-sets" {{#unless editable}}disabled{{/unless}}>
+    <datalist id="mmrpg-power-sets">
+      {{#each powerSetOptions}}<option value="{{value}}">{{label}}</option>{{/each}}
+    </datalist>
+  </label>
+  <label class="mmrpg-field">
+    <span>{{localize "MMRPG.Item.level"}}</span>
+    <input type="number" name="system.level" value="{{source.level}}" min="0" step="1" {{#unless editable}}disabled{{/unless}}>
+  </label>
+  <label class="mmrpg-field wide">
+    <span>{{localize "MMRPG.Item.prerequisites"}}</span>
+    <input type="text" name="system.prerequisites" value="{{source.prerequisites}}" {{#unless editable}}disabled{{/unless}}>
+  </label>
+  <label class="mmrpg-field">
+    <span>{{localize "MMRPG.Item.duration"}}</span>
+    <input type="text" name="system.duration" value="{{source.duration}}" {{#unless editable}}disabled{{/unless}}>
+  </label>
+  <label class="mmrpg-field">
+    <span>{{localize "MMRPG.Item.range"}}</span>
+    <input type="text" name="system.range" value="{{source.range}}" {{#unless editable}}disabled{{/unless}}>
+  </label>
+</div>

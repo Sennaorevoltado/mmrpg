@@ -1,0 +1,66 @@
+<div class="mmrpg-sheet npc">
+  {{> "systems/mmrpg/templates/actor/parts/header.hbs"}}
+
+  <nav class="mmrpg-tabs">
+    <a data-action="switchTab" data-tab="main">{{localize "MMRPG.Tabs.main"}}</a>
+    <a data-action="switchTab" data-tab="powers">{{localize "MMRPG.Tabs.powers"}}</a>
+    <a data-action="switchTab" data-tab="gear">{{localize "MMRPG.Tabs.gear"}}</a>
+    <a data-action="switchTab" data-tab="traits">{{localize "MMRPG.Tabs.traits"}}</a>
+    <a data-action="switchTab" data-tab="effects">{{localize "MMRPG.Tabs.effects"}}</a>
+    <a data-action="switchTab" data-tab="mods">{{localize "MMRPG.Tabs.mods"}}</a>
+    <a data-action="switchTab" data-tab="notes">{{localize "MMRPG.Tabs.notes"}}</a>
+  </nav>
+
+  <div class="mmrpg-panels">
+    <section class="mmrpg-panel" data-tab="main">
+      <label class="mmrpg-field wide">
+        <span>{{localize "MMRPG.Sheet.category"}}</span>
+        <input type="text" name="system.category" value="{{source.category}}" {{#unless editable}}disabled{{/unless}}>
+      </label>
+      {{> "systems/mmrpg/templates/actor/parts/abilities.hbs"}}
+      {{> "systems/mmrpg/templates/actor/parts/resources.hbs"}}
+    </section>
+
+    <section class="mmrpg-panel" data-tab="powers">
+      {{#each powerGroups}}
+        {{> "systems/mmrpg/templates/actor/parts/items.hbs" list=items type="power" title=label powerSet=key showEquip=false showQty=false editable=../editable}}
+      {{else}}
+        <p class="mmrpg-empty">{{localize "MMRPG.Sheet.noPowers"}}</p>
+      {{/each}}
+      {{#if editable}}
+        <button type="button" class="mmrpg-wide-button" data-action="createItem" data-type="power">
+          <i class="fa-solid fa-plus"></i> {{localize "MMRPG.Sheet.addPower"}}
+        </button>
+      {{/if}}
+      <button type="button" class="mmrpg-wide-button" data-action="resetUses">
+        <i class="fa-solid fa-rotate-left"></i> {{localize "MMRPG.Sheet.resetUses"}}
+      </button>
+    </section>
+
+    <section class="mmrpg-panel" data-tab="gear">
+      {{> "systems/mmrpg/templates/actor/parts/items.hbs" list=weapons type="weapon" title=(localize "MMRPG.Sheet.weapons") showEquip=true showQty=true}}
+      {{> "systems/mmrpg/templates/actor/parts/items.hbs" list=gear type="gear" title=(localize "MMRPG.Sheet.gear") showEquip=true showQty=true}}
+    </section>
+
+    <section class="mmrpg-panel" data-tab="traits">
+      {{> "systems/mmrpg/templates/actor/parts/items.hbs" list=traits type="trait" title=(localize "MMRPG.Sheet.traits") showEquip=false showQty=false}}
+      {{> "systems/mmrpg/templates/actor/parts/items.hbs" list=tags type="tag" title=(localize "MMRPG.Sheet.tags") showEquip=false showQty=false}}
+    </section>
+
+    <section class="mmrpg-panel" data-tab="effects">
+      {{> "systems/mmrpg/templates/actor/parts/effects.hbs"}}
+    </section>
+
+    <section class="mmrpg-panel" data-tab="mods">
+      {{> "systems/mmrpg/templates/actor/parts/modifiers.hbs"}}
+      {{> "systems/mmrpg/templates/actor/parts/movement.hbs"}}
+    </section>
+
+    <section class="mmrpg-panel" data-tab="notes">
+      <h3>{{localize "MMRPG.Sheet.notes"}}</h3>
+      <prose-mirror name="system.notes" value="{{source.notes}}" toggled>{{{enriched.notes}}}</prose-mirror>
+      <h3>{{localize "MMRPG.Sheet.biography"}}</h3>
+      <prose-mirror name="system.biography" value="{{source.biography}}" toggled>{{{enriched.biography}}}</prose-mirror>
+    </section>
+  </div>
+</div>

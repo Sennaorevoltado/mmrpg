@@ -1,0 +1,18 @@
+<div class="mmrpg-detail-grid">
+  <label class="mmrpg-field">
+    <span>{{localize "MMRPG.Item.category"}}</span>
+    <input type="text" name="system.category" value="{{source.category}}" {{#unless editable}}disabled{{/unless}}>
+  </label>
+  <label class="mmrpg-field">
+    <span>{{localize "MMRPG.Item.price"}}</span>
+    <input type="text" name="system.price" value="{{source.price}}" {{#unless editable}}disabled{{/unless}}>
+  </label>
+  <label class="mmrpg-field">
+    <span>{{localize "MMRPG.Item.quantity"}}</span>
+    <input type="number" name="system.quantity" value="{{source.quantity}}" min="0" step="1" {{#unless editable}}disabled{{/unless}}>
+  </label>
+  <label class="mmrpg-field inline">
+    <input type="checkbox" name="system.equipped" {{#if source.equipped}}checked{{/if}} {{#unless editable}}disabled{{/unless}}>
+    <span>{{localize "MMRPG.Sheet.equipped"}}</span>
+  </label>
+</div>

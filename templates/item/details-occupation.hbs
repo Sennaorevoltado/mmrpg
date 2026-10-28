@@ -1,0 +1,7 @@
+<div class="mmrpg-detail-grid">
+  <label class="mmrpg-field wide">
+    <span>{{localize "MMRPG.Item.examples"}}</span>
+    <input type="text" name="system.examples" value="{{source.examples}}" {{#unless editable}}disabled{{/unless}}>
+  </label>
+</div>
+{{> "systems/mmrpg/templates/item/grants.hbs"}}

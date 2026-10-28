@@ -3,8 +3,9 @@
  */
 
 import { MMRPG } from "../../config.mjs";
-import { ABILITY_KEYS } from "../../rules/index.mjs";
+import { ABILITY_KEYS, MAX_RANK } from "../../rules/index.mjs";
 import { rollAbilityCheck } from "../../actions/executor.mjs";
+import { descriptionsOpenByDefault, openAppearanceDialog } from "../../helpers/appearance.mjs";
 
 const { ActorSheetV2 } = foundry.applications.sheets;
 const { HandlebarsApplicationMixin } = foundry.applications.api;
@@ -15,7 +16,7 @@ export default class MMRPGActorSheet extends HandlebarsApplicationMixin(ActorShe
   /** @override */
   static DEFAULT_OPTIONS = {
     classes: ["mmrpg", "sheet", "actor"],
-    position: { width: 800, height: 860 },
+    position: { width: 860, height: 880 },
     window: { resizable: true },
     form: { submitOnChange: true },
     actions: {
@@ -35,12 +36,19 @@ export default class MMRPGActorSheet extends HandlebarsApplicationMixin(ActorShe
       deleteEffect: MMRPGActorSheet.#onDeleteEffect,
       toggleEffect: MMRPGActorSheet.#onToggleEffect,
       toggleStatus: MMRPGActorSheet.#onToggleStatus,
-      teamManeuver: MMRPGActorSheet.#onTeamManeuver
+      teamManeuver: MMRPGActorSheet.#onTeamManeuver,
+      openAppearance: MMRPGActorSheet.#onOpenAppearance
     }
   };
 
   /** Aba ativa (mantida entre renderizações). */
   #activeTab = "main";
+
+  /** Descrições abertas/fechadas pelo usuário (id do item → aberta), mantidas entre renderizações. */
+  #descriptionState = new Map();
+
+  /** Texto do filtro da lista de poderes e equipamentos. */
+  #filter = "";
 
   /* -------------------------------------------- */
   /*  Contexto                                    */
@@ -97,8 +105,24 @@ export default class MMRPGActorSheet extends HandlebarsApplicationMixin(ActorShe
     context.focusPercent = percent(system.focus.value, system.focus.max);
     context.karmaPercent = percent(system.karma.value, system.karma.max);
 
-    Object.assign(context, this.#prepareItems());
-    Object.assign(context, this.#prepareForms());
+    const descriptions = await this.#enrichDescriptions();
+    Object.assign(context, this.#prepareItems(descriptions));
+    context.filter = this.#filter;
+    context.damageRows = context.abilities
+      .filter((a) => a.isAttack)
+      .map((a) => ({
+        key: a.key,
+        label: a.label,
+        abbr: a.abbr,
+        multiplier: a.multiplier,
+        score: Number(a.value) + Number(source.abilities[a.key].damageBonus ?? 0)
+      }));
+    context.identity = {
+      origin: context.origins.map((i) => i.name).join(", "),
+      occupation: context.occupations.map((i) => i.name).join(", ")
+    };
+    context.maxRank = MAX_RANK;
+    Object.assign(context, this.#prepareForms(descriptions));
     context.effects = this.#prepareEffects();
     context.statuses = MMRPG.statuses.map((s) => ({ id: s.id, label: loc(`MMRPG.Status.${s.id}`), img: s.img, active: actor.statuses.has(s.id) }));
 
@@ -112,8 +136,34 @@ export default class MMRPGActorSheet extends HandlebarsApplicationMixin(ActorShe
     return context;
   }
 
+  /** Descrições (HTML enriquecido) de todos os itens da ficha, por id. */
+  async #enrichDescriptions() {
+    const map = new Map();
+    await Promise.all(
+      this.actor.items.contents.map(async (item) => {
+        const raw = item.system.description ?? "";
+        if (raw.trim()) map.set(item.id, await enrich(raw, item));
+      })
+    );
+    return map;
+  }
+
+  /** Dados comuns de descrição e busca de um item da lista. */
+  #descriptionView(item, descriptions) {
+    const html = descriptions.get(item.id) ?? "";
+    const excerpt = excerptOf(item.system.description);
+    const open = this.#descriptionState.has(item.id) ? this.#descriptionState.get(item.id) : descriptionsOpenByDefault();
+    return {
+      hasDescription: html !== "",
+      descriptionHtml: html,
+      excerpt,
+      descriptionOpen: open,
+      search: `${item.name} ${excerptOf(item.system.description, 700)}`.toLocaleLowerCase()
+    };
+  }
+
   /** Itens agrupados para a ficha. */
-  #prepareItems() {
+  #prepareItems(descriptions) {
     const items = this.actor.items.contents;
     const view = (item) => {
       const actions = (item.actions ?? []).map((a) => ({
@@ -142,7 +192,10 @@ export default class MMRPGActorSheet extends HandlebarsApplicationMixin(ActorShe
         hasActions: actions.length > 0,
         equipped: item.system.equipped,
         quantity: item.system.quantity,
-        powerSet: item.system.powerSet
+        showQuantity: Number(item.system.quantity) > 1,
+        powerSet: item.system.powerSet,
+        meta: itemMeta(item),
+        ...this.#descriptionView(item, descriptions)
       };
     };
     const byType = (t) => items.filter((i) => i.type === t).sort((a, b) => a.sort - b.sort).map(view);
@@ -182,8 +235,15 @@ export default class MMRPGActorSheet extends HandlebarsApplicationMixin(ActorShe
     };
   }
 
+  /** Barra de ferramentas da janela (menu ⋮): acrescenta a aparência. */
+  _getHeaderControls() {
+    const controls = super._getHeaderControls?.() ?? [];
+    controls.push({ icon: "fa-solid fa-font", label: "MMRPG.Appearance.title", action: "openAppearance" });
+    return controls;
+  }
+
   /** Formas agrupadas por categoria, formas ativas e Rank efetivo. */
-  #prepareForms() {
+  #prepareForms(descriptions) {
     const forms = this.actor.forms.sort((a, b) => a.sort - b.sort);
     const view = (item) => {
       const s = item.system;
@@ -193,7 +253,7 @@ export default class MMRPGActorSheet extends HandlebarsApplicationMixin(ActorShe
       if (s.grants.length) badges.push(loc("MMRPG.Form.badgeGrants", { count: s.grants.length }));
       if (s.changes.length) badges.push(loc("MMRPG.Form.badgeChanges", { count: s.changes.length }));
       if (s.portrait || s.token) badges.push(loc("MMRPG.Form.badgeImages"));
-      return { id: item.id, name: item.name, img: item.img, active: s.active, borrowed: s.borrowed, badges };
+      return { id: item.id, name: item.name, img: item.img, active: s.active, borrowed: s.borrowed, badges, ...this.#descriptionView(item, descriptions) };
     };
     const formGroups = Object.keys(MMRPG.formKinds).map((kind) => ({
       kind,
@@ -226,6 +286,8 @@ export default class MMRPGActorSheet extends HandlebarsApplicationMixin(ActorShe
   _onRender(context, options) {
     super._onRender(context, options);
     this.#applyTab();
+    this.#activateFilter();
+    this.#trackDescriptions();
 
     // Ações arrastáveis para a barra de atalhos.
     for (const el of this.element.querySelectorAll("[data-drag-action]")) {
@@ -239,7 +301,38 @@ export default class MMRPGActorSheet extends HandlebarsApplicationMixin(ActorShe
 
   #applyTab() {
     for (const el of this.element.querySelectorAll("[data-tab]")) {
-      el.classList.toggle("active", el.dataset.tab === this.#activeTab);
+      const active = el.dataset.tab === this.#activeTab;
+      el.classList.toggle("active", active);
+      if (el.matches(".mm-tab")) el.setAttribute("aria-selected", String(active));
+    }
+  }
+
+  /** Campo de busca das listas: esconde o que não combina e os grupos que ficam vazios. */
+  #activateFilter() {
+    const inputs = this.element.querySelectorAll("input[data-filter]");
+    const apply = (text) => {
+      this.#filter = text;
+      const needle = text.trim().toLocaleLowerCase();
+      for (const entry of this.element.querySelectorAll(".mmrpg-entry[data-search]")) {
+        entry.hidden = needle !== "" && !entry.dataset.search.includes(needle);
+      }
+      for (const section of this.element.querySelectorAll(".mmrpg-item-section")) {
+        const entries = section.querySelectorAll(".mmrpg-entry");
+        if (!entries.length) continue;
+        section.hidden = needle !== "" && [...entries].every((e) => e.hidden);
+      }
+      for (const input of inputs) if (input.value !== text) input.value = text;
+    };
+    for (const input of inputs) {
+      input.addEventListener("input", (event) => apply(event.target.value));
+    }
+    if (this.#filter) apply(this.#filter);
+  }
+
+  /** Lembra quais descrições o usuário abriu ou fechou. */
+  #trackDescriptions() {
+    for (const details of this.element.querySelectorAll("details[data-item-id]")) {
+      details.addEventListener("toggle", () => this.#descriptionState.set(details.dataset.itemId, details.open));
     }
   }
 
@@ -346,6 +439,10 @@ export default class MMRPGActorSheet extends HandlebarsApplicationMixin(ActorShe
     await this.actor.toggleStatusEffect(target.dataset.status);
   }
 
+  static #onOpenAppearance() {
+    return openAppearanceDialog();
+  }
+
   static async #onTeamManeuver() {
     const { default: TeamManeuverApp } = await import("../team-maneuver.mjs");
     TeamManeuverApp.open(this.actor);
@@ -369,6 +466,62 @@ function originName(effect) {
   } catch (err) {
     return "";
   }
+}
+
+/** Linhas curtas "rótulo: valor" de um item, para a lista da ficha. */
+function itemMeta(item) {
+  const s = item.system;
+  const out = [];
+  const add = (label, value) => {
+    const text = value === undefined || value === null ? "" : String(value).trim();
+    if (text) out.push({ label: loc(label), value: text });
+  };
+  switch (item.type) {
+    case "power":
+      if (Number(s.level) > 0) add("MMRPG.Item.level", s.level);
+      add("MMRPG.Item.range", s.range);
+      add("MMRPG.Item.duration", s.duration);
+      break;
+    case "weapon":
+      add("MMRPG.Item.weaponKind", MMRPG.weaponKinds[s.kind] ? loc(MMRPG.weaponKinds[s.kind]) : "");
+      add("MMRPG.Item.category", s.category);
+      add("MMRPG.Item.range", s.range);
+      add("MMRPG.Item.reach", s.reach);
+      add("MMRPG.Item.recommendedRank", s.recommendedRank);
+      break;
+    case "gear":
+      add("MMRPG.Item.category", s.category);
+      add("MMRPG.Item.price", s.price);
+      break;
+    case "trait":
+      add("MMRPG.Item.restriction", s.restriction);
+      break;
+    case "tag":
+      add("MMRPG.Item.restriction", s.restriction);
+      add("MMRPG.Item.rarity", s.rarity);
+      break;
+  }
+  return out;
+}
+
+/** Texto puro e curto da descrição (primeiras palavras), para o resumo da lista. */
+export function excerptOf(html, max = 170) {
+  const text = String(html ?? "")
+    .replace(/<\/(p|div|li|h[1-6]|tr)>/gi, " ")
+    .replace(/<br\s*\/?>/gi, " ")
+    .replace(/<[^>]*>/g, "")
+    .replace(/&nbsp;/g, " ")
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
+    .replace(/&amp;/g, "&")
+    .replace(/\s+/g, " ")
+    .trim();
+  if (text.length <= max) return text;
+  const cut = text.slice(0, max);
+  const space = cut.lastIndexOf(" ");
+  return `${(space > max * 0.6 ? cut.slice(0, space) : cut).replace(/[\s,;:.\-]+$/, "")}…`;
 }
 
 function enrich(html, document) {

@@ -1,5 +1,5 @@
-<div class="mmrpg-detail-grid">
-  <label class="mmrpg-field">
+<div class="mm-detail-grid">
+  <label class="mm-field">
     <span>{{localize "MMRPG.Item.weaponKind"}}</span>
     <select name="system.kind" {{#unless editable}}disabled{{/unless}}>
       {{#each weaponKindOptions}}
@@ -7,23 +7,23 @@
       {{/each}}
     </select>
   </label>
-  <label class="mmrpg-field">
+  <label class="mm-field">
     <span>{{localize "MMRPG.Item.category"}}</span>
     <input type="text" name="system.category" value="{{source.category}}" {{#unless editable}}disabled{{/unless}}>
   </label>
-  <label class="mmrpg-field">
+  <label class="mm-field">
     <span>{{localize "MMRPG.Item.range"}}</span>
     <input type="text" name="system.range" value="{{source.range}}" {{#unless editable}}disabled{{/unless}}>
   </label>
-  <label class="mmrpg-field">
+  <label class="mm-field">
     <span>{{localize "MMRPG.Item.reach"}}</span>
     <input type="text" name="system.reach" value="{{source.reach}}" {{#unless editable}}disabled{{/unless}}>
   </label>
-  <label class="mmrpg-field">
+  <label class="mm-field">
     <span>{{localize "MMRPG.Item.recommendedRank"}}</span>
     <input type="text" name="system.recommendedRank" value="{{source.recommendedRank}}" {{#unless editable}}disabled{{/unless}}>
   </label>
-  <label class="mmrpg-field">
+  <label class="mm-field">
     <span>{{localize "MMRPG.Item.quantity"}}</span>
     <input type="number" name="system.quantity" value="{{source.quantity}}" min="0" step="1" {{#unless editable}}disabled{{/unless}}>
   </label>

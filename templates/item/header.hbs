@@ -1,11 +1,16 @@
-<header class="mmrpg-header item-header">
-  <div class="mmrpg-portrait small">
-    <img src="{{item.img}}" alt="{{item.name}}" data-action="editImage" data-edit="img" title="{{localize 'MMRPG.Sheet.changeImage'}}">
+<header class="mm-item-header">
+  <div class="mm-item-portrait">
+    <div class="mm-portrait">
+      <img src="{{item.img}}" alt="{{item.name}}" data-action="editImage" data-edit="img" title="{{localize 'MMRPG.Sheet.changeImage'}}">
+    </div>
   </div>
-  <div class="mmrpg-header-main">
-    <input class="mmrpg-name" type="text" name="name" value="{{item.name}}" placeholder="{{localize 'MMRPG.Sheet.name'}}" {{#unless editable}}disabled{{/unless}}>
-    <div class="mmrpg-header-row">
-      <span class="mmrpg-chip">{{typeLabel}}</span>
+  <div class="mm-item-head-main">
+    <label class="mm-field is-name">
+      <span>{{localize "MMRPG.Sheet.name"}}</span>
+      <input type="text" name="name" value="{{item.name}}" placeholder="{{localize 'MMRPG.Sheet.name'}}" {{#unless editable}}disabled{{/unless}}>
+    </label>
+    <div class="mm-identity">
+      <span class="mmrpg-chip solid">{{typeLabel}}</span>
       {{#if isForm}}
         <span class="mmrpg-chip {{#if formActive}}active{{/if}}">{{#if formActive}}{{localize "MMRPG.Form.active"}}{{else}}{{localize "MMRPG.Form.inactive"}}{{/if}}</span>
         {{#if canToggleForm}}
@@ -14,8 +19,7 @@
           </button>
         {{/if}}
       {{/if}}
-      <label class="mmrpg-field inline grow">
-        <span>{{localize "MMRPG.Item.source"}}</span>
+      <label class="mm-id-item mm-source"><b>{{localize "MMRPG.Item.source"}}</b>
         <input type="text" name="system.source" value="{{source.source}}" {{#unless editable}}disabled{{/unless}}>
       </label>
     </div>

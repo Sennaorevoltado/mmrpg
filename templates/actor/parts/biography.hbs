@@ -10,10 +10,10 @@
     <label class="mmrpg-field"><span>{{localize "MMRPG.Sheet.teams"}}</span><input type="text" name="system.details.teams" value="{{source.details.teams}}" {{#unless editable}}disabled{{/unless}}></label>
     <label class="mmrpg-field"><span>{{localize "MMRPG.Sheet.base"}}</span><input type="text" name="system.details.base" value="{{source.details.base}}" {{#unless editable}}disabled{{/unless}}></label>
   </div>
-  <h3>{{localize "MMRPG.Sheet.biography"}}</h3>
+  <h4 class="mm-sub">{{localize "MMRPG.Sheet.biography"}}</h4>
   <prose-mirror name="system.biography" value="{{source.biography}}" toggled>{{{enriched.biography}}}</prose-mirror>
-  <h3>{{localize "MMRPG.Sheet.personality"}}</h3>
+  <h4 class="mm-sub">{{localize "MMRPG.Sheet.personality"}}</h4>
   <prose-mirror name="system.personality" value="{{source.personality}}" toggled>{{{enriched.personality}}}</prose-mirror>
-  <h3>{{localize "MMRPG.Sheet.notes"}}</h3>
+  <h4 class="mm-sub">{{localize "MMRPG.Sheet.notes"}}</h4>
   <prose-mirror name="system.notes" value="{{source.notes}}" toggled>{{{enriched.notes}}}</prose-mirror>
 </section>

@@ -7,7 +7,7 @@ O sistema **não inclui conteúdo dos livros**. Quem joga monta o próprio arqui
 ## Como importar
 
 1. Entre como GM.
-2. Abra **Configurações → Configurar opções do sistema → Importar conteúdo**, ou use o botão **Importar conteúdo** no topo da aba *Itens*.
+2. Abra **Configurações → Configurar opções do sistema → Importar conteúdo**, ou use o botão **Importar conteúdo** no topo da aba *Itens* ou da aba *Compêndios*.
 3. Escolha o `.json`. A janela mostra quantos itens de cada tipo foram lidos e lista erros e avisos.
 4. Escolha o que fazer se já existir um item com o mesmo tipo e nome: **ignorar**, **atualizar o existente** ou **criar cópia**.
 5. Escolha o **destino**: *Compêndios do mundo (um por tipo)* ou *Itens do mundo*. Veja a seção abaixo.

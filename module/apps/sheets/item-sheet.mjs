@@ -5,6 +5,7 @@
 import { MMRPG } from "../../config.mjs";
 import ActionEditor from "../action-editor.mjs";
 import { FORM_CHANGE_TYPES } from "../../rules/forms.mjs";
+import { openAppearanceDialog } from "../../helpers/appearance.mjs";
 
 const { ItemSheetV2 } = foundry.applications.sheets;
 const { HandlebarsApplicationMixin } = foundry.applications.api;
@@ -21,6 +22,7 @@ export default class MMRPGItemSheet extends HandlebarsApplicationMixin(ItemSheet
     actions: {
       switchTab: MMRPGItemSheet.#onSwitchTab,
       editImage: MMRPGItemSheet.#onEditImage,
+      openAppearance: MMRPGItemSheet.#onOpenAppearance,
       addAction: MMRPGItemSheet.#onAddAction,
       editAction: MMRPGItemSheet.#onEditAction,
       duplicateAction: MMRPGItemSheet.#onDuplicateAction,
@@ -43,6 +45,15 @@ export default class MMRPGItemSheet extends HandlebarsApplicationMixin(ItemSheet
   };
 
   #activeTab = "description";
+
+  /* -------------------------------------------- */
+
+  /** Menu da janela: opções de aparência (tema, tamanho do texto, densidade). */
+  _getHeaderControls() {
+    const controls = super._getHeaderControls?.() ?? [];
+    controls.push({ icon: "fa-solid fa-font", label: "MMRPG.Appearance.title", action: "openAppearance" });
+    return controls;
+  }
 
   /* -------------------------------------------- */
 
@@ -154,7 +165,9 @@ export default class MMRPGItemSheet extends HandlebarsApplicationMixin(ItemSheet
 
   #applyTab() {
     for (const el of this.element.querySelectorAll("[data-tab]")) {
-      el.classList.toggle("active", el.dataset.tab === this.#activeTab);
+      const active = el.dataset.tab === this.#activeTab;
+      el.classList.toggle("active", active);
+      if (el.matches(".mm-tab")) el.setAttribute("aria-selected", String(active));
     }
   }
 
@@ -206,6 +219,10 @@ export default class MMRPGItemSheet extends HandlebarsApplicationMixin(ItemSheet
   static #onSwitchTab(event, target) {
     this.#activeTab = target.dataset.tab;
     this.#applyTab();
+  }
+
+  static #onOpenAppearance() {
+    return openAppearanceDialog();
   }
 
   static async #onEditImage(event, target) {

@@ -1,27 +1,39 @@
 <div class="mmrpg-sheet item {{type}}">
   {{> "systems/mmrpg/templates/item/header.hbs"}}
 
-  <nav class="mmrpg-tabs">
-    <a data-action="switchTab" data-tab="description">{{localize "MMRPG.Tabs.description"}}</a>
-    <a data-action="switchTab" data-tab="details">{{localize "MMRPG.Tabs.details"}}</a>
-    {{#if hasActions}}<a data-action="switchTab" data-tab="actions">{{localize "MMRPG.Tabs.actions"}} ({{actions.length}})</a>{{/if}}
-    <a data-action="switchTab" data-tab="effects">{{localize "MMRPG.Tabs.effects"}}</a>
+  <nav class="mm-tabs" role="tablist" aria-label="{{localize 'MMRPG.Sheet.sections'}}">
+    <button type="button" class="mm-tab" role="tab" data-action="switchTab" data-tab="description">{{localize "MMRPG.Tabs.description"}}</button>
+    <button type="button" class="mm-tab" role="tab" data-action="switchTab" data-tab="details">{{localize "MMRPG.Tabs.details"}}</button>
+    {{#if hasActions}}<button type="button" class="mm-tab" role="tab" data-action="switchTab" data-tab="actions">{{localize "MMRPG.Tabs.actions"}} ({{actions.length}})</button>{{/if}}
+    <button type="button" class="mm-tab" role="tab" data-action="switchTab" data-tab="effects">{{localize "MMRPG.Tabs.effects"}}</button>
   </nav>
 
   <div class="mmrpg-panels">
     <section class="mmrpg-panel" data-tab="description">
-      {{> "systems/mmrpg/templates/item/description.hbs"}}
+      <div class="mm-panel">
+        <h3>{{localize "MMRPG.Tabs.description"}}</h3>
+        <div class="mm-panel-body">
+          {{> "systems/mmrpg/templates/item/description.hbs"}}
+        </div>
+      </div>
     </section>
 
     <section class="mmrpg-panel" data-tab="details">
-      {{#if (eq type "power")}}{{> "systems/mmrpg/templates/item/details-power.hbs"}}{{/if}}
-      {{#if (eq type "trait")}}{{> "systems/mmrpg/templates/item/details-trait.hbs"}}{{/if}}
-      {{#if (eq type "tag")}}{{> "systems/mmrpg/templates/item/details-tag.hbs"}}{{/if}}
-      {{#if (eq type "origin")}}{{> "systems/mmrpg/templates/item/details-origin.hbs"}}{{/if}}
-      {{#if (eq type "occupation")}}{{> "systems/mmrpg/templates/item/details-occupation.hbs"}}{{/if}}
-      {{#if (eq type "weapon")}}{{> "systems/mmrpg/templates/item/details-weapon.hbs"}}{{/if}}
-      {{#if (eq type "gear")}}{{> "systems/mmrpg/templates/item/details-gear.hbs"}}{{/if}}
-      {{#if (eq type "form")}}{{> "systems/mmrpg/templates/item/details-form.hbs"}}{{/if}}
+      <div class="mm-panel">
+        <h3>{{localize "MMRPG.Tabs.details"}}</h3>
+        <div class="mm-panel-body">
+          {{#if (eq type "power")}}{{> "systems/mmrpg/templates/item/details-power.hbs"}}{{/if}}
+          {{#if (eq type "trait")}}{{> "systems/mmrpg/templates/item/details-trait.hbs"}}{{/if}}
+          {{#if (eq type "tag")}}{{> "systems/mmrpg/templates/item/details-tag.hbs"}}{{/if}}
+          {{#if (eq type "origin")}}{{> "systems/mmrpg/templates/item/details-origin.hbs"}}{{/if}}
+          {{#if (eq type "occupation")}}{{> "systems/mmrpg/templates/item/details-occupation.hbs"}}{{/if}}
+          {{#if (eq type "weapon")}}{{> "systems/mmrpg/templates/item/details-weapon.hbs"}}{{/if}}
+          {{#if (eq type "gear")}}{{> "systems/mmrpg/templates/item/details-gear.hbs"}}{{/if}}
+          {{#if (eq type "form")}}{{> "systems/mmrpg/templates/item/details-form.hbs"}}{{/if}}
+        </div>
+      </div>
+      {{#if isForm}}{{> "systems/mmrpg/templates/item/changes.hbs"}}{{/if}}
+      {{#if isGranting}}{{> "systems/mmrpg/templates/item/grants.hbs"}}{{/if}}
     </section>
 
     {{#if hasActions}}

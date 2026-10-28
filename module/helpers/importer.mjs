@@ -4,37 +4,11 @@
 
 import { MMRPG } from "../config.mjs";
 import { ITEM_TYPES, buildContentFile, contentKey, resolveGrants } from "./content-format.mjs";
-import { describePacks, ensurePack, ensurePackFolder, existingPacks } from "./compendia.mjs";
+import { describePacks, ensurePack, ensurePackFolder, ensureWorldFolder, existingPacks } from "./compendia.mjs";
 import { changeData, changeTypeOf } from "./compat.mjs";
 
 /** Destinos possíveis da importação. */
 export const DESTINATIONS = Object.freeze({ world: "world", compendia: "compendia" });
-
-/**
- * Pasta de itens do mundo a partir de um caminho ("A/B"), criando o que faltar.
- * @param {string[]} path
- * @param {Map<string, Folder>} cache
- * @returns {Promise<string|null>} id da pasta
- */
-async function ensureFolder(path, cache) {
-  if (!path.length) return null;
-  let parent = null;
-  let id = null;
-  for (let i = 0; i < path.length; i++) {
-    const key = path.slice(0, i + 1).join("/");
-    let folder = cache.get(key);
-    if (!folder) {
-      folder =
-        game.folders.find(
-          (f) => f.type === "Item" && f.name === path[i] && (f.folder?.id ?? null) === (parent?.id ?? null)
-        ) ?? (await Folder.create({ name: path[i], type: "Item", folder: parent?.id ?? null }));
-      cache.set(key, folder);
-    }
-    parent = folder;
-    id = folder.id;
-  }
-  return id;
-}
 
 /** Destino "itens do mundo". */
 function worldTarget() {
@@ -44,7 +18,7 @@ function worldTarget() {
       for (const existing of game.items) known.set(contentKey(existing.type, existing.name), existing);
     },
     async place(entry) {
-      return { folder: await ensureFolder(entry.folder, folderCache), options: {} };
+      return { folder: await ensureWorldFolder(entry.folder, folderCache), options: {} };
     }
   };
 }

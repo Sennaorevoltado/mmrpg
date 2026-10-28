@@ -2,7 +2,7 @@
   "id": "mmrpg",
   "title": "Marvel Multiverse RPG (não oficial)",
   "description": "Sistema não oficial de Marvel Multiverse RPG para Foundry VTT (v14; v13 experimental). Não inclui conteúdo dos livros: importe o seu próprio.",
-  "version": "0.3.1",
+  "version": "0.4.0",
   "compatibility": {
     "minimum": "13"
   },

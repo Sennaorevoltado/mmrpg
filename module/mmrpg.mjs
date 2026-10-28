@@ -19,6 +19,7 @@ import TeamManeuverApp from "./apps/team-maneuver.mjs";
 import { registerHandlebarsHelpers, preloadTemplates } from "./helpers/handlebars.mjs";
 import { registerDocumentSheet, unregisterCoreSheets, foundryGeneration } from "./helpers/compat.mjs";
 import { registerSettings } from "./helpers/settings.mjs";
+import { registerAppearanceSettings, applyAppearance } from "./helpers/appearance.mjs";
 import { registerStatusEffects } from "./helpers/status-effects.mjs";
 import { registerCombatHooks } from "./helpers/combat.mjs";
 import { registerFormHooks } from "./helpers/forms.mjs";
@@ -63,6 +64,7 @@ Hooks.once("init", () => {
 
   registerStatusEffects();
   registerSettings();
+  registerAppearanceSettings();
   registerHandlebarsHelpers();
   registerHotbar();
   registerCombatHooks();
@@ -118,13 +120,18 @@ Hooks.once("ready", () => {
   registerApplyHandler();
 });
 
+// Aparência escolhida pelo usuário (tema, tamanho do texto…) em todas as janelas do sistema.
+Hooks.on("renderApplicationV2", (app, element) => {
+  if (element?.classList?.contains("mmrpg")) applyAppearance(element);
+});
+
 // Botões dos cartões do chat
 Hooks.on("renderChatMessageHTML", (message, html) => {
   activateCardListeners(message, html);
 });
 
-// Botão de importação no diretório de itens (GM)
-Hooks.on("renderItemDirectory", (app, html) => {
+// Botão de importação nos diretórios de itens e de compêndios (GM)
+function addImportButton(app, html) {
   if (!game.user.isGM) return;
   const root = html instanceof HTMLElement ? html : html?.[0];
   if (!root || root.querySelector(".mmrpg-import-button")) return;
@@ -136,4 +143,7 @@ Hooks.on("renderItemDirectory", (app, html) => {
   button.innerHTML = `<i class="fa-solid fa-file-import"></i> ${game.i18n.localize("MMRPG.Importer.open")}`;
   button.addEventListener("click", () => ContentImporter.open());
   header.append(button);
-});
+}
+Hooks.on("renderItemDirectory", addImportButton);
+Hooks.on("renderCompendiumDirectory", addImportButton);
+

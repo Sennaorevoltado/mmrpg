@@ -1,0 +1,37 @@
+<div class="mm-panel wide-tab mmrpg-form-changes">
+  <h3>{{localize "MMRPG.Form.changes"}}</h3>
+  <div class="mm-panel-body">
+    <p class="mmrpg-muted">{{localize "MMRPG.Form.changesHint"}}</p>
+    {{#if editable}}
+      <div class="mmrpg-toolbar">
+        <button type="button" class="mmrpg-wide-button" data-action="addChange">
+          <i class="fa-solid fa-plus"></i> {{localize "MMRPG.Form.addChange"}}
+        </button>
+      </div>
+    {{/if}}
+    <datalist id="{{changeListId}}">
+      {{#each changeKeySuggestions}}<option value="{{this}}"></option>{{/each}}
+    </datalist>
+    {{#if formChanges.length}}
+      <ul class="mmrpg-item-list">
+        {{#each formChanges}}
+          <li class="mmrpg-item mmrpg-change-row">
+            <input type="text" class="mmrpg-change-key" list="{{../changeListId}}" data-change-field="key" data-index="{{index}}" value="{{key}}" placeholder="{{localize 'MMRPG.Form.changeKey'}}" aria-label="{{localize 'MMRPG.Form.changeKey'}}" {{#unless ../editable}}disabled{{/unless}}>
+            <select data-change-field="type" data-index="{{index}}" aria-label="{{localize 'MMRPG.Form.changeType'}}" {{#unless ../editable}}disabled{{/unless}}>
+              {{#each types}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}
+            </select>
+            <input type="text" class="mmrpg-change-value" data-change-field="value" data-index="{{index}}" value="{{value}}" placeholder="{{localize 'MMRPG.Form.changeValue'}}" aria-label="{{localize 'MMRPG.Form.changeValue'}}" {{#unless ../editable}}disabled{{/unless}}>
+            <input type="number" class="mmrpg-change-priority" data-change-field="priority" data-index="{{index}}" value="{{priority}}" step="1" placeholder="{{localize 'MMRPG.Form.changePriority'}}" aria-label="{{localize 'MMRPG.Form.changePriority'}}" title="{{localize 'MMRPG.Form.changePriorityHint'}}" {{#unless ../editable}}disabled{{/unless}}>
+            {{#if ../editable}}
+              <button type="button" class="mmrpg-icon-button" data-action="removeChange" data-index="{{index}}" title="{{localize 'MMRPG.Sheet.delete'}}" aria-label="{{localize 'MMRPG.Sheet.delete'}}">
+                <i class="fa-solid fa-trash"></i>
+              </button>
+            {{/if}}
+          </li>
+        {{/each}}
+      </ul>
+    {{else}}
+      <p class="mmrpg-empty">{{localize "MMRPG.Form.noChanges"}}</p>
+    {{/if}}
+  </div>
+</div>

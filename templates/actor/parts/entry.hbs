@@ -1,0 +1,53 @@
+<li class="mmrpg-entry {{#if equipped}}is-equipped{{/if}}" data-item-id="{{id}}" data-search="{{search}}">
+  <div class="mmrpg-entry-head">
+    <img class="mmrpg-entry-icon" src="{{img}}" alt="">
+    <div class="mmrpg-entry-title">
+      <button type="button" class="mmrpg-entry-name" data-action="editItem" data-item-id="{{id}}">{{name}}</button>
+      {{#if meta.length}}
+        <div class="mmrpg-entry-meta">
+          {{#each meta}}<span><b>{{label}}:</b> {{value}}</span>{{/each}}
+          {{#if ../showQuantity}}<span class="qty">&times;{{../quantity}}</span>{{/if}}
+        </div>
+      {{else}}
+        {{#if showQuantity}}<div class="mmrpg-entry-meta"><span class="qty">&times;{{quantity}}</span></div>{{/if}}
+      {{/if}}
+    </div>
+    <div class="mmrpg-entry-controls">
+      {{#if showEquip}}
+        <button type="button" class="mmrpg-equip {{#if equipped}}is-on{{/if}}" data-action="toggleEquipped" data-item-id="{{id}}" aria-pressed="{{#if equipped}}true{{else}}false{{/if}}" title="{{localize 'MMRPG.Sheet.equipHint'}}">
+          <i class="fa-solid fa-hand-fist"></i> {{#if equipped}}{{localize "MMRPG.Sheet.equipped"}}{{else}}{{localize "MMRPG.Sheet.stored"}}{{/if}}
+        </button>
+      {{/if}}
+      <button type="button" class="mmrpg-icon-button" data-action="editItem" data-item-id="{{id}}" title="{{localize 'MMRPG.Sheet.edit'}}" aria-label="{{localize 'MMRPG.Sheet.edit'}}: {{name}}">
+        <i class="fa-solid fa-pen-to-square"></i>
+      </button>
+      {{#if editable}}
+        <button type="button" class="mmrpg-icon-button" data-action="deleteItem" data-item-id="{{id}}" title="{{localize 'MMRPG.Sheet.delete'}}" aria-label="{{localize 'MMRPG.Sheet.delete'}}: {{name}}">
+          <i class="fa-solid fa-trash"></i>
+        </button>
+      {{/if}}
+    </div>
+  </div>
+  {{#if hasActions}}
+    <div class="mmrpg-entry-actions">
+      {{#each actions}}
+        <button type="button" class="mmrpg-action-button" data-action="useAction" data-item-id="{{../id}}" data-action-id="{{id}}" data-drag-action data-item-uuid="{{../uuid}}" title="{{#if hasCost}}{{cost}}{{else}}{{localize 'MMRPG.Sheet.useAction'}}{{/if}}">
+          <i class="fa-solid fa-bolt"></i> {{label}}
+          {{#if rolls}}<small>{{ability}}</small>{{/if}}
+          {{#if hasCost}}<small>{{cost}}</small>{{/if}}
+          {{#if limited}}<small>{{uses.value}}/{{uses.max}}</small>{{/if}}
+        </button>
+      {{/each}}
+    </div>
+  {{/if}}
+  {{#if hasDescription}}
+    <details class="mmrpg-entry-desc" data-item-id="{{id}}" {{#if descriptionOpen}}open{{/if}}>
+      <summary>
+        <i class="fa-solid fa-chevron-right mmrpg-chevron" aria-hidden="true"></i>
+        <span class="mmrpg-excerpt">{{excerpt}}</span>
+        <span class="mmrpg-more"><span class="more">{{localize "MMRPG.Sheet.readMore"}}</span><span class="less">{{localize "MMRPG.Sheet.readLess"}}</span></span>
+      </summary>
+      <div class="mmrpg-prose">{{{descriptionHtml}}}</div>
+    </details>
+  {{/if}}
+</li>

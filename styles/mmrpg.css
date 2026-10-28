@@ -1,36 +1,111 @@
-/* Marvel Multiverse RPG (não oficial) — vermelho, preto e dourado. Sem emojis; ícones Font Awesome. */
+/*
+ * Marvel Multiverse RPG (não oficial)
+ *
+ * Fichas no estilo da ficha impressa do livro: painéis vermelhos com cantos chanfrados,
+ * campos creme, Saúde em vermelho e Foco em azul. A linguagem visual se inspira na ficha do
+ * sistema comunitário mjording/marvel-multiverse (MIT; veja o NOTICE). Código e estilos escritos
+ * aqui; nenhuma imagem do livro ou do outro sistema é usada.
+ *
+ * Dois temas (opção de cada jogador): "Livro" (claro, o padrão) e "Escuro".
+ * Sem emojis; ícones Font Awesome. Texto em em: o tamanho da letra muda numa variável só.
+ */
 
-.mmrpg,
+/* ---------- Fontes (Roboto: Apache 2.0; Roboto Condensed: SIL OFL 1.1; a licença fica em cada pasta de fonts) ---------- */
+
+@font-face { font-family: "MM Roboto"; font-weight: 400; font-style: normal; font-display: swap; src: url("../fonts/roboto/Roboto-Regular.woff2") format("woff2"); }
+@font-face { font-family: "MM Roboto"; font-weight: 700; font-style: normal; font-display: swap; src: url("../fonts/roboto/Roboto-Bold.woff2") format("woff2"); }
+@font-face { font-family: "MM Roboto"; font-weight: 400; font-style: italic; font-display: swap; src: url("../fonts/roboto/Roboto-Italic.woff2") format("woff2"); }
+@font-face { font-family: "MM Roboto"; font-weight: 700; font-style: italic; font-display: swap; src: url("../fonts/roboto/Roboto-BoldItalic.woff2") format("woff2"); }
+@font-face { font-family: "MM Roboto Condensed"; font-weight: 400; font-style: normal; font-display: swap; src: url("../fonts/roboto-condensed/RobotoCondensed-Regular.woff2") format("woff2"); }
+@font-face { font-family: "MM Roboto Condensed"; font-weight: 700; font-style: normal; font-display: swap; src: url("../fonts/roboto-condensed/RobotoCondensed-Bold.woff2") format("woff2"); }
+
+/* ---------- Cores e tamanhos ---------- */
+
+.mmrpg {
+  /* Marca */
+  --mm-red: #e41d18;
+  --mm-red-dark: #8b0502;
+  --mm-blue: #0088cd;
+  --mm-blue-dark: #00599e;
+  --mm-gold: #ffc82e;
+  --mm-green: #1b8a4a;
+  /* Página (fora dos painéis) */
+  --mm-bg: #e5e4e2;
+  --mm-text: #141012;
+  --mm-muted: #565056;
+  --mm-border: #c9b9b2;
+  /* Campos e cartões (sobre os painéis) */
+  --mm-surface: #fff4ef;
+  --mm-surface-2: #f7e4dc;
+  --mm-surface-text: #0d0b0c;
+  --mm-surface-muted: #5a4f53;
+  --mm-on-red: #ffffff;
+
+  --mm-radius: 3px;
+  --mm-gap: 0.5em;
+  --mm-font: 15px;
+
+  font-family: "MM Roboto", "Segoe UI", system-ui, sans-serif;
+}
+
+.mmrpg[data-mm-theme="dark"] {
+  --mm-red: #c8191c;
+  --mm-red-dark: #6f0a0c;
+  --mm-blue: #1d96d6;
+  --mm-blue-dark: #0b5f95;
+  --mm-bg: #141217;
+  --mm-text: #f2eef4;
+  --mm-muted: #b5aebd;
+  --mm-border: #3d3745;
+  --mm-surface: #24202a;
+  --mm-surface-2: #2e2935;
+  --mm-surface-text: #f5f1f7;
+  --mm-surface-muted: #b9b1c2;
+}
+
+.mmrpg[data-mm-text="large"] { --mm-font: 17px; }
+.mmrpg[data-mm-text="xlarge"] { --mm-font: 19px; }
+.mmrpg[data-mm-density="compact"] { --mm-gap: 0.3em; }
+
+/* Cartões e rolagens no chat: sempre escuros, qualquer que seja o tema da ficha. */
 .mmrpg-card {
+  --mm-red: #d6262c;
+  --mm-red-dark: #8f1519;
+  --mm-gold: #e8b923;
+  --mm-green: #3fa66b;
+  --mm-blue: #4a8fd8;
   --mm-bg: #141110;
   --mm-surface: #1e1a18;
   --mm-surface-2: #29231f;
   --mm-border: #3d342e;
   --mm-text: #f0ebe2;
   --mm-muted: #a89f93;
-  --mm-red: #d6262c;
-  --mm-red-dark: #8f1519;
-  --mm-gold: #e8b923;
-  --mm-green: #3fa66b;
-  --mm-blue: #4a8fd8;
   --mm-radius: 6px;
   --mm-gap: 0.5rem;
 }
 
-/* ---------- Janelas ---------- */
+/* ---------- Janela ---------- */
 
 .mmrpg.application .window-content {
   background: var(--mm-bg);
   color: var(--mm-text);
+  font-size: var(--mm-font);
+  line-height: 1.4;
   padding: 0;
   overflow: hidden;
 }
 
 .mmrpg.application .window-header {
   background: var(--mm-red-dark);
-  border-bottom: 2px solid var(--mm-gold);
+  border-bottom: 3px solid var(--mm-red);
   color: #fff;
 }
+
+.mmrpg.application .window-header .window-title { font-family: "MM Roboto Condensed", "MM Roboto", sans-serif; font-weight: 700; letter-spacing: 0.02em; }
+
+.mmrpg *,
+.mmrpg *::before,
+.mmrpg *::after { box-sizing: border-box; }
 
 .mmrpg .mmrpg-sheet {
   display: flex;
@@ -39,345 +114,899 @@
   min-height: 0;
 }
 
-.mmrpg h3 {
-  margin: 0.75rem 0 0.35rem;
-  font-size: 0.95rem;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--mm-gold);
-  border: 0;
+.mmrpg a { color: var(--mm-red); cursor: pointer; text-decoration: none; }
+.mmrpg a:hover { color: var(--mm-red-dark); text-shadow: none; }
+.mmrpg[data-mm-theme="dark"] a { color: #ff7b78; }
+.mmrpg[data-mm-theme="dark"] a:hover { color: #fff; }
+
+.mmrpg h3, .mmrpg h4 { border: 0; }
+.mmrpg-muted { color: var(--mm-muted); font-size: 0.88em; }
+.mmrpg-empty { color: var(--mm-muted); font-style: italic; padding: 0.5em 0.2em; margin: 0; }
+.mmrpg [hidden] { display: none !important; }
+
+/* Foco visível: contorno dourado nos controles que não são recortados */
+.mmrpg a:focus-visible,
+.mmrpg button:focus-visible,
+.mmrpg summary:focus-visible,
+.mmrpg input:focus-visible,
+.mmrpg select:focus-visible,
+.mmrpg textarea:focus-visible {
+  outline: 3px solid var(--mm-gold);
+  outline-offset: 1px;
+  box-shadow: none;
 }
-
-.mmrpg a { color: var(--mm-gold); cursor: pointer; }
-.mmrpg a:hover { color: #fff; text-shadow: none; }
-
-.mmrpg-muted { color: var(--mm-muted); font-size: 0.85em; }
-.mmrpg-empty { color: var(--mm-muted); font-style: italic; padding: 0.4rem 0; }
 
 /* ---------- Campos ---------- */
 
 .mmrpg input[type="text"],
 .mmrpg input[type="number"],
+.mmrpg input[type="search"],
 .mmrpg select,
 .mmrpg textarea {
   background: var(--mm-surface);
-  color: var(--mm-text);
-  border: 1px solid var(--mm-border);
-  border-radius: 4px;
-  min-height: 1.9rem;
+  color: var(--mm-surface-text);
+  border: 2px solid var(--mm-red);
+  border-radius: 2px;
+  min-height: 2em;
+  font-family: inherit;
+  font-size: 1em;
+  box-shadow: none;
 }
 
 .mmrpg input:focus,
 .mmrpg select:focus,
-.mmrpg textarea:focus {
-  outline: none;
-  border-color: var(--mm-gold);
-  box-shadow: 0 0 0 1px var(--mm-gold);
-}
-
+.mmrpg textarea:focus { border-color: var(--mm-gold); box-shadow: none; outline: none; }
 .mmrpg input:disabled,
 .mmrpg select:disabled,
-.mmrpg textarea:disabled { opacity: 0.7; }
+.mmrpg textarea:disabled { opacity: 0.75; }
+.mmrpg option { background: var(--mm-surface); color: var(--mm-surface-text); }
+.mmrpg input::placeholder { color: var(--mm-surface-muted); opacity: 0.8; }
 
-.mmrpg option { background: var(--mm-surface); color: var(--mm-text); }
-
-.mmrpg-field { display: flex; flex-direction: column; gap: 0.15rem; min-width: 0; }
-.mmrpg-field > span { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--mm-muted); }
-.mmrpg-field.inline { flex-direction: row; align-items: center; gap: 0.4rem; }
-.mmrpg-field.inline > span { font-size: 0.8rem; }
+.mmrpg-field { display: flex; flex-direction: column; gap: 0.2em; min-width: 0; }
+.mmrpg-field > span { font-size: 0.78em; font-weight: 700; color: var(--mm-muted); }
+.mmrpg-field.inline { flex-direction: row; align-items: center; gap: 0.5em; }
+.mmrpg-field.inline > span { font-size: 0.9em; }
 .mmrpg-field.wide { grid-column: 1 / -1; }
 .mmrpg-field.grow { flex: 1; }
 
-.mmrpg-detail-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-  gap: var(--mm-gap);
-}
+.mmrpg-detail-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(11em, 1fr)); gap: 0.7em 0.8em; }
+.mmrpg-detail-grid > p.wide { grid-column: 1 / -1; margin: 0; }
 
-/* ---------- Cabeçalho ---------- */
-
-.mmrpg-header {
-  display: flex;
-  gap: 0.9rem;
-  padding: 0.8rem 1rem;
-  background: linear-gradient(135deg, var(--mm-red-dark), #2a0d0e 70%);
-  border-bottom: 3px solid var(--mm-gold);
-}
-
-.mmrpg-portrait img {
-  width: 96px;
-  height: 96px;
-  object-fit: cover;
-  border: 2px solid var(--mm-gold);
-  border-radius: var(--mm-radius);
-  cursor: pointer;
-  background: #000;
-}
-.mmrpg-portrait.small img { width: 64px; height: 64px; }
-
-.mmrpg-header-main { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 0.4rem; }
-.mmrpg-header-row { display: flex; flex-wrap: wrap; gap: 0.6rem; align-items: flex-end; }
-
-.mmrpg-name {
-  font-size: 1.5rem !important;
-  font-weight: 800;
-  letter-spacing: 0.03em;
-  background: transparent !important;
-  border: 0 !important;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.25) !important;
-  border-radius: 0 !important;
-  color: #fff !important;
-  height: auto;
-}
-
-.mmrpg-header .mmrpg-field > span { color: #f3c9ca; }
-
-/* ---------- Abas ---------- */
-
-.mmrpg-tabs {
-  display: flex;
-  flex-wrap: wrap;
-  background: #0d0b0a;
-  border-bottom: 1px solid var(--mm-border);
-}
-
-.mmrpg-tabs a {
-  padding: 0.55rem 0.9rem;
-  color: var(--mm-muted);
-  text-transform: uppercase;
-  font-size: 0.78rem;
-  letter-spacing: 0.06em;
-  border-bottom: 3px solid transparent;
-}
-
-.mmrpg-tabs a.active { color: var(--mm-gold); border-bottom-color: var(--mm-red); background: var(--mm-surface); }
-
-.mmrpg-panels { flex: 1; min-height: 0; overflow-y: auto; padding: 0.8rem 1rem 1.2rem; }
-.mmrpg-panel { display: none; }
-.mmrpg-panel.active { display: block; }
-
-/* ---------- Atributos ---------- */
-
-.mmrpg-abilities {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(215px, 1fr));
-  gap: var(--mm-gap);
-}
-
-.mmrpg-ability {
+/* Campo do livro: rótulo recortado sobre a borda do campo */
+.mm-field { position: relative; display: block; min-width: 0; padding-top: 0.55em; }
+.mm-field > span {
+  position: absolute;
+  top: 0;
+  left: 0.9em;
+  z-index: 2;
+  padding: 0 0.9em;
   background: var(--mm-surface);
-  border: 1px solid var(--mm-border);
-  border-top: 3px solid var(--mm-red);
-  border-radius: var(--mm-radius);
-  padding: 0.5rem 0.6rem;
-  display: grid;
-  grid-template-columns: 1fr auto;
-  gap: 0.3rem 0.6rem;
-  align-items: center;
-}
-
-.mmrpg-ability-head { display: flex; flex-direction: column; }
-.mmrpg-ability-name {
-  background: none;
-  border: 0;
-  padding: 0;
-  color: var(--mm-text);
+  color: var(--mm-surface-text);
+  border-top: 2px solid var(--mm-red);
+  clip-path: polygon(0.5em 0, calc(100% - 0.5em) 0, 100% 100%, 0 100%);
+  font-size: 0.68em;
   font-weight: 700;
-  text-align: left;
-  cursor: pointer;
-  line-height: 1.2;
+  line-height: 1.6;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
 }
-.mmrpg-ability-name:hover { color: var(--mm-gold); }
-
-.mmrpg-ability-value {
-  width: 3.4rem;
-  text-align: center;
-  font-size: 1.5rem;
-  font-weight: 800;
-  color: var(--mm-gold) !important;
+.mm-field > input,
+.mm-field > select {
+  width: 100%;
+  min-height: 2.5em;
+  padding: 0.5em 0.7em 0.2em;
+  font-weight: 700;
+  font-size: 1.05em;
 }
+.mm-field.is-name > input { font-size: 1.35em; padding-top: 0.45em; }
 
-.mmrpg-ability-derived { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.2rem 0.6rem; margin: 0; }
-.mmrpg-ability-derived div { display: flex; justify-content: space-between; align-items: center; }
-.mmrpg-ability-derived dt { font-size: 0.72rem; text-transform: uppercase; color: var(--mm-muted); }
-.mmrpg-ability-derived dd { margin: 0; font-weight: 700; }
+/* ---------- Botões e etiquetas ---------- */
 
-.mmrpg-edge-toggles { grid-column: 1 / -1; display: flex; gap: 0.8rem; font-size: 0.75rem; color: var(--mm-muted); }
-.mmrpg-edge-toggles label { display: flex; align-items: center; gap: 0.25rem; cursor: pointer; }
-
-/* ---------- Recursos ---------- */
-
-.mmrpg-resources { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: var(--mm-gap); margin-top: 0.8rem; }
-
-.mmrpg-resource {
-  background: var(--mm-surface);
-  border: 1px solid var(--mm-border);
-  border-radius: var(--mm-radius);
-  padding: 0.5rem 0.6rem;
-}
-
-.mmrpg-resource-title { font-weight: 700; text-transform: uppercase; font-size: 0.78rem; letter-spacing: 0.06em; margin-bottom: 0.3rem; }
-.mmrpg-bar { height: 10px; background: #000; border-radius: 5px; overflow: hidden; border: 1px solid var(--mm-border); }
-.mmrpg-bar-fill { height: 100%; transition: width 0.2s; }
-.mmrpg-resource.health .mmrpg-bar-fill { background: linear-gradient(90deg, var(--mm-red-dark), var(--mm-red)); }
-.mmrpg-resource.focus .mmrpg-bar-fill { background: linear-gradient(90deg, #1f5a99, var(--mm-blue)); }
-.mmrpg-resource.karma .mmrpg-bar-fill { background: linear-gradient(90deg, #a07c10, var(--mm-gold)); }
-
-.mmrpg-resource-fields { display: flex; align-items: center; gap: 0.3rem; margin: 0.35rem 0; }
-.mmrpg-resource-fields input { width: 100%; text-align: center; font-weight: 700; }
-
-/* ---------- Botões ---------- */
-
-.mmrpg button { cursor: pointer; }
+.mmrpg button { cursor: pointer; font-family: inherit; }
 
 .mmrpg-roll-button,
-.mmrpg-wide-button,
-.mmrpg-card button {
+.mmrpg-wide-button {
   background: var(--mm-red);
   color: #fff;
-  border: 1px solid var(--mm-red-dark);
-  border-radius: 4px;
-  padding: 0.25rem 0.6rem;
+  border: 2px solid var(--mm-red-dark);
+  border-radius: var(--mm-radius);
+  padding: 0.2em 0.7em;
   font-weight: 700;
-  line-height: 1.4;
+  line-height: 1.5;
   box-shadow: none;
+  text-shadow: none;
 }
-
 .mmrpg-roll-button:hover,
-.mmrpg-wide-button:hover,
-.mmrpg-card button:hover { background: #ee3a40; border-color: var(--mm-gold); color: #fff; }
-.mmrpg-roll-button.small { padding: 0 0.4rem; font-size: 0.85rem; }
-.mmrpg-wide-button { width: 100%; margin-top: 0.5rem; }
-.mmrpg-wide-button.danger { background: transparent; color: #ff8a8e; border-color: var(--mm-red-dark); }
+.mmrpg-wide-button:hover { background: var(--mm-red-dark); border-color: var(--mm-red-dark); color: #fff; }
+.mmrpg-roll-button.small { padding: 0 0.5em; font-size: 0.9em; }
+.mmrpg-wide-button { width: 100%; margin-top: 0.5em; }
+.mmrpg-wide-button.danger { background: transparent; color: var(--mm-red); border-color: var(--mm-red); }
 
 .mmrpg-icon-button {
-  background: transparent;
-  color: var(--mm-muted);
-  border: 1px solid var(--mm-border);
-  border-radius: 4px;
-  width: 1.7rem;
-  height: 1.7rem;
+  background: var(--mm-surface);
+  color: var(--mm-red);
+  border: 2px solid var(--mm-red);
+  border-radius: var(--mm-radius);
+  width: 1.9em;
+  height: 1.9em;
   padding: 0;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   box-shadow: none;
+  line-height: 1;
 }
-.mmrpg-icon-button:hover { color: var(--mm-gold); border-color: var(--mm-gold); background: transparent; }
-.mmrpg-icon-button.is-on { color: var(--mm-gold); border-color: var(--mm-gold); }
+.mmrpg-icon-button:hover { background: var(--mm-red); color: #fff; }
+.mmrpg-icon-button.is-on { background: var(--mm-red); color: #fff; }
 
 .mmrpg-chip {
   display: inline-flex;
   align-items: center;
-  gap: 0.25rem;
-  padding: 0.05rem 0.5rem;
-  border: 1px solid var(--mm-border);
+  gap: 0.3em;
+  padding: 0.05em 0.65em;
+  border: 2px solid var(--mm-red);
   border-radius: 999px;
-  background: var(--mm-surface-2);
-  color: var(--mm-text);
-  font-size: 0.75rem;
+  background: var(--mm-surface);
+  color: var(--mm-surface-text);
+  font-size: 0.8em;
+  font-weight: 700;
+  line-height: 1.5;
 }
-.mmrpg-chip.cost { border-color: var(--mm-blue); color: #a9cdf3; }
-.mmrpg-chip.element { border-color: var(--mm-gold); color: var(--mm-gold); }
-.mmrpg-chip.edge { border-color: var(--mm-green); color: #8fe0b2; }
-.mmrpg-chip.trouble { border-color: var(--mm-red); color: #ff9a9e; }
+.mmrpg-chip.cost { border-color: var(--mm-blue); }
+.mmrpg-chip.element { border-color: var(--mm-gold); background: var(--mm-gold); color: #1a1200; }
+.mmrpg-chip.edge { border-color: var(--mm-green); }
+.mmrpg-chip.trouble { border-color: var(--mm-red-dark); }
 .mmrpg-chip.fantastic,
-.mmrpg-chip.ultimate { background: var(--mm-gold); border-color: var(--mm-gold); color: #1a1200; font-weight: 800; }
-.mmrpg-chip.warn { border-color: var(--mm-gold); color: var(--mm-gold); }
-.mmrpg-chip.active { background: var(--mm-green); border-color: var(--mm-green); color: #06150c; font-weight: 700; }
+.mmrpg-chip.ultimate { background: var(--mm-gold); border-color: var(--mm-gold); color: #1a1200; }
+.mmrpg-chip.warn { border-color: var(--mm-gold); }
+.mmrpg-chip.active { background: var(--mm-green); border-color: var(--mm-green); color: #fff; }
+.mmrpg-chip.solid { background: var(--mm-red); border-color: var(--mm-red); color: #fff; }
 
-/* ---------- Listas de itens ---------- */
+/* ---------- Painel do livro ---------- */
 
-.mmrpg-section-head { display: flex; align-items: center; justify-content: space-between; }
+.mm-panel {
+  --tab-h: 2.1em;
+  --tab-w: 10.5em;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  padding: 3px;
+  background: var(--mm-red);
+  clip-path: polygon(0 0, calc(var(--tab-w) - 2.1em) 0, var(--tab-w) var(--tab-h), 100% var(--tab-h), 100% 100%, 0 100%);
+}
 
-.mmrpg-item-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.35rem; }
+.mm-panel > h3 {
+  position: relative;
+  top: 1px;
+  width: var(--tab-w);
+  height: var(--tab-h);
+  margin: 0;
+  padding: 0.35em 0.4em 0 0.7em;
+  background: var(--mm-red-dark);
+  clip-path: polygon(0 0, calc(100% - 2.1em) 0, 100% 100%, 0 100%);
+  color: var(--mm-on-red);
+  font-family: "MM Roboto Condensed", "MM Roboto", sans-serif;
+  font-size: 1.2em;
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  overflow: hidden;
+}
 
-.mmrpg-item {
+.mm-panel-body {
+  flex: 1;
+  min-width: 0;
+  padding: 0.6em;
+  color: var(--mm-on-red);
+  /* Meio-tom: pontinhos de gráfica sobre o vermelho */
+  background:
+    radial-gradient(rgba(0, 0, 0, 0.22) 1px, transparent 1.6px) 0 0 / 7px 7px,
+    linear-gradient(180deg, var(--mm-red-dark), var(--mm-red) 38%, var(--mm-red));
+}
+
+.mm-panel.flat > .mm-panel-body { background: var(--mm-red); }
+.mm-panel .mmrpg-muted,
+.mm-panel .hint { color: #ffe9e6; }
+.mm-panel-body > .mmrpg-empty { color: #fff; font-style: normal; font-weight: 700; }
+.mm-panel a { color: var(--mm-red); }
+
+/* ---------- Cabeçalho ---------- */
+
+.mm-header {
+  flex: 0 0 auto;
+  padding: 0.6em 0.7em 0.5em;
+  display: grid;
+  grid-template-columns: 11.4em minmax(0, 1fr);
+  gap: 0.6em 0.8em;
+  align-items: start;
+}
+
+.mm-col-left,
+.mm-col-right { display: flex; flex-direction: column; gap: 0.7em; min-width: 0; }
+
+.mm-portrait-block { position: relative; height: 11.4em; }
+
+.mm-portrait {
+  position: absolute;
+  inset: 0.9em 0 0.9em 0.9em;
+  background: var(--mm-red);
+  clip-path: polygon(0 0, 72% 0, 100% 28%, 100% 100%, 28% 100%, 0 72%);
+  display: flex;
+  align-items: stretch;
+  justify-content: stretch;
+  padding: 3px;
+}
+.mm-portrait img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border: 0;
+  background: #000;
+  cursor: pointer;
+  clip-path: polygon(0 0, 72% 0, 100% 28%, 100% 100%, 28% 100%, 0 72%);
+}
+
+/* Crachás octogonais (Rank e Karma) */
+.mm-badge {
+  --c: 0.8em;
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2px;
+  background: var(--mm-red);
+  clip-path: polygon(var(--c) 0, calc(100% - var(--c)) 0, 100% var(--c), 100% calc(100% - var(--c)), calc(100% - var(--c)) 100%, var(--c) 100%, 0 calc(100% - var(--c)), 0 var(--c));
+  text-align: center;
+}
+.mm-badge::before {
+  content: "";
+  position: absolute;
+  inset: 2px;
+  background: var(--mm-surface);
+  clip-path: polygon(var(--c) 0, calc(100% - var(--c)) 0, 100% var(--c), 100% calc(100% - var(--c)), calc(100% - var(--c)) 100%, var(--c) 100%, 0 calc(100% - var(--c)), 0 var(--c));
+}
+.mm-badge:focus-within { background: var(--mm-gold); }
+.mm-badge > * { position: relative; z-index: 1; }
+.mm-badge .mm-cap { font-size: 0.66em; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--mm-surface-muted); line-height: 1.1; }
+.mmrpg .mm-badge input[type="number"] {
+  background: transparent;
+  border: 0;
+  color: var(--mm-surface-text);
+  font-family: "MM Roboto Condensed", "MM Roboto", sans-serif;
+  font-weight: 700;
+  text-align: center;
+  padding: 0;
+  min-height: 0;
+}
+.mmrpg .mm-badge input[type="number"]:focus { outline: none; background: transparent; border: 0; }
+
+.mm-rank { top: 0; left: 0; width: 4.4em; height: 4.4em; }
+.mmrpg .mm-rank input[type="number"] { font-size: 2em; width: 100%; line-height: 1.1; }
+.mm-rank .mm-cap { margin-top: 0.1em; }
+
+.mm-karma { right: 0; bottom: 0; width: 5.6em; height: 4.2em; }
+.mm-karma .mm-karma-values { display: flex; align-items: center; gap: 0.1em; }
+.mmrpg .mm-karma input[type="number"] { font-size: 1.3em; width: 1.7em; line-height: 1.1; }
+.mm-karma .mm-sep { color: var(--mm-surface-muted); font-weight: 700; }
+
+/* Dano */
+.mm-damage .mm-panel-body { padding: 0.5em 0.5em 0.6em; display: flex; flex-direction: column; gap: 0.35em; }
+.mm-damage-row { display: grid; grid-template-columns: 2.6em minmax(0, 1fr) auto minmax(0, 0.8fr); align-items: center; gap: 0.3em; }
+.mm-damage-row abbr { text-decoration: none; font-size: 0.78em; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; }
+.mm-box {
   display: flex;
   align-items: center;
-  gap: 0.6rem;
-  padding: 0.4rem 0.5rem;
+  justify-content: center;
+  gap: 0.2em;
+  min-height: 2.1em;
+  padding: 0.15em 0.4em;
   background: var(--mm-surface);
-  border: 1px solid var(--mm-border);
-  border-left: 3px solid var(--mm-gold);
-  border-radius: var(--mm-radius);
+  color: var(--mm-surface-text);
+  border: 2px solid #000;
+  font-family: "MM Roboto Condensed", "MM Roboto", sans-serif;
+  font-size: 1.15em;
+  font-weight: 700;
+  line-height: 1;
+  white-space: nowrap;
 }
-.mmrpg-item.is-disabled { opacity: 0.55; }
-.mmrpg-item > img { width: 36px; height: 36px; object-fit: cover; border-radius: 4px; border: 0; background: #000; }
-.mmrpg-item-main { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 0.25rem; }
-.mmrpg-item-title { display: flex; align-items: baseline; gap: 0.5rem; flex-wrap: wrap; }
-.mmrpg-item-name { font-weight: 700; }
-.mmrpg-item-actions,
-.mmrpg-badges { display: flex; flex-wrap: wrap; gap: 0.3rem; }
-.mmrpg-item-controls { display: flex; gap: 0.25rem; }
-.mmrpg-grant-note { width: 10rem; }
+.mm-box.marvel { position: relative; padding-inline: 0.7em; }
+.mm-box.marvel::before, .mm-box.marvel::after { font-size: 1.5em; font-weight: 400; position: absolute; top: 50%; transform: translateY(-52%); line-height: 1; }
+.mm-box.marvel::before { content: "["; left: 0.05em; }
+.mm-box.marvel::after { content: "]"; right: 0.05em; }
+.mm-die-m { display: inline-flex; align-items: center; justify-content: center; width: 1.25em; height: 1.25em; background: var(--mm-red); color: #fff; border-radius: 0.2em; font-size: 0.85em; font-weight: 700; }
+.mm-plus { font-weight: 700; }
 
-.mmrpg-action-button {
-  background: var(--mm-surface-2);
-  color: var(--mm-text);
-  border: 1px solid var(--mm-border);
-  border-radius: 4px;
-  padding: 0.1rem 0.5rem;
-  font-size: 0.8rem;
+/* Nome, equipe, identidade */
+.mm-top-row { display: flex; gap: 0.6em; align-items: flex-end; }
+.mm-top-row .mm-field { flex: 1 1 auto; }
+.mm-top-row .mm-team { flex: 0 0 auto; }
+.mm-identity { display: flex; flex-wrap: wrap; gap: 0.35em 0.9em; align-items: center; font-size: 0.9em; margin-top: -0.2em; }
+.mm-identity .mm-id-item { display: inline-flex; gap: 0.35em; align-items: baseline; }
+.mm-identity .mm-id-item b { color: var(--mm-muted); font-size: 0.85em; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; }
+.mm-identity select { min-height: 1.7em; padding: 0 0.3em; font-weight: 700; }
+
+/* Blocos de Saúde, Foco e Velocidade */
+.mm-vitals { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.6em; padding-top: 1.1em; }
+
+.mm-stat {
+  --c: 0.6em;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 6.2em;
+  padding: 1.5em 0.4em 0.4em;
+  background: var(--mm-red);
+  clip-path: polygon(var(--c) 0, calc(100% - var(--c)) 0, 100% var(--c), 100% calc(100% - var(--c)), calc(100% - var(--c)) 100%, var(--c) 100%, 0 calc(100% - var(--c)), 0 var(--c));
+  text-align: center;
+}
+.mm-stat::before {
+  content: "";
+  position: absolute;
+  inset: 2px;
+  background: var(--mm-surface);
+  clip-path: polygon(var(--c) 0, calc(100% - var(--c)) 0, 100% var(--c), 100% calc(100% - var(--c)), calc(100% - var(--c)) 100%, var(--c) 100%, 0 calc(100% - var(--c)), 0 var(--c));
+}
+.mm-stat.focus { background: var(--mm-blue); }
+.mm-stat:focus-within { background: var(--mm-gold); }
+.mm-stat > * { position: relative; z-index: 1; }
+.mm-stat > .mm-cap { position: absolute; top: 0.45em; left: 0.8em; font-size: 0.78em; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--mm-surface-muted); }
+.mm-stat .mm-bar { position: absolute; left: 0.55em; right: 0.55em; bottom: 0.4em; height: 0.35em; background: rgba(0, 0, 0, 0.18); border-radius: 2px; overflow: hidden; }
+.mm-stat .mm-bar > i { display: block; height: 100%; background: var(--mm-red); transition: width 0.2s; }
+.mm-stat.focus .mm-bar > i { background: var(--mm-blue); }
+.mm-stat-values { display: flex; flex-direction: column; align-items: center; width: 3.6em; margin-bottom: 0.4em; }
+.mmrpg .mm-stat-values input[type="number"] {
+  width: 100%;
+  min-height: 0;
+  padding: 0;
+  background: transparent;
+  border: 0;
+  color: var(--mm-surface-text);
+  font-family: "MM Roboto Condensed", "MM Roboto", sans-serif;
+  font-size: 1.55em;
+  font-weight: 700;
+  line-height: 1.1;
+  text-align: center;
+}
+.mmrpg .mm-stat-values input[type="number"]:focus { outline: none; background: transparent; border: 0; }
+.mm-stat-values hr { width: 100%; margin: 0.05em 0; border: 0; border-top: 2px solid var(--mm-surface-text); }
+.mm-stat.speed { align-items: flex-start; padding-left: 0.9em; justify-content: flex-end; }
+.mm-stat.speed ul { list-style: none; margin: 0.2em 0 0; padding: 0; font-size: 0.82em; font-weight: 700; line-height: 1.25; color: var(--mm-surface-text); text-align: left; }
+.mm-stat.speed li span { color: var(--mm-surface-muted); font-weight: 400; }
+
+/* Bloco do canto (Redução de Dano e Iniciativa) */
+.mm-corner {
+  --c: 0.8em;
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 5.2em;
+  height: 4.2em;
+  padding: 0.35em 2px 3px;
+  background: var(--mm-red-dark);
+  clip-path: polygon(0 0, 100% 0, 100% 100%, var(--c) 100%, 0 calc(100% - var(--c)));
+  text-align: center;
+}
+.mm-corner::before {
+  content: "";
+  position: absolute;
+  inset: 2px;
+  background: var(--mm-surface);
+  clip-path: polygon(0 0, 100% 0, 100% 100%, var(--c) 100%, 0 calc(100% - var(--c)));
+}
+.mm-stat.focus .mm-corner { background: var(--mm-blue-dark); }
+.mm-corner:focus-within { background: var(--mm-gold); }
+.mm-corner > * { position: relative; z-index: 1; }
+.mm-corner .mm-cap { display: block; max-width: 7.6em; font-size: 0.62em; font-weight: 700; text-transform: uppercase; letter-spacing: 0.03em; line-height: 1.1; color: var(--mm-surface-muted); }
+.mmrpg .mm-corner input[type="number"],
+.mmrpg .mm-corner button.mm-init {
+  width: 100%;
+  min-height: 0;
+  padding: 0;
+  background: transparent;
+  border: 0;
+  color: var(--mm-surface-text);
+  font-family: "MM Roboto Condensed", "MM Roboto", sans-serif;
+  font-size: 1.5em;
+  font-weight: 700;
+  line-height: 1.15;
+  text-align: center;
   box-shadow: none;
 }
-.mmrpg-action-button:hover { border-color: var(--mm-gold); color: var(--mm-gold); background: var(--mm-surface-2); }
-.mmrpg-action-button small { color: var(--mm-muted); margin-left: 0.2rem; }
+.mmrpg .mm-corner input[type="number"]:focus { outline: none; background: transparent; border: 0; }
+.mm-corner button.mm-init:hover { color: var(--mm-red); }
+.mm-corner button.mm-init:focus-visible { outline: 2px solid var(--mm-gold); }
+
+/* Tabela de atributos */
+.mm-abilities .mm-panel-body { padding: 0.4em 0.5em 0.55em; }
+.mm-ability-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.3em; }
+.mm-ability-row {
+  display: grid;
+  grid-template-columns: minmax(5.8em, 1.5fr) repeat(4, minmax(3.2em, 1fr)) minmax(5.2em, auto);
+  gap: 0.35em;
+  align-items: center;
+}
+.mm-ability-row.mm-ability-head {
+  font-size: 0.7em;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  line-height: 1.1;
+  text-align: center;
+  align-items: end;
+}
+.mm-ability-row.mm-ability-head > :first-child { text-align: left; }
+.mm-ability-name { font-weight: 700; font-size: 1.05em; line-height: 1.15; }
+.mm-ability-name small { display: block; font-size: 0.68em; font-weight: 400; color: #ffe9e6; letter-spacing: 0.04em; }
+.mm-ability-row input[type="number"].mm-score {
+  width: 100%;
+  min-height: 2em;
+  padding: 0;
+  border: 2px solid #000;
+  background: var(--mm-surface);
+  color: var(--mm-surface-text);
+  font-family: "MM Roboto Condensed", "MM Roboto", sans-serif;
+  font-size: 1.2em;
+  font-weight: 700;
+  text-align: center;
+}
+.mm-ability-row input[type="number"].mm-score:focus { border-color: var(--mm-gold); }
+.mm-ability-row .mm-box { width: 100%; min-height: 2em; }
+.mm-ability-row .mm-box.empty { background: transparent; border-color: transparent; color: #ffe9e6; }
+
+/* Botão octogonal de rolagem */
+.mm-roll {
+  --c: 0.5em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25em;
+  width: 100%;
+  min-height: 2.15em;
+  padding: 0.1em 0.2em;
+  background: var(--mm-red-dark);
+  color: #fff;
+  border: 0;
+  border-radius: 0;
+  clip-path: polygon(var(--c) 0, calc(100% - var(--c)) 0, 100% var(--c), 100% calc(100% - var(--c)), calc(100% - var(--c)) 100%, var(--c) 100%, 0 calc(100% - var(--c)), 0 var(--c));
+  font-family: "MM Roboto Condensed", "MM Roboto", sans-serif;
+  font-size: 1.2em;
+  font-weight: 700;
+  line-height: 1;
+  box-shadow: none;
+  text-shadow: none;
+  transition: background 0.15s;
+}
+.mm-roll:hover { background: #fff; color: var(--mm-red-dark); }
+.mm-roll:focus-visible { background: var(--mm-gold); color: #1a1200; outline: none; }
+.mm-roll i { font-size: 0.7em; opacity: 0.85; }
+.mm-panel .mm-roll { background: var(--mm-red-dark); }
+
+.mm-edge-pair { display: flex; gap: 0.25em; justify-content: center; }
+.mm-toggle { position: relative; display: inline-flex; cursor: pointer; }
+.mm-toggle input { position: absolute; inset: 0; opacity: 0; margin: 0; cursor: pointer; }
+.mm-toggle span {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.1em 0.5em;
+  min-height: 1.7em;
+  border: 2px solid rgba(255, 255, 255, 0.55);
+  border-radius: 999px;
+  color: #fff;
+  font-size: 0.74em;
+  font-weight: 700;
+  line-height: 1;
+  transition: background 0.15s, color 0.15s;
+}
+.mm-toggle input:checked + span { background: #fff; color: var(--mm-red-dark); border-color: #fff; }
+.mm-toggle input:focus-visible + span { outline: 3px solid var(--mm-gold); outline-offset: 1px; }
+.mm-toggle input:disabled + span { opacity: 0.6; }
+
+/* ---------- Abas ---------- */
+
+.mm-tabs {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: stretch;
+  gap: 0;
+  margin: 0 0.7em;
+  padding: 3px;
+  background: var(--mm-red);
+  clip-path: polygon(0 1.3em, 1.3em 0, 100% 0, 100% calc(100% - 1.3em), calc(100% - 1.3em) 100%, 0 100%);
+}
+.mm-tab {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 2.4em;
+  margin-inline: -0.45em;
+  padding: 0 0.85em;
+  background: var(--mm-red-dark);
+  color: #fff;
+  clip-path: polygon(0.9em 0, 100% 0, calc(100% - 0.9em) 100%, 0 100%);
+  font-family: "MM Roboto Condensed", "MM Roboto", sans-serif;
+  font-size: 0.9em;
+  font-weight: 700;
+  letter-spacing: 0;
+  text-transform: uppercase;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: clip;
+  text-shadow: none;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  cursor: pointer;
+}
+.mm-tab:first-child { margin-left: 0; padding-left: 1.4em; clip-path: polygon(0 1.1em, 1.1em 0, 100% 0, calc(100% - 0.9em) 100%, 0 100%); }
+.mm-tab:last-child { margin-right: 0; padding-right: 1.4em; clip-path: polygon(0.9em 0, 100% 0, 100% calc(100% - 1.1em), calc(100% - 1.1em) 100%, 0 100%); }
+.mm-tab:hover { background: #b30906; color: #fff; }
+.mm-tab.active { background: #fff; color: var(--mm-red); }
+.mm-tab:focus-visible { outline: none; background: var(--mm-gold); color: #1a1200; }
+.mmrpg[data-mm-theme="dark"] .mm-tab.active { background: var(--mm-surface); color: #ff8b88; }
+
+.mm-main-grid { display: grid; grid-template-columns: 13.5em minmax(0, 1fr); gap: 0.8em; align-items: start; }
+.mmrpg-panels { flex: 1; min-height: 0; overflow-y: auto; padding: 0.7em 0.7em 1.1em; scrollbar-width: thin; scrollbar-color: var(--mm-red) transparent; }
+.mmrpg-panel { display: none; }
+.mmrpg-panel.active { display: block; }
+.mmrpg-panel > .mm-panel + .mm-panel { margin-top: 0.8em; }
+
+/* ---------- Listas: poderes, armas, equipamentos, traços ---------- */
+
+.mmrpg-toolbar { display: flex; flex-wrap: wrap; gap: 0.5em; align-items: center; margin-bottom: 0.6em; }
+.mmrpg-toolbar .mmrpg-search { position: relative; flex: 1 1 12em; min-width: 0; }
+.mmrpg-toolbar .mmrpg-search i { position: absolute; left: 0.7em; top: 50%; transform: translateY(-50%); color: var(--mm-surface-muted); font-size: 0.85em; pointer-events: none; }
+.mmrpg-toolbar .mmrpg-search input { width: 100%; padding-left: 2.1em; }
+.mmrpg-toolbar button { font-size: 0.9em; }
+.mmrpg-toolbar .mmrpg-wide-button { width: auto; margin: 0; }
+.mm-panel .mmrpg-toolbar .mmrpg-wide-button { background: var(--mm-surface); color: var(--mm-red-dark); border-color: var(--mm-surface); }
+.mm-panel .mmrpg-toolbar .mmrpg-wide-button:hover { background: #fff; border-color: #fff; color: var(--mm-red); }
+.mmrpg[data-mm-theme="dark"] .mm-panel .mmrpg-toolbar .mmrpg-wide-button { background: #f6ebe8; border-color: #f6ebe8; color: #7a0c0a; }
+.mmrpg[data-mm-theme="dark"] .mm-panel .mmrpg-toolbar .mmrpg-wide-button:hover { background: #fff; border-color: #fff; color: var(--mm-red); }
+.mm-panel .mmrpg-header-row { display: flex; flex-wrap: wrap; gap: 0.5em 1.2em; align-items: center; margin-top: 0.7em; color: #fff; font-weight: 700; }
+.mm-panel .mmrpg-header-row input[type="number"] { width: 5em; }
+
+.mmrpg-item-section { margin-bottom: 0.9em; }
+.mmrpg-item-section:last-child { margin-bottom: 0; }
+
+.mmrpg-section-head { display: flex; align-items: center; gap: 0.6em; margin: 0 0 0.45em; }
+.mmrpg-section-head h4 {
+  flex: 0 0 auto;
+  margin: 0;
+  padding: 0.1em 0.9em;
+  background: var(--mm-red-dark);
+  border-radius: 999px;
+  color: #fff;
+  font-family: "MM Roboto Condensed", "MM Roboto", sans-serif;
+  font-size: 0.95em;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  line-height: 1.6;
+  text-transform: uppercase;
+}
+.mmrpg-section-head h4 small { font-size: 0.85em; font-weight: 400; opacity: 0.85; margin-left: 0.35em; }
+.mmrpg-section-head::after { content: ""; order: 1; flex: 1; border-top: 2px solid rgba(255, 255, 255, 0.55); }
+.mmrpg-section-head .mmrpg-icon-button { order: 2; width: 1.7em; height: 1.7em; border-color: var(--mm-surface); }
+
+.mmrpg-item-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.5em; }
+
+/* Entrada de lista: paralelogramo creme com borda vermelha (como as linhas do livro) */
+.mmrpg-entry,
+.mmrpg-item {
+  --slant: 0.8em;
+  position: relative;
+  padding: 2px;
+  background: var(--mm-red);
+  color: var(--mm-surface-text);
+  clip-path: polygon(var(--slant) 0, 100% 0, calc(100% - var(--slant)) 100%, 0 100%);
+}
+.mmrpg-entry::before,
+.mmrpg-item::before {
+  content: "";
+  position: absolute;
+  inset: 2px;
+  background: var(--mm-surface);
+  clip-path: polygon(var(--slant) 0, 100% 0, calc(100% - var(--slant)) 100%, 0 100%);
+}
+.mmrpg-entry > *,
+.mmrpg-item > * { position: relative; z-index: 1; }
+.mmrpg-entry.is-active,
+.mmrpg-item.is-active,
+.mmrpg-form.is-active { background: var(--mm-green); }
+.mmrpg-item.is-disabled { opacity: 0.6; }
+
+.mmrpg-entry-head { display: flex; align-items: flex-start; gap: 0.7em; padding: 0.55em 1.5em 0.35em 1.4em; }
+.mmrpg-entry-icon { flex: 0 0 auto; width: 2.6em; height: 2.6em; object-fit: cover; border: 2px solid var(--mm-red); border-radius: 2px; background: #000; }
+.mmrpg-entry-title { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 0.2em; }
+.mmrpg-entry-name {
+  align-self: flex-start;
+  max-width: 100%;
+  margin: 0;
+  padding: 0;
+  background: none;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  color: var(--mm-surface-text);
+  font-family: inherit;
+  font-size: 1.12em;
+  font-weight: 700;
+  line-height: 1.25;
+  text-align: left;
+  text-shadow: none;
+}
+.mmrpg-entry-name:hover { color: var(--mm-red); background: none; }
+.mmrpg-entry-meta { display: flex; flex-wrap: wrap; gap: 0.1em 0.9em; font-size: 0.82em; color: var(--mm-surface-muted); line-height: 1.4; }
+.mmrpg-entry-meta b { font-weight: 700; color: var(--mm-surface-text); }
+.mmrpg-entry-meta .qty { font-weight: 700; color: var(--mm-red-dark); }
+.mmrpg-entry-controls { flex: 0 0 auto; display: flex; gap: 0.3em; align-items: center; }
+
+.mmrpg-equip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35em;
+  padding: 0 0.7em;
+  height: 1.9em;
+  background: var(--mm-surface);
+  color: var(--mm-surface-muted);
+  border: 2px solid var(--mm-surface-muted);
+  border-radius: 999px;
+  font-size: 0.8em;
+  font-weight: 700;
+  box-shadow: none;
+}
+.mmrpg-equip.is-on { background: var(--mm-green); border-color: var(--mm-green); color: #fff; }
+.mmrpg-equip:hover { border-color: var(--mm-red); color: var(--mm-red); }
+.mmrpg-equip.is-on:hover { background: var(--mm-green); color: #fff; opacity: 0.88; }
+
+.mmrpg-entry-actions,
+.mmrpg-item-actions { display: flex; flex-wrap: wrap; gap: 0.4em; padding: 0 1.5em 0.5em 1.4em; }
+.mmrpg-item-actions { padding: 0; }
+
+.mmrpg-action-button {
+  --c: 0.4em;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4em;
+  min-height: 2em;
+  padding: 0.15em 0.85em;
+  background: var(--mm-red);
+  color: #fff;
+  border: 0;
+  border-radius: 0;
+  clip-path: polygon(var(--c) 0, calc(100% - var(--c)) 0, 100% var(--c), 100% calc(100% - var(--c)), calc(100% - var(--c)) 100%, var(--c) 100%, 0 calc(100% - var(--c)), 0 var(--c));
+  font-size: 0.88em;
+  font-weight: 700;
+  line-height: 1.2;
+  box-shadow: none;
+  text-shadow: none;
+}
+.mmrpg-action-button:hover { background: var(--mm-red-dark); color: #fff; }
+.mmrpg-action-button:focus-visible { background: var(--mm-gold); color: #1a1200; outline: none; }
+.mmrpg-action-button small { font-size: 0.85em; font-weight: 400; opacity: 0.92; margin-left: 0.1em; }
+.mmrpg-action-button small + small::before { content: "|"; margin-right: 0.5em; opacity: 0.6; }
+
+/* Descrição que abre e fecha */
+.mmrpg-entry-desc { border-top: 1px dashed rgba(139, 5, 2, 0.35); margin: 0.1em 1.4em 0.5em 1.4em; }
+.mmrpg-entry-desc > summary {
+  display: flex;
+  align-items: baseline;
+  gap: 0.55em;
+  padding: 0.45em 0.1em 0.2em;
+  list-style: none;
+  cursor: pointer;
+  color: var(--mm-surface-muted);
+  font-size: 0.9em;
+  line-height: 1.5;
+}
+.mmrpg-entry-desc > summary::-webkit-details-marker { display: none; }
+.mmrpg-entry-desc > summary .mmrpg-chevron { flex: 0 0 auto; font-size: 0.75em; color: var(--mm-red); transition: transform 0.15s; }
+.mmrpg-entry-desc[open] > summary .mmrpg-chevron { transform: rotate(90deg); }
+.mmrpg-entry-desc > summary .mmrpg-excerpt { flex: 1; min-width: 0; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.mmrpg-entry-desc[open] > summary .mmrpg-excerpt { display: none; }
+.mmrpg-entry-desc > summary .mmrpg-more { flex: 0 0 auto; color: var(--mm-red); font-weight: 700; font-size: 0.9em; }
+.mmrpg-entry-desc > summary .mmrpg-more .less { display: none; }
+.mmrpg-entry-desc[open] > summary .mmrpg-more .less { display: inline; }
+.mmrpg-entry-desc[open] > summary .mmrpg-more .more { display: none; }
+.mmrpg-entry-desc[open] > summary { padding-bottom: 0.1em; }
+
+/* Texto de leitura (descrições): linhas curtas, entrelinha folgada */
+.mmrpg-prose { color: var(--mm-surface-text); line-height: 1.6; max-width: 46em; overflow-wrap: anywhere; }
+.mmrpg-entry-desc > .mmrpg-prose { padding: 0.2em 0.1em 0.5em; font-size: 0.97em; }
+.mmrpg-prose > :first-child { margin-top: 0; }
+.mmrpg-prose > :last-child { margin-bottom: 0; }
+.mmrpg-prose p { margin: 0 0 0.75em; }
+.mmrpg-prose ul, .mmrpg-prose ol { margin: 0 0 0.75em; padding-left: 1.4em; }
+.mmrpg-prose li { margin-bottom: 0.25em; }
+.mmrpg-prose h1, .mmrpg-prose h2, .mmrpg-prose h3, .mmrpg-prose h4 { margin: 1em 0 0.35em; color: var(--mm-red-dark); font-family: "MM Roboto Condensed", "MM Roboto", sans-serif; letter-spacing: 0.02em; line-height: 1.25; border: 0; }
+.mmrpg[data-mm-theme="dark"] .mmrpg-prose h1, .mmrpg[data-mm-theme="dark"] .mmrpg-prose h2, .mmrpg[data-mm-theme="dark"] .mmrpg-prose h3, .mmrpg[data-mm-theme="dark"] .mmrpg-prose h4 { color: #ff8b88; }
+.mmrpg-prose strong { font-weight: 700; }
+.mmrpg-prose table { width: 100%; border-collapse: collapse; margin: 0 0 0.8em; font-size: 0.95em; }
+.mmrpg-prose th, .mmrpg-prose td { border: 1px solid var(--mm-red); padding: 0.3em 0.5em; text-align: left; color: var(--mm-surface-text); }
+.mmrpg-prose th { background: var(--mm-surface-2); }
+.mmrpg-prose a { color: var(--mm-red); text-decoration: underline; }
+.mmrpg-prose blockquote { margin: 0 0 0.8em; padding: 0.2em 0.9em; border-left: 4px solid var(--mm-red); background: var(--mm-surface-2); }
+
+.mm-sub { margin: 0.9em 0 0.35em; color: #fff; font-family: "MM Roboto Condensed", "MM Roboto", sans-serif; font-size: 1.05em; font-weight: 700; letter-spacing: 0.03em; text-transform: uppercase; }
+.mm-sub:first-child { margin-top: 0; }
+.mm-panel .mmrpg-field > span { color: #ffe9e6; }
+.mm-panel .mmrpg-field.inline > span { color: #fff; }
+.mm-panel table th { color: #fff; }
+.mm-panel td { color: #fff; }
+.mm-panel .mmrpg-derived { color: #fff; }
+.mm-panel[data-form-kind] { --tab-w: 14em; }
+.mm-panel + .mm-panel, .mmrpg-note-box + .mm-panel { margin-top: 0.8em; }
+.mmrpg-note-box { margin: 0 0 0.8em; padding: 0.5em 0.8em; background: var(--mm-surface); color: var(--mm-surface-text); border: 2px solid var(--mm-red); border-radius: 2px; font-size: 0.92em; line-height: 1.5; }
+
+/* Densidade compacta */
+.mmrpg[data-mm-density="compact"] .mmrpg-entry-head { padding-block: 0.35em 0.2em; }
+.mmrpg[data-mm-density="compact"] .mmrpg-entry-icon { width: 2em; height: 2em; }
+.mmrpg[data-mm-density="compact"] .mmrpg-item-list { gap: 0.3em; }
+.mmrpg[data-mm-density="compact"] .mmrpg-entry-actions { padding-bottom: 0.3em; }
+
+/* Linhas simples (efeitos, ações, concessões) reaproveitam o mesmo desenho */
+.mmrpg-item { display: flex; align-items: center; gap: 0.7em; padding: 2px; }
+.mmrpg-item > img { flex: 0 0 auto; width: 2.4em; height: 2.4em; margin-left: 1.3em; object-fit: cover; border: 2px solid var(--mm-red); border-radius: 2px; background: #000; }
+.mmrpg-item-main { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 0.3em; padding: 0.5em 0 0.5em 1.4em; }
+.mmrpg-item > img + .mmrpg-item-main { padding-left: 0; }
+.mmrpg-item-title { display: flex; align-items: baseline; gap: 0.6em; flex-wrap: wrap; }
+.mmrpg-item-name { font-weight: 700; font-size: 1.05em; color: var(--mm-surface-text); }
+.mmrpg-item-controls { flex: 0 0 auto; display: flex; gap: 0.3em; align-items: center; padding-right: 1.5em; }
+.mmrpg-item .mmrpg-muted { color: var(--mm-surface-muted); }
+.mmrpg-badges { display: flex; flex-wrap: wrap; gap: 0.35em; }
+.mmrpg-grant-note { width: 10em; }
 
 /* ---------- Condições ---------- */
 
-.mmrpg-condition-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 0.35rem; }
-
+.mmrpg-condition-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(9em, 1fr)); gap: 0.4em; }
 .mmrpg-condition {
   display: flex;
   align-items: center;
-  gap: 0.4rem;
+  gap: 0.5em;
   background: var(--mm-surface);
-  color: var(--mm-muted);
-  border: 1px solid var(--mm-border);
+  color: var(--mm-surface-muted);
+  border: 2px solid var(--mm-surface-muted);
   border-radius: var(--mm-radius);
-  padding: 0.25rem 0.4rem;
-  font-size: 0.8rem;
+  padding: 0.3em 0.5em;
+  font-size: 0.88em;
+  font-weight: 700;
   box-shadow: none;
 }
-.mmrpg-condition img { width: 20px; height: 20px; border: 0; filter: grayscale(1); }
-.mmrpg-condition.is-active { color: #fff; border-color: var(--mm-red); background: var(--mm-red-dark); }
+.mmrpg-condition img { width: 1.5em; height: 1.5em; border: 0; filter: grayscale(1); }
+.mmrpg-condition:hover { border-color: var(--mm-red); color: var(--mm-red); }
+.mmrpg-condition.is-active { color: #fff; border-color: var(--mm-red-dark); background: var(--mm-red); }
 .mmrpg-condition.is-active img { filter: none; }
 
-/* ---------- Tabelas ---------- */
+/* ---------- Tabelas, fieldsets, editores ---------- */
 
 .mmrpg table { width: 100%; border-collapse: collapse; }
-.mmrpg th { text-align: left; font-size: 0.72rem; text-transform: uppercase; color: var(--mm-muted); padding: 0.2rem 0.3rem; }
-.mmrpg td { padding: 0.15rem 0.3rem; }
-.mmrpg td input[type="number"] { width: 4rem; text-align: center; }
-.mmrpg-derived { font-weight: 800; color: var(--mm-gold); text-align: center; }
+.mmrpg th { text-align: left; font-size: 0.78em; font-weight: 700; text-transform: uppercase; letter-spacing: 0.03em; color: inherit; padding: 0.3em; }
+.mmrpg td { padding: 0.2em 0.3em; }
+.mmrpg td input[type="number"] { width: 4.2em; text-align: center; }
+.mmrpg-derived { font-weight: 700; text-align: center; }
+.mmrpg-panels table th { color: inherit; }
 
-prose-mirror { display: block; min-height: 4rem; background: var(--mm-surface); border: 1px solid var(--mm-border); border-radius: var(--mm-radius); padding: 0.4rem; }
+prose-mirror {
+  display: block;
+  min-height: 7em;
+  padding: 0.5em 0.7em;
+  background: var(--mm-surface);
+  color: var(--mm-surface-text);
+  border: 2px solid var(--mm-red);
+  border-radius: 2px;
+  line-height: 1.6;
+}
+prose-mirror .editor-content { min-height: 14em; color: var(--mm-surface-text); }
 
-/* ---------- Editor de ações ---------- */
+.mmrpg-action-editor .mmrpg-editor-body { height: 100%; overflow-y: auto; padding: 0.8em 1em; }
+.mmrpg fieldset { border: 2px solid var(--mm-red); border-radius: var(--mm-radius); margin: 0 0 0.8em; padding: 0.5em 0.8em 0.8em; }
+.mmrpg legend { color: var(--mm-red); font-weight: 700; font-size: 0.9em; text-transform: uppercase; letter-spacing: 0.04em; padding: 0 0.5em; }
+.mmrpg[data-mm-theme="dark"] legend { color: #ff8b88; }
+.mmrpg .hint { color: var(--mm-muted); font-size: 0.85em; margin: 0.4em 0 0; }
+.mmrpg-effect-block { border: 2px dashed var(--mm-red); border-radius: var(--mm-radius); padding: 0.6em; margin-bottom: 0.6em; }
+.mmrpg-change-row { display: flex; flex-wrap: wrap; gap: 0.3em; margin-top: 0.3em; }
 
-.mmrpg-action-editor .mmrpg-editor-body { height: 100%; overflow-y: auto; padding: 0.8rem 1rem; }
-.mmrpg fieldset { border: 1px solid var(--mm-border); border-radius: var(--mm-radius); margin: 0 0 0.7rem; padding: 0.5rem 0.7rem 0.7rem; }
-.mmrpg legend { color: var(--mm-gold); font-weight: 700; text-transform: uppercase; font-size: 0.8rem; letter-spacing: 0.05em; padding: 0 0.4rem; }
-.mmrpg .hint { color: var(--mm-muted); font-size: 0.8rem; margin: 0.4rem 0 0; }
-.mmrpg-effect-block { border: 1px dashed var(--mm-border); border-radius: var(--mm-radius); padding: 0.5rem; margin-bottom: 0.5rem; }
-.mmrpg-change-row { display: grid; grid-template-columns: 2fr 1fr 1fr auto; gap: 0.3rem; margin-top: 0.3rem; }
-
-/* ---------- Importador e manobra de equipe ---------- */
+/* ---------- Importador, equipe, diálogos ---------- */
 
 .mmrpg-importer-body,
-.mmrpg-team-body { padding: 0.8rem 1rem 1rem; }
-.mmrpg-count-list { list-style: none; padding: 0; display: flex; flex-wrap: wrap; gap: 0.6rem; }
-.mmrpg-check-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 0.3rem; }
-.mmrpg-error { color: #ff8a8e; }
-.mmrpg-warning { color: var(--mm-gold); }
+.mmrpg-team-body { padding: 0.8em 1em 1em; }
+.mmrpg-count-list { list-style: none; padding: 0; display: flex; flex-wrap: wrap; gap: 0.6em; }
+.mmrpg-check-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(10em, 1fr)); gap: 0.3em; }
+.mmrpg-error { color: var(--mm-red); font-weight: 700; }
+.mmrpg-warning { color: #9a5a00; font-weight: 700; }
+.mmrpg[data-mm-theme="dark"] .mmrpg-error { color: #ff8b88; }
+.mmrpg[data-mm-theme="dark"] .mmrpg-warning { color: var(--mm-gold); }
 
-.mmrpg-member-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.25rem; }
-.mmrpg-member-list li { display: flex; align-items: center; gap: 0.5rem; }
-.mmrpg-member-list img { width: 24px; height: 24px; border: 0; border-radius: 3px; }
-.mmrpg-member-list li.is-short { color: #ff8a8e; }
+.mmrpg-member-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.3em; }
+.mmrpg-member-list li { display: flex; align-items: center; gap: 0.5em; }
+.mmrpg-member-list img { width: 1.7em; height: 1.7em; border: 0; border-radius: 3px; }
+.mmrpg-member-list li.is-short { color: var(--mm-red); font-weight: 700; }
 
-.mmrpg-roll-config .mmrpg-roll-summary { font-weight: 700; color: var(--mm-gold); }
+.mmrpg-roll-config .mmrpg-roll-summary { font-weight: 700; color: var(--mm-red); }
+.mmrpg-roll-config .form-group > label { flex: 0 0 40%; line-height: 1.25; }
+.mmrpg.application .form-group > label { color: var(--mm-text); }
+.mmrpg.application .dialog-buttons button,
+.mmrpg.application footer.form-footer button { background: var(--mm-red); color: #fff; border: 2px solid var(--mm-red-dark); }
+.mmrpg.application .dialog-buttons button:hover,
+.mmrpg.application footer.form-footer button:hover { background: var(--mm-red-dark); }
+.mmrpg-appearance .form-group { margin-bottom: 0.6em; }
+
+/* ---------- Formas ---------- */
+
+.mmrpg-form-toggle.is-on { background: var(--mm-green); border-color: var(--mm-green); color: #fff; }
+.mmrpg-form-toggle.is-on:hover { background: var(--mm-red-dark); border-color: var(--mm-red-dark); }
+.mmrpg-active-forms { display: flex; flex-wrap: wrap; gap: 0.3em; }
+.mmrpg-change-key { flex: 2 1 12em; min-width: 0; }
+.mmrpg-change-value { flex: 1 1 5em; min-width: 0; }
+.mmrpg-change-priority { flex: 0 0 4.5em; min-width: 0; }
+.mmrpg-form-changes { margin-bottom: 0.8em; }
+.mmrpg-form-card p { margin: 0.15em 0; }
+.mmrpg-form .mmrpg-entry-head { align-items: center; }
+
+/* ---------- Ficha de item ---------- */
+
+.mm-item-header { flex: 0 0 auto; display: grid; grid-template-columns: 6.6em minmax(0, 1fr); gap: 0.8em; align-items: center; padding: 0.6em 0.7em 0.5em; }
+.mm-item-portrait { position: relative; width: 6.6em; height: 6.6em; }
+.mm-item-portrait .mm-portrait { inset: 0; }
+.mm-item-head-main { display: flex; flex-direction: column; gap: 0.5em; min-width: 0; }
+.mm-item-head-main .mm-identity { margin-top: 0; }
+.mm-identity .mm-source { flex: 1 1 12em; min-width: 0; }
+.mm-identity .mm-source input { flex: 1; min-width: 0; min-height: 1.8em; padding: 0 0.5em; }
+
+.mm-detail-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(12.5em, 1fr)); gap: 1em 0.8em; padding-top: 0.3em; }
+.mm-detail-grid > .wide { grid-column: 1 / -1; }
+.mm-detail-grid > p.wide { margin: 0; }
+.mm-panel .mm-field > input,
+.mm-panel .mm-field > select { border-color: var(--mm-red-dark); }
+.mm-panel .mm-field > span { border-top-color: var(--mm-red-dark); }
+.mm-panel .mm-field:focus-within > input,
+.mm-panel .mm-field:focus-within > select { border-color: var(--mm-gold); }
+.mm-panel.wide-tab { --tab-w: 14em; }
+
+/* Papel de leitura: a descrição do item, grande e com folga */
+.mm-paper {
+  padding: 1em 1.2em 1.2em;
+  background: var(--mm-surface);
+  color: var(--mm-surface-text);
+  border: 2px solid var(--mm-red-dark);
+  border-radius: 2px;
+}
+.mm-paper prose-mirror { min-height: 16em; padding: 0; background: transparent; border: 0; font-size: 1.08em; }
+.mm-paper prose-mirror .editor-content { min-height: 16em; max-width: 50em; color: var(--mm-surface-text); line-height: 1.65; overflow-wrap: anywhere; }
+.mm-paper .ProseMirror { color: var(--mm-surface-text); min-height: 16em; }
+.mm-paper prose-mirror .editor-content > :first-child { margin-top: 0; }
+.mm-paper prose-mirror .editor-content p { margin: 0 0 0.8em; }
+.mm-paper prose-mirror .editor-content ul,
+.mm-paper prose-mirror .editor-content ol { margin: 0 0 0.8em; padding-left: 1.4em; }
+.mm-paper prose-mirror .editor-content li { margin-bottom: 0.25em; }
+.mm-paper prose-mirror .editor-content h1,
+.mm-paper prose-mirror .editor-content h2,
+.mm-paper prose-mirror .editor-content h3,
+.mm-paper prose-mirror .editor-content h4 { margin: 1em 0 0.35em; color: var(--mm-red-dark); font-family: "MM Roboto Condensed", "MM Roboto", sans-serif; letter-spacing: 0.02em; line-height: 1.25; border: 0; }
+.mmrpg[data-mm-theme="dark"] .mm-paper prose-mirror .editor-content h1,
+.mmrpg[data-mm-theme="dark"] .mm-paper prose-mirror .editor-content h2,
+.mmrpg[data-mm-theme="dark"] .mm-paper prose-mirror .editor-content h3,
+.mmrpg[data-mm-theme="dark"] .mm-paper prose-mirror .editor-content h4 { color: #ff8b88; }
+.mm-paper prose-mirror .editor-content table { width: 100%; border-collapse: collapse; margin: 0 0 0.8em; }
+.mm-paper prose-mirror .editor-content th,
+.mm-paper prose-mirror .editor-content td { border: 1px solid var(--mm-red); padding: 0.3em 0.5em; text-align: left; color: var(--mm-surface-text); }
+.mm-paper prose-mirror .editor-content blockquote { margin: 0 0 0.8em; padding: 0.2em 0.9em; border-left: 4px solid var(--mm-red); background: var(--mm-surface-2); }
+.mm-paper prose-mirror .editor-content a { color: var(--mm-red); text-decoration: underline; }
+.mm-paper prose-mirror button.toggle { background: var(--mm-surface); color: var(--mm-red); border: 2px solid var(--mm-red); border-radius: 2px; box-shadow: none; }
+.mm-paper prose-mirror button.toggle:hover { background: var(--mm-red); color: #fff; }
 
 /* ---------- Dados ---------- */
 
@@ -424,7 +1053,7 @@ prose-mirror { display: block; min-height: 4rem; background: var(--mm-surface); 
 }
 .mmrpg-card-header { display: flex; align-items: center; gap: 0.6rem; margin-bottom: 0.3rem; }
 .mmrpg-card-header img { width: 40px; height: 40px; object-fit: cover; border: 1px solid var(--mm-gold); border-radius: 4px; }
-.mmrpg-card-header h3 { margin: 0; font-size: 1rem; color: var(--mm-gold); }
+.mmrpg-card-header h3 { margin: 0; font-size: 1rem; color: var(--mm-gold); border: 0; }
 .mmrpg-card-icon { font-size: 1.6rem; color: var(--mm-gold); }
 .mmrpg-card-tags { display: flex; flex-wrap: wrap; gap: 0.3rem; margin-bottom: 0.3rem; }
 .mmrpg-card-description { font-size: 0.85rem; color: var(--mm-text); margin: 0.3rem 0; }
@@ -451,23 +1080,29 @@ prose-mirror { display: block; min-height: 4rem; background: var(--mm-surface); 
 .mmrpg-buttons,
 .mmrpg-card-footer { display: flex; gap: 0.3rem; margin-top: 0.3rem; flex-wrap: wrap; }
 .mmrpg-card.is-locked .mmrpg-reroll { display: none; }
-
-/* ---------- Formas ---------- */
-
-.mmrpg-form.is-active { border-left-color: var(--mm-green); background: var(--mm-surface-2); }
-.mmrpg-form-toggle.is-on { background: transparent; color: var(--mm-green); border-color: var(--mm-green); }
-.mmrpg-form-toggle.is-on:hover { background: transparent; color: #fff; border-color: var(--mm-red); }
-.mmrpg-active-forms { gap: 0.3rem; }
-.mmrpg-change-row { flex-wrap: wrap; }
-.mmrpg-change-key { flex: 2 1 12rem; min-width: 0; }
-.mmrpg-change-value { flex: 1 1 5rem; min-width: 0; }
-.mmrpg-change-priority { flex: 0 0 4.5rem; min-width: 0; }
-.mmrpg-form-changes { margin-bottom: 0.75rem; }
-.mmrpg-form-card p { margin: 0.15rem 0; }
-.mmrpg-detail-grid > p.wide { grid-column: 1 / -1; margin: 0; }
-
-
-/* ---------- Diálogo de rolagem: o rótulo não quebra em duas linhas altas ---------- */
-
-.mmrpg-roll-config .form-group > label { flex: 0 0 40%; line-height: 1.25; }
 .mmrpg-bare-roll { margin: 0; }
+
+.mmrpg-card .mmrpg-roll-button,
+.mmrpg-card .mmrpg-wide-button,
+.mmrpg-card button {
+  background: var(--mm-red);
+  color: #fff;
+  border: 1px solid var(--mm-red-dark);
+  border-radius: 4px;
+  padding: 0.25rem 0.6rem;
+  font-weight: 700;
+  line-height: 1.4;
+  box-shadow: none;
+}
+.mmrpg-card button:hover { background: #ee3a40; border-color: var(--mm-gold); color: #fff; }
+
+/* ---------- Telas estreitas e movimento reduzido ---------- */
+
+@media (max-width: 700px) {
+  .mm-header { grid-template-columns: 1fr; }
+  .mm-vitals { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mmrpg *, .mmrpg *::before, .mmrpg *::after { transition: none !important; animation: none !important; }
+}

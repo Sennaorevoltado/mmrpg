@@ -1,5 +1,6 @@
-<section class="mmrpg-conditions">
+<section class="mm-panel mmrpg-conditions">
   <h3>{{localize "MMRPG.Sheet.conditions"}}</h3>
+  <div class="mm-panel-body">
   <div class="mmrpg-condition-grid">
     {{#each statuses}}
       <button type="button" class="mmrpg-condition {{#if active}}is-active{{/if}}" data-action="toggleStatus" data-status="{{id}}" {{#unless ../editable}}disabled{{/unless}}>
@@ -8,17 +9,19 @@
       </button>
     {{/each}}
   </div>
+  </div>
 </section>
 
-<section class="mmrpg-effects">
-  <header class="mmrpg-section-head">
-    <h3>{{localize "MMRPG.Sheet.effects"}}</h3>
-    {{#if editable}}
-      <button type="button" class="mmrpg-icon-button" data-action="createEffect" title="{{localize 'MMRPG.Sheet.add'}}">
-        <i class="fa-solid fa-plus"></i>
+<section class="mm-panel mmrpg-effects">
+  <h3>{{localize "MMRPG.Sheet.effects"}}</h3>
+  <div class="mm-panel-body">
+  {{#if editable}}
+    <div class="mmrpg-toolbar">
+      <button type="button" class="mmrpg-wide-button" data-action="createEffect">
+        <i class="fa-solid fa-plus"></i> {{localize "MMRPG.Sheet.add"}}
       </button>
-    {{/if}}
-  </header>
+    </div>
+  {{/if}}
   {{#if effects.length}}
     <ul class="mmrpg-item-list">
       {{#each effects}}
@@ -32,7 +35,7 @@
             </div>
           </div>
           <div class="mmrpg-item-controls">
-            <button type="button" class="mmrpg-icon-button {{#unless disabled}}is-on{{/unless}}" data-action="toggleEffect" data-effect-id="{{id}}" title="{{localize 'MMRPG.Sheet.toggle'}}">
+            <button type="button" class="mmrpg-icon-button {{#unless disabled}}is-on{{/unless}}" data-action="toggleEffect" data-effect-id="{{id}}" title="{{localize 'MMRPG.Sheet.toggle'}}" aria-label="{{localize 'MMRPG.Sheet.toggle'}}: {{name}}">
               <i class="fa-solid fa-power-off"></i>
             </button>
             <button type="button" class="mmrpg-icon-button" data-action="editEffect" data-effect-id="{{id}}" title="{{localize 'MMRPG.Sheet.edit'}}">
@@ -50,4 +53,5 @@
   {{else}}
     <p class="mmrpg-empty">{{localize "MMRPG.Sheet.empty"}}</p>
   {{/if}}
+  </div>
 </section>

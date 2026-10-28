@@ -69,6 +69,9 @@ Decisões que importam:
 - As abas são trocadas pelo próprio sistema (classe `active`), sem o sistema de abas do core, para não depender de detalhes da API.
 - Ações dos botões usam `data-action` + `DEFAULT_OPTIONS.actions`. O validador confere que todo `data-action` de um template tem manipulador e vice-versa.
 - O editor de ação lê o item, aplica o formulário numa cópia da ação e grava o array inteiro.
+- **Visual**: `styles/mmrpg.css` define o estilo do livro com variáveis em `.mmrpg` (cores, `--mm-font`) e recortes `clip-path`. Tudo usa `em`, então o tamanho do texto muda numa variável só. A aparência de cada jogador (`module/helpers/appearance.mjs`) é gravada em atributos `data-mm-*` da janela (tema, tamanho do texto, densidade) pelo hook `renderApplicationV2`; mudar a opção redesenha as janelas abertas.
+- **Listas** (poderes, armas, equipamentos, traços): `templates/actor/parts/entry.hbs` desenha cada linha; a descrição vem enriquecida (`enrichHTML`) no contexto da ficha, com um resumo curto (`excerptOf`) e `<details>` para abrir o texto inteiro. O estado aberto/fechado de cada descrição e o texto do filtro sobrevivem a um novo desenho da ficha.
+- **Rank** vai de 1 a 6 (`clampRank` em `module/rules/abilities.mjs`): aplicado ao criar e ao atualizar o ator. O esquema continua aceitando qualquer inteiro ≥ 1 para que Active Effects e formas elevem o *Rank efetivo*.
 
 ## 5. Formas
 
@@ -105,7 +108,7 @@ Decisões que importam:
 
 O Foundry simulado implementa só o necessário: campos de dados com validação **estrita** (valores iniciais e opções inválidos falham), documentos com itens embutidos e efeitos, `Roll` com dados sorteados de forma controlável (`dice.queue`), `ApplicationV2` + Handlebars de verdade, hooks, configurações e socket. Quando um teste falha por causa do simulado e não do sistema, ajuste o simulado; quando passa, isso **não prova** que o Foundry real se comporta igual.
 
-`scripts/validate.mjs` faz as checagens estáticas e roda dentro do `npm run check`.
+`scripts/validate.mjs` faz as checagens estáticas e roda dentro do `npm run check`, inclusive no CSS: comentários que fecham antes da hora (um `*/` dentro do texto engole a regra seguinte), chaves desbalanceadas, arquivos citados em `url()` e as faces normal e negrito de cada fonte.
 
 ## 7. Como estender
 
@@ -132,4 +135,6 @@ O Foundry simulado implementa só o necessário: campos de dados com validação
 - Efeitos "desde o começo/fim do turno" não são automatizados: use duração em rodadas ou remova à mão.
 - A compatibilidade declarada é `minimum: 13`. Nenhuma versão foi marcada como *verificada* no manifesto, porque nenhuma foi aberta num Foundry real.
 - As diferenças entre v13 e v14 ficam em `module/helpers/compat.mjs` (modo de mensagem, registro de fichas, helpers de Handlebars). Código novo que dependa da versão deve passar por ali, e `tests/foundry-v13.test.mjs` roda a bateria de integração com o simulador na geração 13.
+- Visual: a aparência foi conferida em prévias de navegador (Chromium) com o Foundry simulado, não num Foundry real. O estilo do editor de texto (`prose-mirror`) da descrição do item é o menos garantido, porque o simulado não o implementa.
+- Importação: pastas já duplicadas por versões antigas do importador não são mescladas; apague-as à mão (ou apague o compêndio e importe de novo).
 - Formas: a troca de retrato e token nunca foi testada num Foundry real. Se o personagem trocar o retrato à mão enquanto uma forma com imagem estiver ativa, ao desativar volta o retrato guardado na primeira troca. Pontos de atributo e Karma ganhos com um Rank novo não são distribuídos sozinhos (use `changes` ou ajuste à mão).

@@ -1,55 +1,102 @@
-<header class="mmrpg-header">
-  <div class="mmrpg-portrait">
-    <img src="{{actor.img}}" alt="{{actor.name}}" data-action="editImage" data-edit="img" title="{{localize 'MMRPG.Sheet.changeImage'}}">
-  </div>
-  <div class="mmrpg-header-main">
-    <input class="mmrpg-name" type="text" name="name" value="{{actor.name}}" placeholder="{{localize 'MMRPG.Sheet.name'}}" {{#unless editable}}disabled{{/unless}}>
-    <div class="mmrpg-header-row">
-      <label class="mmrpg-field">
-        <span>{{localize "MMRPG.Sheet.rank"}}</span>
-        <input type="number" name="system.rank" value="{{source.rank}}" min="1" step="1" {{#unless editable}}disabled{{/unless}}>
+<header class="mm-header">
+  {{!-- Coluna esquerda: retrato, Rank, Karma e Dano --}}
+  <div class="mm-col-left">
+    <div class="mm-portrait-block">
+      <div class="mm-portrait">
+        <img src="{{actor.img}}" alt="{{actor.name}}" data-action="editImage" data-edit="img" title="{{localize 'MMRPG.Sheet.changeImage'}}">
+      </div>
+      <label class="mm-badge mm-rank" title="{{localize 'MMRPG.Sheet.rankHint' max=maxRank}}">
+        <input type="number" name="system.rank" value="{{source.rank}}" min="1" max="{{maxRank}}" step="1" aria-label="{{localize 'MMRPG.Sheet.rank'}}" {{#unless editable}}disabled{{/unless}}>
+        <span class="mm-cap">{{localize "MMRPG.Sheet.rank"}}</span>
       </label>
-      {{#if rankChanged}}
-        <div class="mmrpg-field">
-          <span>{{localize "MMRPG.Form.effectiveRank"}}</span>
-          <span class="mmrpg-chip warn" title="{{localize 'MMRPG.Form.effectiveRankHint'}}">{{system.rank}}</span>
+      <div class="mm-badge mm-karma">
+        <div class="mm-karma-values">
+          <input type="number" name="system.karma.value" value="{{source.karma.value}}" min="0" step="1" aria-label="{{localize 'MMRPG.Resource.karma'}}" {{#unless editable}}disabled{{/unless}}>
+          <span class="mm-sep">/</span>
+          <input type="number" name="system.karma.max" value="{{source.karma.max}}" min="0" step="1" aria-label="{{localize 'MMRPG.Sheet.karmaMax'}}" {{#unless editable}}disabled{{/unless}}>
         </div>
+        <span class="mm-cap">{{localize "MMRPG.Resource.karma"}}</span>
+      </div>
+    </div>
+  </div>
+
+  {{!-- Coluna direita: nome, identidade, Saúde, Foco, Velocidade e atributos --}}
+  <div class="mm-col-right">
+    <div class="mm-top-row">
+      <label class="mm-field is-name">
+        <span>{{localize "MMRPG.Sheet.codename"}}</span>
+        <input type="text" name="name" value="{{actor.name}}" placeholder="{{localize 'MMRPG.Sheet.name'}}" {{#unless editable}}disabled{{/unless}}>
+      </label>
+      {{#if isCharacter}}
+        <button type="button" class="mmrpg-roll-button mm-team" data-action="teamManeuver" title="{{localize 'MMRPG.TeamManeuver.title'}}">
+          <i class="fa-solid fa-people-group"></i> {{localize "MMRPG.Sheet.team"}}
+        </button>
       {{/if}}
-      <label class="mmrpg-field">
-        <span>{{localize "MMRPG.Sheet.size"}}</span>
+    </div>
+
+    <div class="mm-identity">
+      {{#if identity.origin}}<span class="mm-id-item mm-extra"><b>{{localize "MMRPG.Sheet.origin"}}</b> {{identity.origin}}</span>{{/if}}
+      {{#if identity.occupation}}<span class="mm-id-item mm-extra"><b>{{localize "MMRPG.Sheet.occupation"}}</b> {{identity.occupation}}</span>{{/if}}
+      {{#unless isCharacter}}
+        <label class="mm-id-item mm-extra"><b>{{localize "MMRPG.Sheet.category"}}</b>
+          <input type="text" name="system.category" value="{{source.category}}" {{#unless editable}}disabled{{/unless}}>
+        </label>
+      {{/unless}}
+      <label class="mm-id-item mm-extra"><b>{{localize "MMRPG.Sheet.size"}}</b>
         <select name="system.size" {{#unless editable}}disabled{{/unless}}>
           {{#each sizeOptions}}
             <option value="{{value}}" {{#if (eq value ../source.size)}}selected{{/if}}>{{label}}</option>
           {{/each}}
         </select>
       </label>
-      <div class="mmrpg-field initiative">
-        <span>{{localize "MMRPG.Sheet.initiative"}}</span>
-        <button type="button" class="mmrpg-roll-button" data-action="rollInitiative" title="{{localize 'MMRPG.Sheet.rollInitiative'}}">
-          <i class="fa-solid fa-dice"></i> {{mmrpgSigned system.init.total}}
-        </button>
-      </div>
-      {{#if isCharacter}}
-        <div class="mmrpg-field">
-          <span>{{localize "MMRPG.Sheet.team"}}</span>
-          <button type="button" class="mmrpg-roll-button" data-action="teamManeuver" title="{{localize 'MMRPG.TeamManeuver.title'}}">
-            <i class="fa-solid fa-people-group"></i>
-          </button>
-        </div>
+      {{#if rankChanged}}
+        <span class="mm-id-item" title="{{localize 'MMRPG.Form.effectiveRankHint'}}"><b>{{localize "MMRPG.Form.effectiveRank"}}</b> <span class="mmrpg-chip warn">{{system.rank}}</span></span>
       {{/if}}
-    </div>
-    <div class="mmrpg-header-row mmrpg-movement-summary">
-      {{#each activeMovement}}
-        <span class="mmrpg-chip"><strong>{{label}}</strong> {{value}}</span>
+      {{#each activeForms}}
+        <span class="mmrpg-chip active" title="{{kindLabel}}">{{name}}</span>
       {{/each}}
-      <span class="mmrpg-chip"><strong>{{localize "MMRPG.Sheet.reach"}}</strong> {{system.reach}}</span>
     </div>
-    {{#if activeForms.length}}
-      <div class="mmrpg-header-row mmrpg-active-forms">
-        {{#each activeForms}}
-          <span class="mmrpg-chip active" title="{{kindLabel}}"><strong>{{name}}</strong></span>
-        {{/each}}
+
+    <div class="mm-vitals">
+      <div class="mm-stat health">
+        <span class="mm-cap">{{localize "MMRPG.Resource.health"}}</span>
+        <label class="mm-corner">
+          <span class="mm-cap">{{localize "MMRPG.Sheet.reduction"}}</span>
+          <input type="number" name="system.health.reduction" value="{{source.health.reduction}}" min="0" step="1" aria-label="{{localize 'MMRPG.Sheet.reduction'}} ({{localize 'MMRPG.Resource.health'}})" {{#unless editable}}disabled{{/unless}}>
+        </label>
+        <div class="mm-stat-values">
+          <input type="number" name="system.health.value" value="{{source.health.value}}" step="1" aria-label="{{localize 'MMRPG.Resource.health'}}" {{#unless editable}}disabled{{/unless}}>
+          <hr>
+          <input type="number" name="system.health.max" value="{{source.health.max}}" step="1" aria-label="{{localize 'MMRPG.Sheet.max'}} ({{localize 'MMRPG.Resource.health'}})" {{#unless editable}}disabled{{/unless}}>
+        </div>
+        <div class="mm-bar" aria-hidden="true"><i style="width: {{healthPercent}}%"></i></div>
       </div>
-    {{/if}}
+
+      <div class="mm-stat focus">
+        <span class="mm-cap">{{localize "MMRPG.Resource.focus"}}</span>
+        <label class="mm-corner">
+          <span class="mm-cap">{{localize "MMRPG.Sheet.reduction"}}</span>
+          <input type="number" name="system.focus.reduction" value="{{source.focus.reduction}}" min="0" step="1" aria-label="{{localize 'MMRPG.Sheet.reduction'}} ({{localize 'MMRPG.Resource.focus'}})" {{#unless editable}}disabled{{/unless}}>
+        </label>
+        <div class="mm-stat-values">
+          <input type="number" name="system.focus.value" value="{{source.focus.value}}" step="1" aria-label="{{localize 'MMRPG.Resource.focus'}}" {{#unless editable}}disabled{{/unless}}>
+          <hr>
+          <input type="number" name="system.focus.max" value="{{source.focus.max}}" step="1" aria-label="{{localize 'MMRPG.Sheet.max'}} ({{localize 'MMRPG.Resource.focus'}})" {{#unless editable}}disabled{{/unless}}>
+        </div>
+        <div class="mm-bar" aria-hidden="true"><i style="width: {{focusPercent}}%"></i></div>
+      </div>
+
+      <div class="mm-stat speed">
+        <span class="mm-cap">{{localize "MMRPG.Sheet.speed"}}</span>
+        <div class="mm-corner">
+          <span class="mm-cap">{{localize "MMRPG.Sheet.initiative"}}</span>
+          <button type="button" class="mm-init" data-action="rollInitiative" title="{{localize 'MMRPG.Sheet.rollInitiative'}}">{{mmrpgSigned system.init.total}}</button>
+        </div>
+        <ul>
+          {{#each activeMovement}}<li>{{label}} <span>{{value}}</span></li>{{/each}}
+          <li>{{localize "MMRPG.Sheet.reach"}} <span>{{system.reach}}</span></li>
+        </ul>
+      </div>
+    </div>
   </div>
 </header>

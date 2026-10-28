@@ -8,6 +8,23 @@ export const ABILITY_KEYS = Object.freeze(["mle", "agl", "res", "vig", "ego", "l
 /** Atributos que podem ser usados como atributo de ataque/dano. */
 export const ATTACK_ABILITY_KEYS = Object.freeze(["mle", "agl", "ego", "log"]);
 
+/** Rank mais alto da ficha. O "Rank X" dos NPCs fica fora por enquanto. */
+export const MAX_RANK = 6;
+
+/** Rank mais baixo. */
+export const MIN_RANK = 1;
+
+/**
+ * Limita um Rank ao intervalo do livro (1 a 6). Valor inválido vira 1.
+ * @param {number|string} value
+ * @returns {number}
+ */
+export function clampRank(value) {
+  const n = Math.trunc(Number(value));
+  if (!Number.isFinite(n)) return MIN_RANK;
+  return Math.min(MAX_RANK, Math.max(MIN_RANK, n));
+}
+
 /** Valor base somado à pontuação para obter a Defesa. */
 export const DEFENSE_BASE = 10;
 

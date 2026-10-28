@@ -3,7 +3,7 @@
  */
 
 import { MMRPG } from "../config.mjs";
-import { damagePool, healPool, toInt, carryPoolValue, formChanges } from "../rules/index.mjs";
+import { damagePool, healPool, toInt, carryPoolValue, formChanges, clampRank } from "../rules/index.mjs";
 import { changeData, createChatMessage } from "../helpers/compat.mjs";
 
 /** Escapa texto para HTML (nomes de personagens e formas vão para o chat). */
@@ -33,6 +33,21 @@ export default class MMRPGActor extends Actor {
       token.disposition = CONST.TOKEN_DISPOSITIONS.HOSTILE;
     }
     this.updateSource({ prototypeToken: foundry.utils.mergeObject(token, data.prototypeToken ?? {}, { inplace: false }) });
+
+    // O Rank do livro vai de 1 a 6.
+    const rank = foundry.utils.getProperty(data, "system.rank");
+    if (rank !== undefined && clampRank(rank) !== rank) this.updateSource({ "system.rank": clampRank(rank) });
+  }
+
+  /**
+   * O Rank base fica entre 1 e 6, como no livro. (Formas podem mudar o Rank efetivo por efeitos,
+   * que não passam por aqui.)
+   * @inheritdoc
+   */
+  async _preUpdate(changed, options, user) {
+    if ((await super._preUpdate(changed, options, user)) === false) return false;
+    const rank = foundry.utils.getProperty(changed, "system.rank");
+    if (rank !== undefined && clampRank(rank) !== rank) foundry.utils.setProperty(changed, "system.rank", clampRank(rank));
   }
 
   /**

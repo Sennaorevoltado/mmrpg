@@ -1,8 +1,8 @@
-<section class="mmrpg-item-section">
+<section class="mmrpg-item-section" data-section="{{type}}">
   <header class="mmrpg-section-head">
-    <h3>{{title}}</h3>
+    <h4>{{title}}<small>{{list.length}}</small></h4>
     {{#if editable}}
-      <button type="button" class="mmrpg-icon-button" data-action="createItem" data-type="{{type}}" {{#if powerSet}}data-power-set="{{powerSet}}"{{/if}} title="{{localize 'MMRPG.Sheet.add'}}">
+      <button type="button" class="mmrpg-icon-button" data-action="createItem" data-type="{{type}}" {{#if powerSet}}data-power-set="{{powerSet}}"{{/if}} title="{{localize 'MMRPG.Sheet.add'}}: {{title}}" aria-label="{{localize 'MMRPG.Sheet.add'}}: {{title}}">
         <i class="fa-solid fa-plus"></i>
       </button>
     {{/if}}
@@ -10,41 +10,7 @@
   {{#if list.length}}
     <ul class="mmrpg-item-list">
       {{#each list}}
-        <li class="mmrpg-item" data-item-id="{{id}}">
-          <img src="{{img}}" alt="">
-          <div class="mmrpg-item-main">
-            <div class="mmrpg-item-title">
-              <a class="mmrpg-item-name" data-action="editItem" data-item-id="{{id}}">{{name}}</a>
-              {{#if ../showQty}}<span class="mmrpg-muted">×{{quantity}}</span>{{/if}}
-            </div>
-            {{#if hasActions}}
-              <div class="mmrpg-item-actions">
-                {{#each actions}}
-                  <button type="button" class="mmrpg-action-button" data-action="useAction" data-item-id="{{../id}}" data-action-id="{{id}}" data-drag-action data-item-uuid="{{../uuid}}" title="{{#if hasCost}}{{cost}}{{else}}{{localize 'MMRPG.Sheet.useAction'}}{{/if}}">
-                    <i class="fa-solid fa-bolt"></i> {{label}}
-                    {{#if rolls}}<small>{{ability}}</small>{{/if}}
-                    {{#if limited}}<small>{{uses.value}}/{{uses.max}}</small>{{/if}}
-                  </button>
-                {{/each}}
-              </div>
-            {{/if}}
-          </div>
-          <div class="mmrpg-item-controls">
-            {{#if ../showEquip}}
-              <button type="button" class="mmrpg-icon-button {{#if equipped}}is-on{{/if}}" data-action="toggleEquipped" data-item-id="{{id}}" title="{{localize 'MMRPG.Sheet.equipped'}}">
-                <i class="fa-solid fa-hand-fist"></i>
-              </button>
-            {{/if}}
-            <button type="button" class="mmrpg-icon-button" data-action="editItem" data-item-id="{{id}}" title="{{localize 'MMRPG.Sheet.edit'}}">
-              <i class="fa-solid fa-pen-to-square"></i>
-            </button>
-            {{#if ../editable}}
-              <button type="button" class="mmrpg-icon-button" data-action="deleteItem" data-item-id="{{id}}" title="{{localize 'MMRPG.Sheet.delete'}}">
-                <i class="fa-solid fa-trash"></i>
-              </button>
-            {{/if}}
-          </div>
-        </li>
+        {{> "systems/mmrpg/templates/actor/parts/entry.hbs" showEquip=../showEquip editable=../editable}}
       {{/each}}
     </ul>
   {{else}}

@@ -10,7 +10,7 @@ Projeto não oficial, sem vínculo com a Marvel, a Disney ou a Foundry Gaming. C
 
 Este sistema foi escrito **sem acesso a um Foundry de verdade, nem v14 nem v13**. O que foi feito para reduzir o risco:
 
-- Mais de 160 testes automáticos (`npm test`): regras do d616, formato de importação e um **Foundry simulado** que carrega o sistema inteiro, usa ações, posta e aplica cartões, renderiza fichas e janelas. A bateria roda duas vezes, uma com o simulador na geração 14 e outra na 13.
+- Mais de 170 testes automáticos (`npm test`): regras do d616, formato de importação e um **Foundry simulado** que carrega o sistema inteiro, usa ações, posta e aplica cartões, renderiza fichas e janelas. A bateria roda duas vezes, uma com o simulador na geração 14 e outra na 13.
 - Um validador estático (`npm run validate`): confere o manifesto, a sintaxe, os templates, as ligações `data-action` ↔ código, as traduções e a ausência de emojis.
 
 Isso pega erros de código e de dados, mas **não substitui um teste num mundo real**. A primeira rodada de testes no Foundry, na ordem:
@@ -45,7 +45,7 @@ Os pontos abaixo só um teste real confirma, tanto na v13 quanto na v14: arrasta
 
 **Por zip:** rode `npm run package` e extraia `dist/mmrpg-<versão>.zip` em `Data/systems/mmrpg`.
 
-**Por URL de manifesto:** depois de publicar o projeto no GitHub e criar uma tag (`git tag v0.3.1 && git push --tags`), o workflow em `.github/workflows/release.yml` gera o release com `system.json` e o zip. A URL a colar em *Instalar sistema* é
+**Por URL de manifesto:** depois de publicar o projeto no GitHub e criar uma tag (`git tag v0.4.0 && git push --tags`), o workflow em `.github/workflows/release.yml` gera o release com `system.json` e o zip. A URL a colar em *Instalar sistema* é
 `https://github.com/<usuário>/<repositório>/releases/latest/download/system.json`.
 
 ## O que o sistema faz
@@ -66,7 +66,10 @@ Os pontos abaixo só um teste real confirma, tanto na v13 quanto na v14: arrasta
 
 **Fichas e dados**
 - Personagem e NPC: seis atributos (defesa, ataque, bônus fora de combate e multiplicador calculados), Saúde, Foco e Karma, redução de dano, iniciativa, movimento (corrida, escalada, natação, voo, etc., cada um com modo de cálculo: fixo, metade, cheio, dobro, triplo, Rank ou corrida × Rank), tamanho, detalhes, biografia.
-- Abas: principal, poderes (agrupados por conjunto de poder), traços e tags, equipamentos, modificadores, efeitos, biografia.
+- Abas: **Principal** (atributos e dano), **Poderes** (agrupados por conjunto de poder), **Traços e tags**, **Equipamento** (armas e equipamentos), **Formas**, **Efeitos**, **Modificadores** e **Biografia** (ou **Anotações**, no NPC).
+- **Rank vai de 1 a 6**, como no livro. O campo e a gravação seguem o limite; um efeito ou forma pode elevar o *Rank efetivo*, que aparece ao lado. A regra do Rank X, de NPC, ficou de fora por enquanto.
+- **Ficha no estilo do livro**: painéis vermelhos com cantos cortados, campos creme, Saúde em vermelho e Foco em azul, listas de poderes, armas e equipamentos em linhas com a descrição recolhida num resumo ("Ler descrição" abre o texto inteiro). Há um campo para filtrar poderes e equipamentos por nome ou texto.
+- **Aparência (por jogador)**: tema *Livro* (claro) ou *Escuro*, tamanho do texto (normal, grande, muito grande), densidade (confortável ou compacta) e descrições recolhidas ou abertas. Fica em *Configurações do jogo → Configurar opções* e no menu da janela da ficha. Nada disso muda o que os outros jogadores veem.
 - Itens: poder, traço, tag, origem, ocupação, arma, equipamento e **forma**. **Origens e ocupações concedem itens**: ao entrar na ficha, criam os itens ligados.
 - **Efeitos passivos nos itens**: um poder numerado (Mighty, Sturdy, Flight…) pode trazer Active Effects que valem enquanto ele estiver na ficha e ajustam atributos, redução de dano, movimento e outros campos. Poderes com vários níveis usam `upgrade`, então vale só o maior.
 - 17 condições + derrotado como status effects do Foundry. NPC chega a 0 de Saúde → derrotado (opção de mundo).
@@ -83,6 +86,8 @@ Os pontos abaixo só um teste real confirma, tanto na v13 quanto na v14: arrasta
 - Detalhes e formato de importação: [docs/IMPORTACAO.md](docs/IMPORTACAO.md#formas-form-armaduras-transformações-e-formas-alternativas).
 
 **Importar/exportar**: janela *Importar conteúdo* (menu de configurações do sistema e botão no diretório de itens) para o seu próprio JSON. Pode importar para os **itens do mundo** ou para **compêndios do mundo**, um por tipo (poderes, traços, origens, tags, ocupações, armas, equipamentos, formas), e exporta no mesmo formato.
+
+**Visual**: o estilo se inspira na ficha do sistema da comunidade [mjording/marvel-multiverse](https://github.com/mjording/marvel-multiverse) (MIT) e usa as fontes Roboto (Apache 2.0) e Roboto Condensed (SIL OFL 1.1), na pasta `fonts/`, cada uma com a própria licença. Nenhuma imagem do livro ou do outro sistema é usada. A aparência foi conferida só em prévias de navegador com o Foundry simulado, **não num Foundry real**: se algo sair do lugar (por exemplo o editor de texto da descrição), diga qual janela e o tema usado.
 
 ## Primeiros passos
 

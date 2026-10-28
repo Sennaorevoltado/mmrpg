@@ -8,8 +8,8 @@ sistema não inclui texto, tabelas ou arte dos livros: quem usa cria ou importa 
 próprio conteúdo.
 
 Este sistema foi escrito do zero para o Foundry VTT v14 (com suporte experimental à v13), mas se apoia em duas obras
-abertas (licença MIT). Os avisos de copyright delas são reproduzidos abaixo, como a
-licença exige.
+abertas (licença MIT) e usa fontes sob as licenças Apache 2.0 e SIL OFL 1.1. Os avisos de copyright
+delas são reproduzidos abaixo, como as licenças exigem.
 
 -----------------------------------------------------------------------------------
 1. Gaia: Prelúdio — https://github.com/LPfontes/gaia-preludio
@@ -43,7 +43,9 @@ licença exige.
 2. marvel-multiverse (sistema da comunidade para Foundry VTT)
    — https://github.com/mjording/marvel-multiverse
    Referência para a mecânica do d616, as listas de atributos, conjuntos de poderes,
-   elementos e condições, e para o fluxo de ataque, dano e cura.
+   elementos e condições, e para o fluxo de ataque, dano e cura. A linguagem visual das
+   fichas (painéis vermelhos com cantos cortados, campos creme, rótulos sobre a borda)
+   se inspira na ficha desse sistema; o CSS aqui é próprio e nenhuma imagem dele foi copiada.
 
    MIT License
 
@@ -66,3 +68,13 @@ licença exige.
    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
    SOFTWARE.
+
+-----------------------------------------------------------------------------------
+3. Fontes Roboto e Roboto Condensed (pasta fonts/)
+   — https://github.com/googlefonts/roboto
+   Roboto: Copyright 2011-2024 The Roboto Project Authors. Licença Apache 2.0.
+   Roboto Condensed: Copyright 2011 The Roboto Project Authors
+   (https://github.com/googlefonts/roboto-classic). Licença SIL Open Font License 1.1.
+   O texto de cada licença acompanha as fontes em fonts/roboto/LICENSE e
+   fonts/roboto-condensed/LICENSE. Os arquivos foram copiados sem alteração do
+   repositório do sistema acima, que já os distribui.

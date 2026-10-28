@@ -466,6 +466,33 @@ test("mensagem antiga de teste (sem os dados do cartão) re-rola dentro de um ca
   assertClean(msg.content, "mensagem antiga depois de re-rolar");
 });
 
+test("o botão Importar conteúdo aparece nos diretórios de itens e de compêndios, só para o GM", async () => {
+  const savedDocument = globalThis.document;
+  const savedGM = game.user.isGM;
+  globalThis.document = { createElement: () => ({ addEventListener() {}, className: "", innerHTML: "" }) };
+  const fakeRoot = () => {
+    const header = { children: [], append(el) { this.children.push(el); } };
+    const root = new HTMLElement();
+    root.querySelector = (selector) => (selector === ".header-actions" ? header : null);
+    return { root, header };
+  };
+  try {
+    for (const hook of ["renderItemDirectory", "renderCompendiumDirectory"]) {
+      game.user.isGM = true;
+      const gm = fakeRoot();
+      await Hooks.callAll(hook, {}, gm.root);
+      assert.equal(gm.header.children.length, 1, `${hook}: GM vê o botão`);
+      game.user.isGM = false;
+      const player = fakeRoot();
+      await Hooks.callAll(hook, {}, player.root);
+      assert.equal(player.header.children.length, 0, `${hook}: jogador não vê`);
+    }
+  } finally {
+    globalThis.document = savedDocument;
+    game.user.isGM = savedGM;
+  }
+});
+
 test("iniciativa é d616 + Vigilance e re-rola sozinha com Edge", async () => {
   const { hero } = await makeScene();
   hero.system.updateSource({ init: { edge: true } });
@@ -1324,6 +1351,176 @@ test("importar formas: valida alterações, liga concessões e exporta de volta"
 });
 
 /* -------------------------------------------- */
+
+/* -------------------------------------------- */
+/*  Ficha no estilo do livro, Rank 1–6, aparência */
+/* -------------------------------------------- */
+
+test("Rank só vai de 1 a 6: ao criar e ao editar", async () => {
+  const high = await Actor.create({ name: "Rank alto", type: "character", system: { rank: 7 } });
+  assert.equal(high.system.rank, 6, "7 vira 6");
+  await high.update({ "system.rank": 12 });
+  assert.equal(high.system.rank, 6);
+  await high.update({ "system.rank": 0 });
+  assert.equal(high.system.rank, 1, "0 vira 1");
+  await high.update({ "system.rank": -3 });
+  assert.equal(high.system.rank, 1);
+  await high.update({ "system.rank": 4 });
+  assert.equal(high.system.rank, 4);
+
+  const villain = await Actor.create({ name: "Vilão", type: "npc", system: { rank: 9 } });
+  assert.equal(villain.system.rank, 6, "NPC também (a regra do Rank X fica de fora por enquanto)");
+
+  // Outras edições não mexem no Rank.
+  await high.update({ "system.health.value": 3 });
+  assert.equal(high.system.rank, 4);
+
+  const { clampRank, MAX_RANK, MIN_RANK } = await import("../module/rules/abilities.mjs");
+  assert.equal(MAX_RANK, 6);
+  assert.equal(MIN_RANK, 1);
+  assert.equal(clampRank("5"), 5);
+  assert.equal(clampRank("abc"), 1);
+  assert.equal(clampRank(3.7), 3);
+});
+
+test("aparência: opções por jogador, padrões seguros e valores inválidos ignorados", async () => {
+  const { APPEARANCE, getAppearance, applyAppearance, descriptionsOpenByDefault } = await import("../module/helpers/appearance.mjs");
+  for (const [key, def] of Object.entries(APPEARANCE)) {
+    const registered = env.settings.settings.get(`mmrpg.${key}`);
+    assert.ok(registered, `${key} registrada`);
+    assert.equal(registered.scope, "client", `${key} vale só para quem escolheu`);
+    assert.equal(registered.default, def.initial);
+    assert.deepEqual(Object.keys(registered.choices), def.choices);
+  }
+  assert.deepEqual(getAppearance(), { uiTheme: "book", uiTextSize: "normal", uiDensity: "comfortable", uiDescriptions: "collapsed" });
+  assert.equal(descriptionsOpenByDefault(), false);
+
+  const element = { dataset: {} };
+  applyAppearance(element);
+  assert.deepEqual(element.dataset, { mmTheme: "book", mmText: "normal", mmDensity: "comfortable", mmDescriptions: "collapsed" });
+
+  env.settings.set("mmrpg", "uiTheme", "dark");
+  env.settings.set("mmrpg", "uiTextSize", "xlarge");
+  env.settings.set("mmrpg", "uiDescriptions", "open");
+  env.settings.set("mmrpg", "uiDensity", "valor-antigo-que-nao-existe");
+  const current = getAppearance();
+  assert.equal(current.uiTheme, "dark");
+  assert.equal(current.uiTextSize, "xlarge");
+  assert.equal(current.uiDensity, "comfortable", "valor inválido cai no padrão");
+  assert.equal(descriptionsOpenByDefault(), true);
+  applyAppearance(element);
+  assert.equal(element.dataset.mmTheme, "dark");
+  assert.equal(element.dataset.mmText, "xlarge");
+
+  for (const key of Object.keys(APPEARANCE)) env.settings.set("mmrpg", key, APPEARANCE[key].initial);
+});
+
+test("ficha nova: abas, Principal com atributos e dano, poderes e equipamento em listas legíveis", async () => {
+  const { CharacterSheet, NpcSheet } = await import("../module/apps/sheets/actor-sheet.mjs");
+  const hero = await Actor.create({ name: "Ficha Nova", type: "character", system: { rank: 4, abilities: { log: { value: 6, damageBonus: 1 } } } });
+  await hero.createEmbeddedDocuments("Item", [
+    { name: "Rajada Longa", type: "power", system: { powerSet: "Super-Powers", range: "10 m", duration: "Instantâneo", level: 2, description: "<p>Você dispara <strong>uma rajada</strong> de energia. O texto segue por bastante tempo para passar do limite do resumo e provar que a descrição inteira fica disponível quando aberta, sem cortar nenhuma frase importante da regra.</p>", actions: [{ id: "a1", name: "Rajada", roll: { mode: "attack", ability: "log", targetDefense: "agl" }, damage: { enabled: true } }] } },
+    { name: "Voo", type: "power", system: { powerSet: "Super-Powers" } },
+    { name: "Escudo", type: "weapon", system: { kind: "close", category: "Escudo", reach: "1 m", recommendedRank: "3+", equipped: true, description: "<p>Escudo circular.</p>" } },
+    { name: "Celular", type: "gear", system: { category: "Eletrônicos" } },
+    { name: "Gênio", type: "trait", system: { restriction: "Logic 4+" } }
+  ]);
+
+  const html = await (await sheetFor(CharacterSheet, hero)).renderToString();
+  assertClean(html, "ficha nova");
+  for (const tab of ["main", "powers", "traits", "gear", "forms", "effects", "mods", "bio"]) {
+    assert.ok(html.includes(`data-tab="${tab}"`), `aba ${tab}`);
+  }
+  assert.equal((html.match(/class="mm-tab"/g) ?? []).length, 8, "oito abas");
+  assert.ok(html.includes('class="mm-badge mm-rank"') && html.includes('max="6"'), "Rank limitado a 6 no campo");
+  assert.ok(html.includes("mm-damage") && html.includes("mm-ability-row"), "dano e atributos no Principal");
+  assert.ok(html.includes("Rajada Longa") && html.includes("Escudo") && html.includes("Celular") && html.includes("Gênio"));
+  assert.ok(html.includes('data-filter') && html.includes("data-search="), "campo de busca e texto de busca nas entradas");
+  assert.ok(html.includes("<details"), "descrições em blocos que abrem");
+  assert.ok(html.includes("uma rajada"), "a descrição completa está no HTML, só recolhida");
+  assert.ok(html.includes("mmrpg-excerpt"), "resumo curto de cada descrição");
+  assert.ok(!/<details[^>]*\sopen/.test(html), "descrições começam fechadas por padrão");
+
+  // Com a opção "descrições abertas", elas já vêm abertas.
+  env.settings.set("mmrpg", "uiDescriptions", "open");
+  const open = await (await sheetFor(CharacterSheet, hero)).renderToString();
+  assert.ok(/<details[^>]*\sopen/.test(open), "descrições abertas por padrão");
+  env.settings.set("mmrpg", "uiDescriptions", "collapsed");
+
+  const villain = await Actor.create({ name: "Vilão Novo", type: "npc", system: { rank: 5, category: "Vilão" } });
+  assertClean(await (await sheetFor(NpcSheet, villain)).renderToString(), "NPC novo");
+  assert.equal(CharacterSheet.DEFAULT_OPTIONS.actions.openAppearance.name.includes("onOpenAppearance"), true);
+});
+
+test("ficha do item: abas no estilo do livro, descrição legível e detalhes por tipo", async () => {
+  const MMRPGItemSheet = (await import("../module/apps/sheets/item-sheet.mjs")).default;
+  const hero = await Actor.create({ name: "Dono do Item", type: "character" });
+  const [power, weapon, origin, form] = await hero.createEmbeddedDocuments("Item", [
+    { name: "Poder Lido", type: "power", system: { powerSet: "Super-Powers", description: "<p>Texto da descrição.</p>", actions: [{ id: "x1", name: "Golpe", roll: { mode: "attack", ability: "mle", targetDefense: "mle" } }] } },
+    { name: "Arma Lida", type: "weapon", system: { kind: "close", category: "Lâmina" } },
+    { name: "Origem Lida", type: "origin", system: { grants: [{ name: "Gênio", type: "trait", note: "" }] } },
+    { name: "Forma Lida", type: "form", system: { kind: "suit", changes: [{ key: "system.health.max", type: "add", value: "5", priority: null }], grants: [{ name: "Voo", type: "power", note: "" }] } }
+  ]);
+
+  for (const item of [power, weapon, origin, form]) {
+    const html = await (await sheetFor(MMRPGItemSheet, item)).renderToString();
+    assertClean(html, `ficha de ${item.type}`);
+    assert.equal((html.match(/class="mm-tab"/g) ?? []).length, item.type === "origin" || item.type === "form" ? 3 : 4, `abas de ${item.type}`);
+    assert.ok(html.includes("mm-item-header") && html.includes("mm-panel"), `cabeçalho e painéis de ${item.type}`);
+    assert.ok(html.includes("<prose-mirror") && html.includes("mm-paper"), `descrição em papel de leitura (${item.type})`);
+    assert.ok(!html.includes("mmrpg-tabs") && !html.includes("mmrpg-panel-body"), "sem as classes da ficha antiga");
+  }
+
+  const powerHtml = await (await sheetFor(MMRPGItemSheet, power)).renderToString();
+  assert.ok(powerHtml.includes("Texto da descrição.") && powerHtml.includes('data-action="addAction"') && powerHtml.includes("Golpe"));
+  assert.ok(powerHtml.includes("mm-detail-grid") && powerHtml.includes('class="mm-field'), "detalhes em campos do livro");
+
+  const originHtml = await (await sheetFor(MMRPGItemSheet, origin)).renderToString();
+  assert.ok(originHtml.includes("data-grants-drop") && originHtml.includes("Gênio"), "concessões na aba Detalhes");
+
+  const formHtml = await (await sheetFor(MMRPGItemSheet, form)).renderToString();
+  assert.ok(formHtml.includes("mmrpg-form-changes") && formHtml.includes("system.health.max") && formHtml.includes("data-grants-drop"));
+  assert.ok(formHtml.includes('aria-label="Tipo da alteração"'), "campos da alteração com nome para leitores de tela");
+});
+
+test("pastas na importação: reaproveita as existentes, ignora espaços e maiúsculas, nunca duplica", async () => {
+  // Compêndio: duas importações seguidas e chamadas ao mesmo tempo com o mesmo caminho.
+  const pack = await compendia.ensurePack("power");
+  const cache = new Map();
+  const ids = await Promise.all([
+    compendia.ensurePackFolder(pack, ["Armaduras", "Mark"], cache),
+    compendia.ensurePackFolder(pack, ["Armaduras", "Mark"], cache),
+    compendia.ensurePackFolder(pack, [" armaduras ", "MARK"], cache),
+    compendia.ensurePackFolder(pack, ["Armaduras"], cache)
+  ]);
+  assert.equal(ids[0], ids[1]);
+  assert.equal(ids[0], ids[2], "espaços e maiúsculas não criam outra pasta");
+  assert.notEqual(ids[3], ids[0]);
+  const created = pack.folders.filter((f) => ["armaduras", "mark"].includes(String(f.name).trim().toLowerCase()));
+  assert.equal(created.length, 2, "uma pasta pai e uma filha");
+
+  // Uma importação nova (cache novo) continua achando as pastas que já estão no compêndio.
+  const again = await compendia.ensurePackFolder(pack, ["Armaduras", "Mark"], new Map());
+  assert.equal(again, ids[0]);
+  assert.equal(pack.folders.filter((f) => String(f.name).trim().toLowerCase() === "mark").length, 1);
+
+  // Mesmo nome em outro pai é outra pasta.
+  const other = await compendia.ensurePackFolder(pack, ["Outra", "Mark"], new Map());
+  assert.notEqual(other, ids[0]);
+
+  // Itens do mundo.
+  const worldCache = new Map();
+  const [w1, w2] = await Promise.all([
+    compendia.ensureWorldFolder(["Formas", "Heróis"], worldCache),
+    compendia.ensureWorldFolder(["formas", "heróis"], worldCache)
+  ]);
+  assert.equal(w1, w2);
+  const w3 = await compendia.ensureWorldFolder(["Formas", "Heróis"], new Map());
+  assert.equal(w3, w1, "outra importação reaproveita a pasta do mundo");
+  assert.equal(game.folders.filter((f) => f.type === "Item" && f.name === "Heróis").length, 1);
+
+  assert.equal(await compendia.ensureWorldFolder([], new Map()), null, "sem caminho, sem pasta");
+});
 
 test("nenhuma chave de tradução ficou sem texto durante os testes", () => {
   assert.deepEqual([...env.missingKeys].sort(), []);

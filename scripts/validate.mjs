@@ -15,6 +15,7 @@ import { fileURLToPath } from "node:url";
 import Handlebars from "handlebars";
 import { MMRPG } from "../module/config.mjs";
 import { ITEM_TYPES } from "../module/helpers/content-format.mjs";
+import { APPEARANCE } from "../module/helpers/appearance.mjs";
 import { walk, collectConfigKeys, collectLiteralKeys, flatten } from "./lib/keys.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
@@ -147,6 +148,67 @@ for (const file of templates) {
 console.log(`${templates.length} templates verificados`);
 
 /* -------------------------------------------- */
+section("estilos (CSS)");
+
+for (const styleFile of system.styles ?? []) {
+  if (!exists(styleFile)) continue;
+  const css = read(path.join(root, styleFile));
+
+  // Comentário que fecha antes da hora (um "*/" dentro do texto) engole a regra seguinte sem avisar.
+  let i = 0;
+  while (i < css.length) {
+    if (css.startsWith("/*", i)) {
+      const end = css.indexOf("*/", i + 2);
+      const line = css.slice(0, i).split("\n").length;
+      if (end === -1) {
+        errors.push(`${styleFile}:${line}: comentário sem fim`);
+        break;
+      }
+      if (css.slice(i + 2, end).includes("/*")) errors.push(`${styleFile}:${line}: "/*" dentro de comentário`);
+      i = end + 2;
+    } else if (css.startsWith("*/", i)) {
+      errors.push(`${styleFile}:${css.slice(0, i).split("\n").length}: "*/" solto (um comentário fechou antes da hora?)`);
+      i += 2;
+    } else {
+      i++;
+    }
+  }
+
+  // Chaves balanceadas fora de comentários.
+  const bare = css.replace(/\/\*[\s\S]*?\*\//g, "");
+  const open = (bare.match(/\{/g) ?? []).length;
+  const close = (bare.match(/\}/g) ?? []).length;
+  if (open !== close) errors.push(`${styleFile}: chaves desbalanceadas ({ ${open} × } ${close})`);
+
+  // Arquivos citados em url(...) (fontes, imagens) precisam existir.
+  const base = path.dirname(path.join(root, styleFile));
+  let refs = 0;
+  for (const m of bare.matchAll(/url\(\s*["']?([^"')]+)["']?\s*\)/g)) {
+    const target = m[1];
+    if (/^(data:|https?:|#)/.test(target)) continue;
+    refs++;
+    if (!fs.existsSync(path.resolve(base, target))) errors.push(`${styleFile}: arquivo citado não existe: ${target}`);
+  }
+
+  // Cada família de fonte declarada tem de ter as faces normal e negrito.
+  const faces = [...bare.matchAll(/@font-face\s*\{([^}]*)\}/g)].map((m) => m[1]);
+  const byFamily = new Map();
+  for (const face of faces) {
+    const family = face.match(/font-family:\s*"([^"]+)"/)?.[1];
+    const weight = face.match(/font-weight:\s*(\d+)/)?.[1];
+    const style = face.match(/font-style:\s*(\w+)/)?.[1] ?? "normal";
+    if (!family) continue;
+    byFamily.set(family, [...(byFamily.get(family) ?? []), `${weight}/${style}`]);
+  }
+  for (const [family, variants] of byFamily) {
+    for (const need of ["400/normal", "700/normal"]) {
+      if (!variants.includes(need)) errors.push(`${styleFile}: fonte "${family}" sem a face ${need}`);
+    }
+  }
+  console.log(`${styleFile}: ${faces.length} fontes, ${refs} arquivos citados`);
+}
+
+/* -------------------------------------------- */
 section("ligação data-action × manipuladores");
 
 function actionNames(file) {
@@ -173,7 +235,8 @@ for (const g of groups) {
     if (!handlers.has(name)) errors.push(`${t}: data-action="${name}" sem manipulador em ${g.files.join(", ")}`);
   }
   for (const h of handlers) {
-    if (h === "editImage" && !used.has(h)) continue;
+    // Ações que não estão num template: a imagem (clique no retrato) e o menu da janela.
+    if ((h === "editImage" || h === "openAppearance") && !used.has(h)) continue;
     if (!used.has(h)) warnings.push(`manipulador "${h}" (${g.files[0]}) não é usado em nenhum template`);
   }
 }
@@ -202,6 +265,10 @@ for (const [doc, types] of Object.entries(system.documentTypes)) {
 }
 // Nomes dos compêndios: um rótulo por tipo de item (chave montada em helpers/compendia.mjs).
 for (const t of ITEM_TYPES) used.set(`MMRPG.Pack.${t}`, new Set(["helpers/compendia.mjs"]));
+// Opções de aparência: nome, dica e cada escolha (chaves montadas em helpers/appearance.mjs).
+for (const [key, def] of Object.entries(APPEARANCE)) {
+  for (const part of ["name", "hint", ...def.choices]) used.set(`MMRPG.Appearance.${key}.${part}`, new Set(["helpers/appearance.mjs"]));
+}
 
 for (const code of langCodes) {
   for (const [key, files] of used) {

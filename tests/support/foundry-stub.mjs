@@ -499,9 +499,14 @@ class BaseDocument {
 
   async update(changes, options = {}) {
     const expanded = expandObject(changes);
+    if ((await this._preUpdate(expanded, options, game.user)) === false) return this;
     this.updateSource(expanded);
     await Hooks.callAll(`update${this.constructor.documentName}`, this, expanded, options, game.user.id);
     return this;
+  }
+
+  async _preUpdate() {
+    return true;
   }
 
   async _preCreate() {
@@ -1008,7 +1013,11 @@ export function installFoundry({ lang = "pt-BR", generation = Number(process.env
   g.ActiveEffect = ActiveEffect;
   g.Folder = {
     create: async (d, options = {}) => {
-      if (!options.pack) return { id: randomID(), ...d };
+      if (!options.pack) {
+        const world = { id: randomID(), name: d.name, type: d.type, folder: d.folder ? game.folders.get(d.folder) ?? null : null };
+        game.folders.set(world.id, world);
+        return world;
+      }
       const pack = game.packs.get(options.pack);
       if (!pack || pack.locked) throw new Error(`Compêndio indisponível: ${options.pack}`);
       const folder = { id: randomID(), name: d.name, type: d.type, folder: d.folder ? pack.folders.get(d.folder) ?? null : null };
@@ -1112,7 +1121,7 @@ export function installFoundry({ lang = "pt-BR", generation = Number(process.env
     messages: new Collection(),
     packs: new Collection(),
     macros: { find: () => null },
-    folders: { find: () => null },
+    folders: new Collection(),
     combat: null,
     world: { title: "Mundo de teste" },
     socket: { on: (name, fn) => socketHandlers.push({ name, fn }), emit: (name, data) => emitted.push({ name, data }) },

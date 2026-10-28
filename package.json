@@ -1,6 +1,6 @@
 {
   "name": "mmrpg",
-  "version": "0.3.1",
+  "version": "0.4.1",
   "private": true,
   "description": "Sistema não oficial de Marvel Multiverse RPG para Foundry VTT (v14; v13 experimental)",
   "type": "module",

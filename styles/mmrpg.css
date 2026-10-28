@@ -466,3 +466,8 @@ prose-mirror { display: block; min-height: 4rem; background: var(--mm-surface); 
 .mmrpg-form-card p { margin: 0.15rem 0; }
 .mmrpg-detail-grid > p.wide { grid-column: 1 / -1; margin: 0; }
 
+
+/* ---------- Diálogo de rolagem: o rótulo não quebra em duas linhas altas ---------- */
+
+.mmrpg-roll-config .form-group > label { flex: 0 0 40%; line-height: 1.25; }
+.mmrpg-bare-roll { margin: 0; }

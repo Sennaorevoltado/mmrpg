@@ -45,7 +45,7 @@ Os pontos abaixo só um teste real confirma, tanto na v13 quanto na v14: arrasta
 
 **Por zip:** rode `npm run package` e extraia `dist/mmrpg-<versão>.zip` em `Data/systems/mmrpg`.
 
-**Por URL de manifesto:** depois de publicar o projeto no GitHub e criar uma tag (`git tag v0.3.0 && git push --tags`), o workflow em `.github/workflows/release.yml` gera o release com `system.json` e o zip. A URL a colar em *Instalar sistema* é
+**Por URL de manifesto:** depois de publicar o projeto no GitHub e criar uma tag (`git tag v0.3.1 && git push --tags`), o workflow em `.github/workflows/release.yml` gera o release com `system.json` e o zip. A URL a colar em *Instalar sistema* é
 `https://github.com/<usuário>/<repositório>/releases/latest/download/system.json`.
 
 ## O que o sistema faz

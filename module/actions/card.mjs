@@ -11,6 +11,8 @@ import { createChatMessage } from "../helpers/compat.mjs";
 
 export const FLAG_SCOPE = MMRPG.id;
 export const FLAG_CARD = "card";
+/** Dados de um cartão de teste de atributo (para regerá-lo depois de uma re-rolagem). */
+export const FLAG_CHECK = "check";
 
 const CARD_TEMPLATE = `${MMRPG.path}/templates/chat/action-card.hbs`;
 const CHECK_TEMPLATE = `${MMRPG.path}/templates/chat/check-card.hbs`;

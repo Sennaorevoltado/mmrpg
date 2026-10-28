@@ -167,11 +167,13 @@ export default class D616Roll extends Roll {
     if (!this._evaluated) await this.evaluate();
     const display = this.toDisplay();
     if (!display) return super.render({ flavor, template: undefined, isPrivate });
-    return foundry.applications.handlebars.renderTemplate(template, {
+    const html = await foundry.applications.handlebars.renderTemplate(template, {
       ...display,
       flavor: isPrivate ? null : (flavor ?? this.options.flavor),
       isPrivate,
       user: game.user.id
     });
+    // Rolagem solta (iniciativa, mensagens antigas): vai dentro de um cartão para ter as cores do sistema.
+    return `<div class="mmrpg-card mmrpg-bare-roll">${html}</div>`;
   }
 }

@@ -3,7 +3,7 @@
  */
 
 import { requestApply } from "./apply.mjs";
-import { FLAG_SCOPE, FLAG_CARD, anyApplied, renderCard } from "./card.mjs";
+import { FLAG_SCOPE, FLAG_CARD, FLAG_CHECK, anyApplied, renderCard, renderCheckCard } from "./card.mjs";
 import { regionShapeData, unitsToPixels, CONE_SPREAD } from "../helpers/area-shapes.mjs";
 
 const TEMPLATE_TYPES = { circle: "circle", cone: "cone", ray: "ray", rect: "rect" };
@@ -78,8 +78,16 @@ export async function rerollDie(message, dieIndex) {
   if (faceRoll && game.dice3d?.showForRoll) game.dice3d.showForRoll(faceRoll, game.user, true);
 
   const update = { rolls: [roll] };
+  const check = message.getFlag(FLAG_SCOPE, FLAG_CHECK);
   if (card) {
     update.content = await renderCard(card, roll);
+  } else if (check) {
+    update.content = await renderCheckCard({
+      actor: { name: check.actorName, img: check.actorImg },
+      title: check.title,
+      subtitle: check.subtitle,
+      roll
+    });
   } else {
     const html = await roll.render({});
     update.content = html;

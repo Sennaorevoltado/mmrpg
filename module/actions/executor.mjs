@@ -209,17 +209,15 @@ export async function rollAbilityCheck(actor, abilityKey, { event, fastForward, 
   });
   await roll.evaluate();
 
-  const content = await renderCheckCard({
-    actor,
-    title: label,
-    subtitle: game.i18n.localize(kind === "attack" ? "MMRPG.Roll.attack" : "MMRPG.Roll.check"),
-    roll
-  });
+  const subtitle = game.i18n.localize(kind === "attack" ? "MMRPG.Roll.attack" : "MMRPG.Roll.check");
+  const content = await renderCheckCard({ actor, title: label, subtitle, roll });
   return createChatMessage(
     {
       speaker: ChatMessage.getSpeaker({ actor, token: sourceToken(actor) }),
       content,
-      rolls: [roll]
+      rolls: [roll],
+      // O que é preciso para regerar o cartão depois de uma re-rolagem.
+      flags: { [MMRPG.id]: { check: { title: label, subtitle, actorName: actor.name, actorImg: actor.img } } }
     },
     config.messageMode
   );

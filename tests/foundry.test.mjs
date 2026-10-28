@@ -434,6 +434,38 @@ test("teste de atributo direto da ficha", async () => {
   assert.equal(msg.rolls[0].summary.total, 6 + hero.system.abilities.agl.noncom);
 });
 
+test("re-rolar o dado de um teste de atributo mantém o cartão (cabeçalho e cores do sistema)", async () => {
+  const { hero } = await makeScene();
+  const { DialogV2 } = foundry.applications.api;
+  DialogV2.answer = { edge: "edge", bonus: 0, messageMode: "public" };
+  rig(1, 3, 2);
+  const msg = await rollAbilityCheck(hero, "mle");
+  DialogV2.answer = null;
+  assert.ok(msg.content.includes("mmrpg-check-card"), "começa como cartão de teste");
+  dice.push(6);
+  await rerollDie(msg, 0);
+  assert.equal(msg.rolls[0].canReroll, false, "só uma vez");
+  assert.ok(msg.content.includes("mmrpg-check-card"), "continua sendo o cartão de teste");
+  assert.ok(msg.content.includes(hero.name), "mantém o cabeçalho com o nome do personagem");
+  assert.ok(msg.content.includes("mmrpg-chip"), "mantém as marcações (Edge, re-rolado)");
+  assertClean(msg.content, "cartão de teste depois de re-rolar");
+});
+
+test("mensagem antiga de teste (sem os dados do cartão) re-rola dentro de um cartão estilizado", async () => {
+  const { hero } = await makeScene();
+  const { DialogV2 } = foundry.applications.api;
+  DialogV2.answer = { edge: "edge", bonus: 0, messageMode: "public" };
+  rig(1, 3, 2);
+  const msg = await rollAbilityCheck(hero, "mle");
+  DialogV2.answer = null;
+  delete msg.flags[MMRPG.id].check;
+  assert.equal(msg.getFlag(MMRPG.id, "check"), undefined, "simula uma mensagem criada antes da correção");
+  dice.push(6);
+  await rerollDie(msg, 0);
+  assert.ok(msg.content.startsWith('<div class="mmrpg-card'), "rolagem solta vai dentro de .mmrpg-card");
+  assertClean(msg.content, "mensagem antiga depois de re-rolar");
+});
+
 test("iniciativa é d616 + Vigilance e re-rola sozinha com Edge", async () => {
   const { hero } = await makeScene();
   hero.system.updateSource({ init: { edge: true } });

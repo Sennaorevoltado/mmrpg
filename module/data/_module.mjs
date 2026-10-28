@@ -8,3 +8,4 @@ export { default as OriginData } from "./origin.mjs";
 export { default as OccupationData } from "./occupation.mjs";
 export { default as WeaponData } from "./weapon.mjs";
 export { default as GearData } from "./gear.mjs";
+export { default as FormData } from "./form.mjs";

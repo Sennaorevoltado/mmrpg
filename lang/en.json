@@ -37,6 +37,9 @@
       "damage": "Damage",
       "damageAbility": "Ability (blank = roll's)",
       "damageResource": "Resource hit",
+      "damageScale": "Damage fraction",
+      "damageScaleHint": "1 = full damage; 0.5 = half damage on any hit. The Fantastic factor multiplies on top.",
+      "damageWhen": "Damage when",
       "description": "Description",
       "difficulty": "Difficulty",
       "duplicate": "Duplicate",
@@ -50,16 +53,6 @@
       "effectWhen": "When it triggers",
       "effects": "Effects",
       "element": "Element",
-      "damageWhen": "Damage when",
-      "ignoreReduction": "Ignores Damage Reduction",
-      "reductionFrom": "Damage Reduction used",
-      "sameAsResource": "The one of the resource hit",
-      "perFocus": "Flat per Focus spent",
-      "perFocusHint": "Flat amount added per Focus point spent (0.5 = +1 per 2 points). Used with \"Focus is a minimum\".",
-      "scalable": "Focus is a minimum",
-      "scalableHint": "The Focus shown is the minimum: when using the action, the player chooses how much to spend.",
-      "damageScale": "Damage fraction",
-      "damageScaleHint": "1 = full damage; 0.5 = half damage on any hit. The Fantastic factor multiplies on top.",
       "fantasticFactor": "Fantastic factor",
       "flat": "Flat bonus",
       "healing": "Healing",
@@ -67,18 +60,25 @@
       "healingResource": "Resource healed",
       "healingTarget": "Who is healed",
       "hint": "Each action describes a roll, what it causes and what it costs. The character picks the action when using the item.",
+      "ignoreReduction": "Ignores Damage Reduction",
       "multiplierBonus": "Multiplier bonus",
       "name": "Action name",
       "nameHint": "Blank = item name",
       "noEffects": "No effects.",
       "none": "This item has no actions yet.",
+      "perFocus": "Flat per Focus spent",
+      "perFocusHint": "Flat amount added per Focus point spent (0.5 = +1 per 2 points). Used with \"Focus is a minimum\".",
       "rangeDistance": "Max range (scene units, 0 = no warning)",
       "rangeText": "Range (text)",
+      "reductionFrom": "Damage Reduction used",
       "removeEffect": "Remove effect",
       "rollAbility": "Roll ability",
       "rollBonus": "Roll bonus",
       "rollMode": "Roll",
+      "sameAsResource": "The one of the resource hit",
       "sameAsRoll": "Same as roll",
+      "scalable": "Focus is a minimum",
+      "scalableHint": "The Focus shown is the minimum: when using the action, the player chooses how much to spend.",
       "targetCount": "Max targets (0 = unlimited)",
       "targetDefense": "Target defense",
       "targetType": "Target",
@@ -148,14 +148,18 @@
       "override": "Override",
       "upgrade": "Upgrade (at least)"
     },
+    "DamageWhen": {
+      "fantastic": "Only on a Fantastic success",
+      "hit": "On any hit"
+    },
     "Dialog": {
       "bonus": "Bonus or penalty",
-      "focusSpent": "Focus to spend",
-      "focusSpentHint": "The minimum is the action's cost; spending more increases the effect if the power allows it.",
       "deleteItem": "Delete \"{name}\"?",
       "deleteTitle": "Delete item",
       "edgeInherited": "Already from the sheet",
       "edgeMode": "Edge / Trouble",
+      "focusSpent": "Focus to spend",
+      "focusSpentHint": "The minimum is the action's cost; spending more increases the effect if the power allows it.",
       "roll": "Roll",
       "shiftHint": "Hold Shift when clicking to roll without this dialog.",
       "visibility": "Visibility"
@@ -174,10 +178,6 @@
     "EffectTarget": {
       "self": "Self",
       "targets": "Targets"
-    },
-    "DamageWhen": {
-      "fantastic": "Only on a Fantastic success",
-      "hit": "On any hit"
     },
     "EffectWhen": {
       "always": "Always",
@@ -203,6 +203,55 @@
       "swarm": "Swarm",
       "toxin": "Toxin",
       "water": "Water"
+    },
+    "Form": {
+      "activate": "Activate",
+      "active": "Active",
+      "addChange": "Add change",
+      "announceGrants": "Grants:",
+      "announceOff": "{actor} deactivates {form} ({kind}).",
+      "announceOn": "{actor} activates {form} ({kind}).",
+      "announceRank": "Rank {from} to {to}.",
+      "announceRemoved": "Loses:",
+      "badgeChanges": "{count} changes",
+      "badgeGrants": "{count} granted",
+      "badgeImages": "images",
+      "badgeRankAdd": "Rank {value}",
+      "badgeRankSet": "Rank {value}",
+      "borrowed": "Borrowed",
+      "borrowedHint": "Borrowed: grants the powers, traits and tags, but does not change Rank or sheet values (the wearer uses their own Rank).",
+      "carryDamage": "Damage follows the body",
+      "carryDamageHint": "When maximum Health or Focus changes with the form, the damage already taken stays the same: the current value goes up or down with it. Unchecked, the current value stays put (it is only cut if it exceeds the new maximum).",
+      "changeKey": "Key (system...)",
+      "changePriority": "auto",
+      "changePriorityHint": "Priority (empty = automatic by type)",
+      "changeValue": "Value",
+      "changes": "Sheet changes",
+      "changesHint": "Only apply while the form is active. Use a character field key, for example system.abilities.mle.value (ability), system.health.max (maximum Health) or system.movement.flight.bonus.",
+      "deactivate": "Deactivate",
+      "effectiveRank": "Effective Rank",
+      "effectiveRankHint": "Rank with the active forms (the field beside it is the base Rank).",
+      "empty": "No forms in this category.",
+      "hint": "Battle suits, transformations and alternate forms. Activating a form grants its items, applies its changes to the sheet and, if it has them, swaps the images. Only one form per category is active at a time.",
+      "imagesHint": "Optional. Swapped while the form is active and restored when it is deactivated.",
+      "inactive": "Inactive",
+      "kind": "Category",
+      "kindHint": "Only one form per category is active at a time.",
+      "noChanges": "No changes.",
+      "portrait": "Sheet image",
+      "rankMode": "Rank",
+      "rankValue": "Value",
+      "token": "Token image"
+    },
+    "FormKind": {
+      "alternate": "Alternate form",
+      "suit": "Battle suit",
+      "transformation": "Transformation"
+    },
+    "FormKindPlural": {
+      "alternate": "Alternate forms",
+      "suit": "Battle suits",
+      "transformation": "Transformations"
     },
     "HealingMode": {
       "flat": "Flat value",
@@ -290,6 +339,7 @@
       "triple": "Triple run"
     },
     "Pack": {
+      "form": "Forms",
       "gear": "Gear",
       "occupation": "Occupations",
       "origin": "Origins",
@@ -326,6 +376,11 @@
       "translation": "Translation",
       "weatherControl": "Weather Control"
     },
+    "RankMode": {
+      "add": "Add",
+      "none": "No change",
+      "set": "At least"
+    },
     "Resource": {
       "focus": "Focus",
       "health": "Health",
@@ -341,6 +396,10 @@
       "ultimate": "Ultimate"
     },
     "Settings": {
+      "announceForms": {
+        "hint": "Posts a message when a character activates or deactivates a form.",
+        "name": "Announce form changes in chat"
+      },
       "autoApply": {
         "hint": "Applies damage, healing and effects to targets as soon as the action is rolled, without clicking Apply.",
         "name": "Apply results automatically"
@@ -452,6 +511,7 @@
       "description": "Description",
       "details": "Details",
       "effects": "Effects",
+      "forms": "Forms",
       "gear": "Gear",
       "main": "Main",
       "mods": "Modifiers",
@@ -488,6 +548,7 @@
     },
     "Warn": {
       "alreadyApplied": "This card already had effects applied; it can't be re-rolled.",
+      "formNoActor": "The form must be on a character sheet.",
       "gmOnly": "Only the GM can open this window.",
       "itemNotFound": "Item not found or has no character.",
       "noAction": "This item has no action.",
@@ -513,6 +574,7 @@
       "npc": "NPC"
     },
     "Item": {
+      "form": "Form",
       "gear": "Gear",
       "occupation": "Occupation",
       "origin": "Origin",

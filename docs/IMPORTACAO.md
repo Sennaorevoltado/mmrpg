@@ -61,7 +61,7 @@ Com o destino *Compêndios do mundo*, o importador cria **um compêndio por tipo
 |---|---|---|
 | `format` | sim | sempre `"mmrpg-content"` |
 | `version` | não | `1`. Versões maiores que a suportada são recusadas |
-| `items[].type` | sim | `power`, `trait`, `tag`, `origin`, `occupation`, `weapon` ou `gear` |
+| `items[].type` | sim | `power`, `trait`, `tag`, `origin`, `occupation`, `weapon`, `gear` ou `form` |
 | `items[].name` | sim | dois itens com o mesmo tipo e nome (sem diferenciar maiúsculas) são o mesmo item; vale o último do arquivo |
 | `items[].img` | não | imagem do item |
 | `items[].folder` | não | caminho de pastas separado por `/`; as pastas que faltarem são criadas |
@@ -81,6 +81,7 @@ Todos os tipos têm: `description` (HTML), `source` (texto livre, por exemplo li
 | `occupation` | `examples`, `grants` |
 | `weapon` | `kind`, `category`, `range`, `reach`, `recommendedRank`, `quantity`, `equipped`, `actions` |
 | `gear` | `category`, `price`, `quantity`, `equipped`, `actions` |
+| `form` | `kind`, `borrowed`, `rank`, `carryDamage`, `portrait`, `token`, `changes`, `grants` (veja "Formas") |
 
 `powerSet` aceita as chaves do sistema (`basic`, `elementalControl`, `healing`, `illusion`, `luck`, `magic`, `martialArts`, `meleeWeapons`, `narrative`, `omniversalTravel`, `phasing`, `plasticity`, `powerControl`, `rangedWeapons`, `resize`, `shieldBearer`, `sixthSense`, `spiderPowers`, `superSpeed`, `superStrength`, `tactics`, `telekinesis`, `telepathy`, `teleportation`, `translation`, `weatherControl`) **ou qualquer outro texto** (vira um grupo próprio na ficha).
 
@@ -139,6 +140,61 @@ Para bônus que valem enquanto o item estiver na ficha (por exemplo, um poder qu
 Chaves úteis: `system.abilities.<hab>.(attackBonus|defenseBonus|damageBonus|noncomBonus|multiplierBonus)` (`mle`, `agl`, `res`, `vig`, `ego`, `log`), `system.health.reduction`, `system.focus.reduction` e `system.movement.<tipo>.bonus`.
 
 Reimportar com "atualizar" troca apenas os efeitos que a importação criou; efeitos feitos à mão no item ficam. A exportação devolve os efeitos no mesmo formato.
+
+## Formas (`form`): armaduras, transformações e formas alternativas
+
+Uma forma é um item que mora na ficha e se liga e desliga na aba **Formas**. Enquanto está ativa, ela:
+
+- aplica as **alterações** (`changes`) e o **Rank** à ficha, por um efeito que o próprio personagem cria e remove;
+- cria na ficha os itens **concedidos** (`grants`: poderes, traços e tags) e os remove ao desativar;
+- troca a imagem da ficha (`portrait`) e do token (`token`), se preenchidas;
+- faz o **dano acompanhar o corpo** (`carryDamage`, padrão ligado): se a forma muda a Saúde ou o Foco máximos, o dano que o personagem já levou continua o mesmo.
+
+Só uma forma de cada categoria (`kind`) fica ativa por vez; categorias diferentes convivem (por exemplo, uma armadura e uma transformação).
+
+```json
+{
+  "type": "form",
+  "name": "Armadura Exemplo",
+  "folder": "Formas/Armaduras",
+  "system": {
+    "kind": "suit",
+    "borrowed": false,
+    "rank": { "mode": "set", "value": 4 },
+    "carryDamage": true,
+    "changes": [
+      { "key": "system.abilities.mle.value", "type": "upgrade", "value": "8" },
+      { "key": "system.health.max", "type": "add", "value": "20" }
+    ],
+    "grants": [
+      { "type": "power", "name": "Flight 2" },
+      { "type": "trait", "name": "Tech Reliance" }
+    ]
+  }
+}
+```
+
+| Campo | Observações |
+|---|---|
+| `kind` | `suit` (armadura), `transformation` (transformação) ou `alternate` (forma alternativa) |
+| `borrowed` | `true` = emprestada: concede os itens, mas **não** altera Rank nem valores da ficha (quem veste usa o próprio Rank) |
+| `rank.mode` | `none` (não altera), `set` (o Rank passa a valer **pelo menos** `value`) ou `add` (soma `value`). O `set` vale antes dos `add`, em qualquer ordem de ativação |
+| `rank.value` | número inteiro |
+| `changes[]` | mesmo formato das alterações de efeito: `key` (campo do personagem), `type` (`add`, `multiply`, `override`, `upgrade`, `downgrade`), `value` e `priority` opcional. As chaves são as mesmas dos efeitos passivos |
+| `grants[]` | igual ao de origens e ocupações (`type`, `name`, `note` opcional). Se o personagem já tem um item com o mesmo nome e tipo, ele não é duplicado e continua com o personagem ao desativar a forma |
+| `portrait`, `token` | caminhos de imagem; vazios = não troca |
+| `carryDamage` | padrão `true` |
+
+Uma forma importada **nunca chega ativa**, mesmo que o arquivo diga `"active": true`. O validador (`npm run check:content`) confere as chaves de `changes` como faz com os efeitos passivos.
+
+Observações:
+
+- **Rank efetivo.** O campo de Rank da ficha continua sendo o Rank base; o Rank com as formas ativas aparece ao lado e é o que vale para multiplicador de dano, deslocamento por Rank e fórmulas.
+- **Pontos de atributo e Karma ganhos** com um Rank novo não são distribuídos sozinhos: ponha-os em `changes` (por exemplo, `system.abilities.mle.value` com `add`) ou ajuste à mão.
+- **Editar uma forma ativa** reaplica o efeito, as concessões e as imagens sozinho.
+- **Apagar uma forma ativa** desliga-a antes (concessões, efeito e imagens saem da ficha).
+- A configuração do mundo *Anunciar trocas de forma no chat* controla a mensagem postada ao ativar ou desativar.
+- Para macros: `game.mmrpg.setForm(ator, "Nome da forma ou id", true)`.
 
 ## Ações (`actions`)
 

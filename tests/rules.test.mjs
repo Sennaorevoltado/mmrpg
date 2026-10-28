@@ -20,7 +20,10 @@ import {
   healPool,
   computeMovement,
   resolveAction,
-  effectTriggers
+  effectTriggers,
+  formChanges,
+  carryPoolValue,
+  RANK_SET_PRIORITY
 } from "../module/rules/index.mjs";
 
 const dice = (a, m, b) => [
@@ -481,4 +484,59 @@ test("autoRerollIndex: Edge escolhe o menor dado, Trouble o maior", () => {
   assert.equal(autoRerollIndex(dice(3, 1, 4), EDGE_MODE.EDGE), 0);
   // empate: Trouble prefere o dado Marvel
   assert.equal(autoRerollIndex(dice(4, 4, 2), EDGE_MODE.TROUBLE), 1);
+});
+
+/* -------------------------------------------- */
+/*  Formas                                      */
+/* -------------------------------------------- */
+
+test("formChanges: Rank pelo menos X (prioridade menor que as somas) e Rank somado", () => {
+  assert.deepEqual(formChanges({ rank: { mode: "set", value: 4 } }), [
+    { key: "system.rank", type: "upgrade", value: "4", priority: RANK_SET_PRIORITY }
+  ]);
+  assert.ok(RANK_SET_PRIORITY < 20, "vale antes das somas");
+  assert.deepEqual(formChanges({ rank: { mode: "add", value: 1 } }), [{ key: "system.rank", type: "add", value: "1" }]);
+  assert.deepEqual(formChanges({ rank: { mode: "none", value: 3 } }), []);
+  assert.deepEqual(formChanges({ rank: { mode: "set", value: 0 } }), [], "Rank 0 não faz nada");
+  assert.deepEqual(formChanges({}), []);
+});
+
+test("formChanges: alterações da forma vêm depois do Rank, com prioridade só se for inteira", () => {
+  const out = formChanges({
+    rank: { mode: "add", value: 1 },
+    changes: [
+      { key: " system.abilities.mle.value ", type: "override", value: 8, priority: 60 },
+      { key: "system.health.max", type: "triplicar", value: "20", priority: "" },
+      { key: "", type: "add", value: "1" },
+      { key: "system.init.bonus", type: "add", value: "2", priority: 1.5 }
+    ]
+  });
+  assert.deepEqual(out, [
+    { key: "system.rank", type: "add", value: "1" },
+    { key: "system.abilities.mle.value", type: "override", value: "8", priority: 60 },
+    { key: "system.health.max", type: "add", value: "20" },
+    { key: "system.init.bonus", type: "add", value: "2" }
+  ]);
+});
+
+test("formChanges: forma emprestada não altera nada", () => {
+  assert.deepEqual(
+    formChanges({ borrowed: true, rank: { mode: "set", value: 6 }, changes: [{ key: "system.rank", type: "add", value: "1" }] }),
+    []
+  );
+});
+
+test("carryPoolValue: o dano sofrido acompanha o corpo", () => {
+  assert.equal(carryPoolValue(20, 30, 50), 40, "10 de dano continuam");
+  assert.equal(carryPoolValue(40, 50, 30), 20, "volta ao máximo menor com o mesmo dano");
+  assert.equal(carryPoolValue(12, 50, 30), 0, "dano maior que o máximo novo zera");
+  assert.equal(carryPoolValue(30, 30, 50), 50, "sem dano, fica cheio no máximo novo");
+  assert.equal(carryPoolValue(25, 30, 30), 25, "máximo igual: nada muda");
+  assert.equal(carryPoolValue(35, 30, 30), 30, "nunca passa do máximo");
+});
+
+test("carryPoolValue sem acompanhar: o valor fica e só é cortado no máximo novo", () => {
+  assert.equal(carryPoolValue(20, 30, 50, false), 20);
+  assert.equal(carryPoolValue(45, 50, 30, false), 30);
+  assert.equal(carryPoolValue(10, 50, 30, false), 10);
 });

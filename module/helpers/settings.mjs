@@ -22,4 +22,13 @@ export function registerSettings() {
     type: Boolean,
     default: true
   });
+
+  game.settings.register(MMRPG.id, "announceForms", {
+    name: "MMRPG.Settings.announceForms.name",
+    hint: "MMRPG.Settings.announceForms.hint",
+    scope: "world",
+    config: true,
+    type: Boolean,
+    default: true
+  });
 }

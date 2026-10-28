@@ -316,6 +316,56 @@ MMRPG.grantingItemTypes = ["origin", "occupation"];
 /** Tipos de item que podem ser concedidos. */
 MMRPG.grantableItemTypes = ["tag", "trait", "power"];
 
+/**
+ * Tipos de item que guardam uma lista de concessões. Origem e ocupação concedem ao entrar na ficha;
+ * a forma concede enquanto estiver ativa.
+ */
+MMRPG.grantHolderTypes = ["origin", "occupation", "form"];
+
+/** Categorias de forma (armadura, transformação, forma alternativa). */
+MMRPG.formKinds = {
+  suit: "MMRPG.FormKind.suit",
+  transformation: "MMRPG.FormKind.transformation",
+  alternate: "MMRPG.FormKind.alternate"
+};
+
+/** Plural de cada categoria, para os títulos da aba Formas. */
+MMRPG.formKindPlurals = {
+  suit: "MMRPG.FormKindPlural.suit",
+  transformation: "MMRPG.FormKindPlural.transformation",
+  alternate: "MMRPG.FormKindPlural.alternate"
+};
+
+/**
+ * Chaves sugeridas para as alterações de uma forma (campo de texto com lista de sugestões).
+ * Qualquer outra chave do ator também vale.
+ */
+MMRPG.formChangeKeys = [
+  "system.rank",
+  ...ABILITY_KEYS.flatMap((k) => [
+    `system.abilities.${k}.value`,
+    `system.abilities.${k}.defenseBonus`,
+    `system.abilities.${k}.attackBonus`,
+    `system.abilities.${k}.damageBonus`,
+    `system.abilities.${k}.multiplierBonus`
+  ]),
+  "system.health.max",
+  "system.focus.max",
+  "system.karma.max",
+  "system.health.reduction",
+  "system.focus.reduction",
+  "system.init.bonus",
+  "system.reach",
+  "system.size"
+];
+
+/** Modos de alteração do Rank por uma forma. */
+MMRPG.formRankModes = {
+  none: "MMRPG.RankMode.none",
+  set: "MMRPG.RankMode.set",
+  add: "MMRPG.RankMode.add"
+};
+
 /** Ícones padrão por tipo de item. */
 MMRPG.itemIcons = {
   power: "icons/svg/lightning.svg",
@@ -324,7 +374,8 @@ MMRPG.itemIcons = {
   origin: "icons/svg/mystery-man.svg",
   occupation: "icons/svg/tower.svg",
   weapon: "icons/svg/sword.svg",
-  gear: "icons/svg/item-bag.svg"
+  gear: "icons/svg/item-bag.svg",
+  form: "icons/svg/shield.svg"
 };
 
 /* -------------------------------------------- */

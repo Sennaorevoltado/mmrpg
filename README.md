@@ -10,7 +10,7 @@ Projeto não oficial, sem vínculo com a Marvel, a Disney ou a Foundry Gaming. C
 
 Este sistema foi escrito **sem acesso a um Foundry de verdade, nem v14 nem v13**. O que foi feito para reduzir o risco:
 
-- Mais de 130 testes automáticos (`npm test`): regras do d616, formato de importação e um **Foundry simulado** que carrega o sistema inteiro, usa ações, posta e aplica cartões, renderiza fichas e janelas. A bateria roda duas vezes, uma com o simulador na geração 14 e outra na 13.
+- Mais de 160 testes automáticos (`npm test`): regras do d616, formato de importação e um **Foundry simulado** que carrega o sistema inteiro, usa ações, posta e aplica cartões, renderiza fichas e janelas. A bateria roda duas vezes, uma com o simulador na geração 14 e outra na 13.
 - Um validador estático (`npm run validate`): confere o manifesto, a sintaxe, os templates, as ligações `data-action` ↔ código, as traduções e a ausência de emojis.
 
 Isso pega erros de código e de dados, mas **não substitui um teste num mundo real**. A primeira rodada de testes no Foundry, na ordem:
@@ -22,6 +22,7 @@ Isso pega erros de código e de dados, mas **não substitui um teste num mundo r
 5. Rolar com Edge/Trouble e usar o botão de re-rolar um dado.
 6. Importar o arquivo de exemplo e arrastar a Origem de exemplo para uma ficha.
 7. Iniciar um combate, rolar iniciativa e aplicar um efeito de 2 rodadas.
+8. Criar uma **Forma** (aba Formas → adicionar armadura), pôr Rank, uma alteração (por exemplo `system.health.max`, soma 20) e um poder concedido; ativar e desativar com a ficha e o token abertos; conferir Rank efetivo, Saúde, itens e o anúncio no chat.
 
 Se algo quebrar, o erro do console e o passo em que aconteceu bastam para corrigir.
 
@@ -44,7 +45,7 @@ Os pontos abaixo só um teste real confirma, tanto na v13 quanto na v14: arrasta
 
 **Por zip:** rode `npm run package` e extraia `dist/mmrpg-<versão>.zip` em `Data/systems/mmrpg`.
 
-**Por URL de manifesto:** depois de publicar o projeto no GitHub e criar uma tag (`git tag v0.2.0 && git push --tags`), o workflow em `.github/workflows/release.yml` gera o release com `system.json` e o zip. A URL a colar em *Instalar sistema* é
+**Por URL de manifesto:** depois de publicar o projeto no GitHub e criar uma tag (`git tag v0.3.0 && git push --tags`), o workflow em `.github/workflows/release.yml` gera o release com `system.json` e o zip. A URL a colar em *Instalar sistema* é
 `https://github.com/<usuário>/<repositório>/releases/latest/download/system.json`.
 
 ## O que o sistema faz
@@ -66,14 +67,22 @@ Os pontos abaixo só um teste real confirma, tanto na v13 quanto na v14: arrasta
 **Fichas e dados**
 - Personagem e NPC: seis atributos (defesa, ataque, bônus fora de combate e multiplicador calculados), Saúde, Foco e Karma, redução de dano, iniciativa, movimento (corrida, escalada, natação, voo, etc., cada um com modo de cálculo: fixo, metade, cheio, dobro, triplo, Rank ou corrida × Rank), tamanho, detalhes, biografia.
 - Abas: principal, poderes (agrupados por conjunto de poder), traços e tags, equipamentos, modificadores, efeitos, biografia.
-- Itens: poder, traço, tag, origem, ocupação, arma e equipamento. **Origens e ocupações concedem itens**: ao entrar na ficha, criam os itens ligados.
+- Itens: poder, traço, tag, origem, ocupação, arma, equipamento e **forma**. **Origens e ocupações concedem itens**: ao entrar na ficha, criam os itens ligados.
 - **Efeitos passivos nos itens**: um poder numerado (Mighty, Sturdy, Flight…) pode trazer Active Effects que valem enquanto ele estiver na ficha e ajustam atributos, redução de dano, movimento e outros campos. Poderes com vários níveis usam `upgrade`, então vale só o maior.
 - 17 condições + derrotado como status effects do Foundry. NPC chega a 0 de Saúde → derrotado (opção de mundo).
 - Efeitos com duração em rodadas expiram sozinhos quando o combate chega à rodada certa, e somem quando o combate termina.
 - **Manobra de equipe**: janela que cobra o Foco de cada integrante selecionado e posta um cartão. O texto das regras da manobra não está incluído.
 - Macros: arraste uma ação da ficha para a barra de atalhos.
 
-**Importar/exportar**: janela *Importar conteúdo* (menu de configurações do sistema e botão no diretório de itens) para o seu próprio JSON. Pode importar para os **itens do mundo** ou para **compêndios do mundo**, um por tipo (poderes, traços, origens, tags, ocupações, armas, equipamentos), e exporta no mesmo formato.
+**Formas (armaduras, transformações, formas alternativas)**
+- Aba **Formas** na ficha de personagem e de NPC, com um botão Ativar/Desativar por forma. Só uma forma de cada categoria fica ativa; armadura e transformação podem estar ativas juntas.
+- Ativar aplica, de uma vez: **Rank** (pelo menos X, ou somando X), **alterações em qualquer campo da ficha** (atributos, Saúde e Foco máximos, redução, movimento…), **itens concedidos** (poderes, traços e tags, que saem ao desativar) e, se a forma tiver, **imagem da ficha e do token**.
+- O **dano sofrido acompanha o corpo**: se a forma muda a Saúde ou o Foco máximos, o dano que o personagem já levou continua o mesmo ao entrar e ao sair da forma.
+- Armadura **emprestada**: concede os itens, mas não mexe em Rank nem em valores (quem veste usa o próprio Rank).
+- O cabeçalho mostra as formas ativas e o **Rank efetivo** ao lado do Rank base. A troca é anunciada no chat (configuração do mundo).
+- Detalhes e formato de importação: [docs/IMPORTACAO.md](docs/IMPORTACAO.md#formas-form-armaduras-transformações-e-formas-alternativas).
+
+**Importar/exportar**: janela *Importar conteúdo* (menu de configurações do sistema e botão no diretório de itens) para o seu próprio JSON. Pode importar para os **itens do mundo** ou para **compêndios do mundo**, um por tipo (poderes, traços, origens, tags, ocupações, armas, equipamentos, formas), e exporta no mesmo formato.
 
 ## Primeiros passos
 
@@ -108,6 +117,7 @@ game.mmrpg.rollAbility("mle");                                      // teste par
 game.mmrpg.rollActorAbility(ator, "vig", { kind: "attack" });       // teste de um ator
 game.mmrpg.openImporter();                                          // janela de importação
 game.mmrpg.openTeamManeuver(ator);                                  // manobra de equipe
+game.mmrpg.setForm(ator, "Armadura Mark VII", true);         // liga (true) ou desliga (false) uma forma pelo nome ou id
 ```
 
 ## Rótulos em português
@@ -118,6 +128,7 @@ Todos os textos da interface estão em [lang/pt-BR.json](lang/pt-BR.json) (e `en
 
 - **Tamanho** é só um rótulo: o sistema não aplica bônus numéricos, para não inventar valores. Use os modificadores.
 - **Saúde/Foco máximos** são manuais.
+- **Formas**: o Rank sobe, mas os pontos de atributo e o Karma que um Rank novo dá não são distribuídos sozinhos; ponha-os nas alterações da forma ou ajuste à mão. A troca de retrato e token é opcional e só um teste real confirma.
 - **Texto de regras** de poderes, traços, manobras de equipe, etc.: nada é distribuído.
 - Gabaritos de área são posicionados no token do atacante, sem arrastar. Tamanhos de área e alcances são lidos em **casas**: configure a grade da cena com 1 unidade por casa.
 - Sem compêndios pré-montados no repositório. Quem tem o texto dos livros monta o próprio arquivo e importa.

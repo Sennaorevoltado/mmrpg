@@ -1,0 +1,49 @@
+<p class="mmrpg-muted">{{localize "MMRPG.Form.hint"}}</p>
+{{#each formGroups}}
+  <section class="mmrpg-item-section">
+    <header class="mmrpg-section-head">
+      <h3>{{label}}</h3>
+      {{#if ../editable}}
+        <button type="button" class="mmrpg-icon-button" data-action="createItem" data-type="form" data-kind="{{kind}}" title="{{localize 'MMRPG.Sheet.add'}}">
+          <i class="fa-solid fa-plus"></i>
+        </button>
+      {{/if}}
+    </header>
+    {{#if items.length}}
+      <ul class="mmrpg-item-list">
+        {{#each items}}
+          <li class="mmrpg-item mmrpg-form {{#if active}}is-active{{/if}}" data-item-id="{{id}}">
+            <img src="{{img}}" alt="">
+            <div class="mmrpg-item-main">
+              <div class="mmrpg-item-title">
+                <a class="mmrpg-item-name" data-action="editItem" data-item-id="{{id}}">{{name}}</a>
+                {{#if active}}<span class="mmrpg-chip active">{{localize "MMRPG.Form.active"}}</span>{{/if}}
+                {{#if borrowed}}<span class="mmrpg-chip warn">{{localize "MMRPG.Form.borrowed"}}</span>{{/if}}
+              </div>
+              {{#if badges.length}}
+                <div class="mmrpg-badges">
+                  {{#each badges}}<span class="mmrpg-chip">{{this}}</span>{{/each}}
+                </div>
+              {{/if}}
+            </div>
+            <div class="mmrpg-item-controls">
+              <button type="button" class="mmrpg-roll-button small mmrpg-form-toggle {{#if active}}is-on{{/if}}" data-action="toggleForm" data-item-id="{{id}}" {{#unless ../../editable}}disabled{{/unless}}>
+                {{#if active}}{{localize "MMRPG.Form.deactivate"}}{{else}}{{localize "MMRPG.Form.activate"}}{{/if}}
+              </button>
+              <button type="button" class="mmrpg-icon-button" data-action="editItem" data-item-id="{{id}}" title="{{localize 'MMRPG.Sheet.edit'}}">
+                <i class="fa-solid fa-pen-to-square"></i>
+              </button>
+              {{#if ../../editable}}
+                <button type="button" class="mmrpg-icon-button" data-action="deleteItem" data-item-id="{{id}}" title="{{localize 'MMRPG.Sheet.delete'}}">
+                  <i class="fa-solid fa-trash"></i>
+                </button>
+              {{/if}}
+            </div>
+          </li>
+        {{/each}}
+      </ul>
+    {{else}}
+      <p class="mmrpg-empty">{{localize "MMRPG.Form.empty"}}</p>
+    {{/if}}
+  </section>
+{{/each}}

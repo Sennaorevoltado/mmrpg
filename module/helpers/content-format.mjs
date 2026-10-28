@@ -19,7 +19,7 @@
 
 export const CONTENT_FORMAT = "mmrpg-content";
 export const CONTENT_VERSION = 1;
-export const ITEM_TYPES = Object.freeze(["power", "trait", "tag", "origin", "occupation", "weapon", "gear"]);
+export const ITEM_TYPES = Object.freeze(["power", "trait", "tag", "origin", "occupation", "weapon", "gear", "form"]);
 
 const isObject = (v) => v !== null && typeof v === "object" && !Array.isArray(v);
 
@@ -68,6 +68,37 @@ function normalizeItemEffects(raw) {
     });
   }
   return { effects };
+}
+
+/**
+ * Valida e normaliza os campos próprios de uma forma (alterações na ficha). Mexe no `system` recebido.
+ * Uma forma importada nunca chega ativa.
+ * @param {object} system
+ * @returns {string|null}  Mensagem de erro, ou null.
+ */
+function normalizeFormSystem(system) {
+  system.active = false;
+  system.activatedAt = 0;
+  if (system.changes === undefined) return null;
+  if (!Array.isArray(system.changes)) return '"system.changes" precisa ser uma lista.';
+  for (const [index, change] of system.changes.entries()) {
+    const label = `alteração ${index + 1}`;
+    if (!isObject(change) || typeof change.key !== "string" || !change.key.trim()) return `${label}: precisa de "key".`;
+    const type = change.type ?? "add";
+    if (!EFFECT_CHANGE_TYPES.includes(type)) return `${label}: tipo inválido "${type}" (use ${EFFECT_CHANGE_TYPES.join(", ")}).`;
+    if (change.value === undefined || change.value === null || change.value === "") return `${label}: "${change.key}" precisa de "value".`;
+    change.key = change.key.trim();
+    change.type = type;
+    change.value = String(change.value);
+    if (change.priority === undefined || change.priority === null || change.priority === "") {
+      change.priority = null;
+    } else {
+      const priority = Number(change.priority);
+      if (!Number.isInteger(priority)) return `${label}: "priority" de "${change.key}" precisa ser um número inteiro.`;
+      change.priority = priority;
+    }
+  }
+  return null;
 }
 
 /** Chave estável de um item (tipo + nome normalizado). */
@@ -160,6 +191,14 @@ export function parseContent(input) {
         return;
       }
       effects = result.effects;
+    }
+
+    if (raw.type === "form") {
+      const problem = normalizeFormSystem(system);
+      if (problem) {
+        errors.push(`${where} (${name}): ${problem}`);
+        return;
+      }
     }
 
     normalizeActions(system);

@@ -147,7 +147,7 @@ export async function importItems(items, { onDuplicate = "skip", destination = D
         report.created++;
       }
       known.set(entry.key, doc);
-      if (MMRPG.grantingItemTypes.includes(entry.type) && (entry.system.grants ?? []).length) {
+      if (MMRPG.grantHolderTypes.includes(entry.type) && (entry.system.grants ?? []).length) {
         grantsToResolve.push({ doc, grants: entry.system.grants });
       }
     } catch (err) {

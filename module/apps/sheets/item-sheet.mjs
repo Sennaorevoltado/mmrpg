@@ -4,6 +4,7 @@
 
 import { MMRPG } from "../../config.mjs";
 import ActionEditor from "../action-editor.mjs";
+import { FORM_CHANGE_TYPES } from "../../rules/forms.mjs";
 
 const { ItemSheetV2 } = foundry.applications.sheets;
 const { HandlebarsApplicationMixin } = foundry.applications.api;
@@ -26,6 +27,9 @@ export default class MMRPGItemSheet extends HandlebarsApplicationMixin(ItemSheet
       removeAction: MMRPGItemSheet.#onRemoveAction,
       useAction: MMRPGItemSheet.#onUseAction,
       removeGrant: MMRPGItemSheet.#onRemoveGrant,
+      addChange: MMRPGItemSheet.#onAddChange,
+      removeChange: MMRPGItemSheet.#onRemoveChange,
+      toggleForm: MMRPGItemSheet.#onToggleForm,
       createEffect: MMRPGItemSheet.#onCreateEffect,
       editEffect: MMRPGItemSheet.#onEditEffect,
       deleteEffect: MMRPGItemSheet.#onDeleteEffect,
@@ -57,7 +61,8 @@ export default class MMRPGItemSheet extends HandlebarsApplicationMixin(ItemSheet
     context.type = item.type;
     context.typeLabel = loc(`TYPES.Item.${item.type}`);
     context.hasActions = MMRPG.actionItemTypes.includes(item.type);
-    context.isGranting = MMRPG.grantingItemTypes.includes(item.type);
+    context.isGranting = MMRPG.grantHolderTypes.includes(item.type);
+    context.isForm = item.type === "form";
     context.isEmbedded = !!item.actor;
 
     context.powerSetOptions = MMRPG.powerSets.map((value) => ({ value, label: loc(MMRPG.powerSetLabels[value]) }));
@@ -80,6 +85,24 @@ export default class MMRPGItemSheet extends HandlebarsApplicationMixin(ItemSheet
       ].filter(Boolean).join(", "),
       uses: a.limitedUses ? `${a.uses.value}/${a.uses.max}` : ""
     }));
+
+    if (context.isForm) {
+      context.formKindOptions = Object.entries(MMRPG.formKinds).map(([value, label]) => ({ value, label: loc(label) }));
+      context.rankModeOptions = Object.entries(MMRPG.formRankModes).map(([value, label]) => ({ value, label: loc(label) }));
+      context.changeTypeOptions = FORM_CHANGE_TYPES.map((value) => ({ value, label: loc(`MMRPG.ChangeType.${value}`) }));
+      context.formChanges = (system.changes ?? []).map((c, index) => ({
+        index,
+        key: c.key,
+        value: c.value,
+        priority: c.priority ?? "",
+        types: FORM_CHANGE_TYPES.map((value) => ({ value, label: loc(`MMRPG.ChangeType.${value}`), selected: value === c.type }))
+      }));
+      context.changeKeySuggestions = MMRPG.formChangeKeys;
+      context.changeListId = `mmrpg-change-keys-${item.id}`;
+      context.formActive = !!system.active;
+      context.canToggleForm = !!item.actor;
+      context.rankMode = system.rank.mode;
+    }
 
     context.grants = (system.grants ?? []).map((g, index) => ({
       index,
@@ -120,6 +143,13 @@ export default class MMRPGItemSheet extends HandlebarsApplicationMixin(ItemSheet
         input.addEventListener("change", (event) => this.#onGrantNote(event));
       }
     }
+
+    // Tabela de alterações da forma (grava a lista inteira a cada edição).
+    if (this.isEditable) {
+      for (const input of this.element.querySelectorAll("[data-change-field]")) {
+        input.addEventListener("change", (event) => this.#onChangeField(event));
+      }
+    }
   }
 
   #applyTab() {
@@ -151,6 +181,22 @@ export default class MMRPGItemSheet extends HandlebarsApplicationMixin(ItemSheet
     if (!grants[index]) return;
     grants[index].note = String(event.target.value ?? "").trim();
     await this.item.update({ "system.grants": grants });
+  }
+
+  /** Edita um campo de uma alteração da forma. */
+  async #onChangeField(event) {
+    event.stopPropagation();
+    const { index, field } = event.target.dataset;
+    const changes = this.item.system.toObject().changes;
+    const row = changes[Number(index)];
+    if (!row) return;
+    let value = event.target.value;
+    if (field === "priority") {
+      const n = Math.trunc(Number(value));
+      value = value === "" || !Number.isFinite(n) ? null : n;
+    }
+    row[field] = value;
+    await this.item.update({ "system.changes": changes });
   }
 
   /* -------------------------------------------- */
@@ -207,6 +253,27 @@ export default class MMRPGItemSheet extends HandlebarsApplicationMixin(ItemSheet
     const grants = this.item.system.toObject().grants;
     grants.splice(Number(target.dataset.index), 1);
     await this.item.update({ "system.grants": grants });
+  }
+
+  static async #onAddChange() {
+    const changes = this.item.system.toObject().changes;
+    changes.push({ key: "", type: "add", value: "", priority: null });
+    await this.item.update({ "system.changes": changes });
+  }
+
+  static async #onRemoveChange(event, target) {
+    const changes = this.item.system.toObject().changes;
+    changes.splice(Number(target.dataset.index), 1);
+    await this.item.update({ "system.changes": changes });
+  }
+
+  static async #onToggleForm() {
+    const actor = this.item.actor;
+    if (!actor) {
+      ui.notifications.warn(loc("MMRPG.Warn.formNoActor"));
+      return;
+    }
+    await actor.setFormActive(this.item, !this.item.system.active);
   }
 
   static async #onCreateEffect() {

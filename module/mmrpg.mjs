@@ -21,6 +21,7 @@ import { registerDocumentSheet, unregisterCoreSheets, foundryGeneration } from "
 import { registerSettings } from "./helpers/settings.mjs";
 import { registerStatusEffects } from "./helpers/status-effects.mjs";
 import { registerCombatHooks } from "./helpers/combat.mjs";
+import { registerFormHooks } from "./helpers/forms.mjs";
 import { registerHotbar, useItemByUuid, rollAbilityForSelected } from "./helpers/macros.mjs";
 import { activateSocket } from "./helpers/socket.mjs";
 import { registerApplyHandler } from "./actions/apply.mjs";
@@ -49,7 +50,8 @@ Hooks.once("init", () => {
     origin: models.OriginData,
     occupation: models.OccupationData,
     weapon: models.WeaponData,
-    gear: models.GearData
+    gear: models.GearData,
+    form: models.FormData
   });
 
   // Dados
@@ -64,6 +66,7 @@ Hooks.once("init", () => {
   registerHandlebarsHelpers();
   registerHotbar();
   registerCombatHooks();
+  registerFormHooks();
 
   // Fichas (a ficha padrão do núcleo e a forma de registrar mudam entre a v13 e a v14)
   unregisterCoreSheets("Actor");
@@ -103,7 +106,8 @@ Hooks.once("init", () => {
     rollActorAbility: rollAbilityCheck,
     openImporter: () => ContentImporter.open(),
     openTeamManeuver: (actor) => TeamManeuverApp.open(actor),
-    openActionEditor: (item, actionId) => ActionEditor.open(item, actionId)
+    openActionEditor: (item, actionId) => ActionEditor.open(item, actionId),
+    setForm: (actor, form, active = true) => actor.setFormActive(form, active)
   };
 
   return preloadTemplates();

@@ -29,8 +29,14 @@
       "system": {
         "description": "<p>Ao entrar na ficha, esta origem cria também o traço e o poder abaixo (ligados pelo tipo e pelo nome).</p>",
         "grants": [
-          { "type": "trait", "name": "Traço de Exemplo" },
-          { "type": "power", "name": "Raio de Exemplo" }
+          {
+            "type": "trait",
+            "name": "Traço de Exemplo"
+          },
+          {
+            "type": "power",
+            "name": "Raio de Exemplo"
+          }
         ]
       }
     },
@@ -40,7 +46,12 @@
       "folder": "Exemplo/Ocupações",
       "system": {
         "description": "<p>Texto de demonstração.</p>",
-        "grants": [{ "type": "tag", "name": "Tag de Exemplo" }]
+        "grants": [
+          {
+            "type": "tag",
+            "name": "Tag de Exemplo"
+          }
+        ]
       }
     },
     {
@@ -54,12 +65,37 @@
           {
             "name": "Disparar",
             "activation": "attack",
-            "target": { "type": "targets", "count": 1, "range": "à vista", "distance": 0 },
-            "roll": { "mode": "attack", "ability": "agl", "kind": "ranged", "targetDefense": "agl" },
-            "damage": { "enabled": true, "ability": "", "multiplierBonus": 0, "flat": 0, "resource": "health", "element": "energy" },
-            "cost": { "focus": 1 },
+            "target": {
+              "type": "targets",
+              "count": 1,
+              "range": "à vista",
+              "distance": 0
+            },
+            "roll": {
+              "mode": "attack",
+              "ability": "agl",
+              "kind": "ranged",
+              "targetDefense": "agl"
+            },
+            "damage": {
+              "enabled": true,
+              "ability": "",
+              "multiplierBonus": 0,
+              "flat": 0,
+              "resource": "health",
+              "element": "energy"
+            },
+            "cost": {
+              "focus": 1
+            },
             "effects": [
-              { "name": "Atingido", "when": "hit", "target": "targets", "status": "slowed", "rounds": 2 }
+              {
+                "name": "Atingido",
+                "when": "hit",
+                "target": "targets",
+                "status": "slowed",
+                "rounds": 2
+              }
             ]
           }
         ]
@@ -76,10 +112,22 @@
           {
             "name": "Recuperar",
             "activation": "action",
-            "target": { "type": "self" },
-            "roll": { "mode": "none" },
-            "healing": { "enabled": true, "mode": "flat", "resource": "health", "target": "self", "flat": 4 },
-            "uses": { "max": 3 }
+            "target": {
+              "type": "self"
+            },
+            "roll": {
+              "mode": "none"
+            },
+            "healing": {
+              "enabled": true,
+              "mode": "flat",
+              "resource": "health",
+              "target": "self",
+              "flat": 4
+            },
+            "uses": {
+              "max": 3
+            }
           }
         ]
       }
@@ -95,15 +143,27 @@
           {
             "name": "Concentrar",
             "activation": "action",
-            "target": { "type": "self" },
-            "roll": { "mode": "check", "ability": "log", "difficulty": 9 },
+            "target": {
+              "type": "self"
+            },
+            "roll": {
+              "mode": "check",
+              "ability": "log",
+              "difficulty": 9
+            },
             "effects": [
               {
                 "name": "Concentrado",
                 "when": "success",
                 "target": "self",
                 "rounds": 3,
-                "changes": [{ "key": "system.abilities.mle.attackBonus", "type": "add", "value": "1" }]
+                "changes": [
+                  {
+                    "key": "system.abilities.mle.attackBonus",
+                    "type": "add",
+                    "value": "1"
+                  }
+                ]
               }
             ]
           }
@@ -121,11 +181,27 @@
           {
             "name": "Onda",
             "activation": "attack",
-            "target": { "type": "area" },
-            "area": { "shape": "cone", "size": 20 },
-            "roll": { "mode": "attack", "ability": "ego", "kind": "area", "targetDefense": "agl" },
-            "damage": { "enabled": true, "resource": "health", "element": "" },
-            "cost": { "focus": 2 }
+            "target": {
+              "type": "area"
+            },
+            "area": {
+              "shape": "cone",
+              "size": 20
+            },
+            "roll": {
+              "mode": "attack",
+              "ability": "ego",
+              "kind": "area",
+              "targetDefense": "agl"
+            },
+            "damage": {
+              "enabled": true,
+              "resource": "health",
+              "element": ""
+            },
+            "cost": {
+              "focus": 2
+            }
           }
         ]
       }
@@ -142,8 +218,15 @@
           {
             "name": "Golpear",
             "activation": "attack",
-            "roll": { "mode": "attack", "ability": "mle", "kind": "close", "targetDefense": "agl" },
-            "damage": { "enabled": true }
+            "roll": {
+              "mode": "attack",
+              "ability": "mle",
+              "kind": "close",
+              "targetDefense": "agl"
+            },
+            "damage": {
+              "enabled": true
+            }
           }
         ]
       }
@@ -159,10 +242,76 @@
           {
             "name": "Usar",
             "activation": "action",
-            "target": { "type": "self" },
-            "roll": { "mode": "none" },
-            "healing": { "enabled": true, "mode": "flat", "resource": "health", "target": "self", "flat": 3 },
-            "uses": { "max": 2 }
+            "target": {
+              "type": "self"
+            },
+            "roll": {
+              "mode": "none"
+            },
+            "healing": {
+              "enabled": true,
+              "mode": "flat",
+              "resource": "health",
+              "target": "self",
+              "flat": 3
+            },
+            "uses": {
+              "max": 2
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "form",
+      "name": "Armadura de Exemplo",
+      "folder": "Exemplo/Formas",
+      "system": {
+        "description": "<p>Armadura inventada. Ao ativar, concede o poder e o traço abaixo, sobe o Rank para pelo menos 3 e dá +10 de Saúde máxima. Ao desativar, tudo volta ao que era.</p>",
+        "kind": "suit",
+        "rank": {
+          "mode": "set",
+          "value": 3
+        },
+        "changes": [
+          {
+            "key": "system.health.max",
+            "type": "add",
+            "value": "10"
+          },
+          {
+            "key": "system.abilities.res.value",
+            "type": "upgrade",
+            "value": "4"
+          }
+        ],
+        "grants": [
+          {
+            "type": "power",
+            "name": "Raio de Exemplo"
+          },
+          {
+            "type": "trait",
+            "name": "Traço de Exemplo"
+          }
+        ]
+      }
+    },
+    {
+      "type": "form",
+      "name": "Transformação de Exemplo",
+      "folder": "Exemplo/Formas",
+      "system": {
+        "description": "<p>Transformação inventada: soma 1 ao Rank enquanto durar.</p>",
+        "kind": "transformation",
+        "rank": {
+          "mode": "add",
+          "value": 1
+        },
+        "grants": [
+          {
+            "type": "tag",
+            "name": "Tag de Exemplo"
           }
         ]
       }

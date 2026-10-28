@@ -37,6 +37,9 @@
       "damage": "Dano",
       "damageAbility": "Atributo (vazio = o da rolagem)",
       "damageResource": "Recurso atingido",
+      "damageScale": "Fração do dano",
+      "damageScaleHint": "1 = dano inteiro; 0,5 = metade do dano em qualquer acerto. O Fantástico multiplica por cima.",
+      "damageWhen": "Dano quando",
       "description": "Descrição",
       "difficulty": "Dificuldade",
       "duplicate": "Duplicar",
@@ -50,16 +53,6 @@
       "effectWhen": "Quando dispara",
       "effects": "Efeitos",
       "element": "Elemento",
-      "damageWhen": "Dano quando",
-      "ignoreReduction": "Ignora a Redução de Dano",
-      "reductionFrom": "Redução de Dano que vale",
-      "sameAsResource": "A do recurso atingido",
-      "perFocus": "Fixo por Foco gasto",
-      "perFocusHint": "Valor fixo somado por ponto de Foco gasto (0,5 = +1 a cada 2 pontos). Usado com \"Foco é mínimo\".",
-      "scalable": "Foco é mínimo",
-      "scalableHint": "O Foco informado é o mínimo: ao usar a ação, o jogador escolhe quanto gastar.",
-      "damageScale": "Fração do dano",
-      "damageScaleHint": "1 = dano inteiro; 0,5 = metade do dano em qualquer acerto. O Fantástico multiplica por cima.",
       "fantasticFactor": "Fator do Fantástico",
       "flat": "Bônus fixo",
       "healing": "Cura",
@@ -67,18 +60,25 @@
       "healingResource": "Recurso curado",
       "healingTarget": "Quem é curado",
       "hint": "Cada ação descreve uma rolagem, o que ela causa e o que custa. O personagem escolhe a ação ao usar o item.",
+      "ignoreReduction": "Ignora a Redução de Dano",
       "multiplierBonus": "Bônus no multiplicador",
       "name": "Nome da ação",
       "nameHint": "Vazio = nome do item",
       "noEffects": "Nenhum efeito.",
       "none": "Este item ainda não tem ações.",
+      "perFocus": "Fixo por Foco gasto",
+      "perFocusHint": "Valor fixo somado por ponto de Foco gasto (0,5 = +1 a cada 2 pontos). Usado com \"Foco é mínimo\".",
       "rangeDistance": "Alcance máximo (unidades da cena, 0 = sem aviso)",
       "rangeText": "Alcance (texto)",
+      "reductionFrom": "Redução de Dano que vale",
       "removeEffect": "Remover efeito",
       "rollAbility": "Atributo da rolagem",
       "rollBonus": "Bônus na rolagem",
       "rollMode": "Rolagem",
+      "sameAsResource": "A do recurso atingido",
       "sameAsRoll": "Mesmo da rolagem",
+      "scalable": "Foco é mínimo",
+      "scalableHint": "O Foco informado é o mínimo: ao usar a ação, o jogador escolhe quanto gastar.",
       "targetCount": "Máximo de alvos (0 = sem limite)",
       "targetDefense": "Defesa do alvo",
       "targetType": "Alvo",
@@ -148,14 +148,18 @@
       "override": "Substituir",
       "upgrade": "Pelo menos"
     },
+    "DamageWhen": {
+      "fantastic": "Só no Sucesso Fantástico",
+      "hit": "Em qualquer acerto"
+    },
     "Dialog": {
       "bonus": "Bônus ou penalidade",
-      "focusSpent": "Foco a gastar",
-      "focusSpentHint": "O mínimo é o custo da ação; gastar mais aumenta o efeito, se o poder permitir.",
       "deleteItem": "Excluir \"{name}\"?",
       "deleteTitle": "Excluir item",
       "edgeInherited": "Já vem da ficha",
       "edgeMode": "Edge / Trouble",
+      "focusSpent": "Foco a gastar",
+      "focusSpentHint": "O mínimo é o custo da ação; gastar mais aumenta o efeito, se o poder permitir.",
       "roll": "Rolar",
       "shiftHint": "Segure Shift ao clicar para rolar sem este diálogo.",
       "visibility": "Visibilidade"
@@ -174,10 +178,6 @@
     "EffectTarget": {
       "self": "Si mesmo",
       "targets": "Alvos"
-    },
-    "DamageWhen": {
-      "fantastic": "Só no Sucesso Fantástico",
-      "hit": "Em qualquer acerto"
     },
     "EffectWhen": {
       "always": "Sempre",
@@ -203,6 +203,55 @@
       "swarm": "Enxame",
       "toxin": "Toxina",
       "water": "Água"
+    },
+    "Form": {
+      "activate": "Ativar",
+      "active": "Ativa",
+      "addChange": "Adicionar alteração",
+      "announceGrants": "Concede:",
+      "announceOff": "{actor} desativa {form} ({kind}).",
+      "announceOn": "{actor} ativa {form} ({kind}).",
+      "announceRank": "Rank {from} para {to}.",
+      "announceRemoved": "Deixa de ter:",
+      "badgeChanges": "{count} alterações",
+      "badgeGrants": "{count} concedidos",
+      "badgeImages": "imagens",
+      "badgeRankAdd": "Rank {value}",
+      "badgeRankSet": "Rank {value}",
+      "borrowed": "Emprestada",
+      "borrowedHint": "Emprestada: concede os poderes, traços e tags, mas não altera Rank nem valores da ficha (quem veste usa o próprio Rank).",
+      "carryDamage": "O dano acompanha o corpo",
+      "carryDamageHint": "Quando a Saúde ou o Foco máximos mudam ao trocar de forma, o dano já sofrido continua o mesmo: o valor atual sobe ou desce junto. Desmarcado, o valor atual não muda (só é cortado se passar do máximo).",
+      "changeKey": "Chave (system...)",
+      "changePriority": "auto",
+      "changePriorityHint": "Prioridade (vazio = automática pelo tipo)",
+      "changeValue": "Valor",
+      "changes": "Alterações na ficha",
+      "changesHint": "Valem só enquanto a forma estiver ativa. Use a chave de um campo do personagem, por exemplo system.abilities.mle.value (atributo), system.health.max (Saúde máxima) ou system.movement.flight.bonus.",
+      "deactivate": "Desativar",
+      "effectiveRank": "Rank efetivo",
+      "effectiveRankHint": "Rank com as formas ativas (o campo ao lado é o Rank base).",
+      "empty": "Nenhuma forma desta categoria.",
+      "hint": "Armaduras, transformações e formas alternativas. Ativar uma forma concede os itens dela, aplica as alterações na ficha e, se ela tiver, troca as imagens. Só uma forma de cada categoria fica ativa por vez.",
+      "imagesHint": "Opcional. Troca enquanto a forma estiver ativa e volta ao original ao desativar.",
+      "inactive": "Inativa",
+      "kind": "Categoria",
+      "kindHint": "Só uma forma de cada categoria fica ativa por vez.",
+      "noChanges": "Nenhuma alteração.",
+      "portrait": "Imagem da ficha",
+      "rankMode": "Rank",
+      "rankValue": "Valor",
+      "token": "Imagem do token"
+    },
+    "FormKind": {
+      "alternate": "Forma alternativa",
+      "suit": "Armadura",
+      "transformation": "Transformação"
+    },
+    "FormKindPlural": {
+      "alternate": "Formas alternativas",
+      "suit": "Armaduras",
+      "transformation": "Transformações"
     },
     "HealingMode": {
       "flat": "Valor fixo",
@@ -290,6 +339,7 @@
       "triple": "Triplo da corrida"
     },
     "Pack": {
+      "form": "Formas",
       "gear": "Equipamentos",
       "occupation": "Ocupações",
       "origin": "Origens",
@@ -326,6 +376,11 @@
       "translation": "Tradução",
       "weatherControl": "Controle do Clima"
     },
+    "RankMode": {
+      "add": "Soma",
+      "none": "Não altera",
+      "set": "Pelo menos"
+    },
     "Resource": {
       "focus": "Foco",
       "health": "Saúde",
@@ -341,6 +396,10 @@
       "ultimate": "Ultimate"
     },
     "Settings": {
+      "announceForms": {
+        "hint": "Posta uma mensagem quando um personagem ativa ou desativa uma forma.",
+        "name": "Anunciar trocas de forma no chat"
+      },
       "autoApply": {
         "hint": "Aplica dano, cura e efeitos aos alvos assim que a ação é rolada, sem clicar em Aplicar.",
         "name": "Aplicar resultados automaticamente"
@@ -452,6 +511,7 @@
       "description": "Descrição",
       "details": "Detalhes",
       "effects": "Efeitos",
+      "forms": "Formas",
       "gear": "Equipamento",
       "main": "Principal",
       "mods": "Modificadores",
@@ -488,6 +548,7 @@
     },
     "Warn": {
       "alreadyApplied": "Este cartão já teve efeitos aplicados; não dá para re-rolar.",
+      "formNoActor": "A forma precisa estar na ficha de um personagem.",
       "gmOnly": "Apenas o GM pode abrir esta janela.",
       "itemNotFound": "Item não encontrado ou sem personagem.",
       "noAction": "Este item não tem ação.",
@@ -513,6 +574,7 @@
       "npc": "NPC"
     },
     "Item": {
+      "form": "Forma",
       "gear": "Equipamento",
       "occupation": "Ocupação",
       "origin": "Origem",

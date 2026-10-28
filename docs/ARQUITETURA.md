@@ -29,6 +29,7 @@ Funções que recebem e devolvem objetos simples. Nada de `game`, `foundry` ou d
 | `abilities.mjs` | chaves dos atributos, defesa, bônus fora de combate, multiplicador, iniciativa |
 | `damage.mjs` | dano, redução, aplicação em reservas (`damagePool`, `healPool`) |
 | `movement.mjs` | deslocamento por tipo e modo de cálculo |
+| `forms.mjs` | formas: alterações que uma forma aplica (`formChanges`, com o Rank "pelo menos" antes das somas) e o valor das reservas depois que o máximo muda (`carryPoolValue`) |
 | `resolve.mjs` | `resolveAction`: dados da ação + rolagem + atacante + alvos → resultado por alvo (acerto, margem, dano, cura, efeitos) |
 
 `resolveAction` é o coração do motor: o cartão do chat **nunca guarda o resultado**, só os dados de entrada, e recalcula tudo quando precisa (re-rolagem, aplicação).
@@ -69,11 +70,36 @@ Decisões que importam:
 - Ações dos botões usam `data-action` + `DEFAULT_OPTIONS.actions`. O validador confere que todo `data-action` de um template tem manipulador e vice-versa.
 - O editor de ação lê o item, aplica o formulário numa cópia da ação e grava o array inteiro.
 
-## 5. Testes
+## 5. Formas
+
+Uma **forma** (`FormData`, item `form`) é uma armadura, transformação ou forma alternativa que mora na ficha e se liga e desliga. Quem manda é o ator: `Actor#setFormActive(forma, ativa)`.
+
+```
+setFormActive (fila: uma troca por vez por personagem)
+  desliga a forma ativa da mesma categoria
+  remove o efeito e as concessões da forma (limpeza idempotente)
+  grava system.active na forma
+  ativando: cria UM Active Effect no ator (origin = a forma, flag mmrpg.formId) com formChanges(),
+            e cria os itens concedidos (flag mmrpg.grantedBy = id da forma; ignora o que já existe)
+  desativando: recria as concessões das outras formas ativas que dependiam dos mesmos itens
+  carryPoolValue: ajusta Saúde e Foco atuais ao novo máximo
+  troca ou restaura retrato e token (original guardado em flags.mmrpg.formBase)
+  posta a mensagem no chat (configuração announceForms)
+```
+
+Decisões que importam:
+
+- **O efeito é do ator, não da forma.** As alterações ficam em `system.changes` (dados da própria forma) e viram um Active Effect no ator só enquanto a forma está ativa. Assim não dependemos de efeitos transferidos de itens (que valem sempre) nem de suprimir efeitos; a forma em compêndio ou fora da ficha nunca afeta ninguém.
+- **Cópias nunca chegam ativas** (`MMRPGItem#_preCreate`). Arrastar uma forma ativa para outra ficha cria uma forma desligada.
+- **Editar ou apagar uma forma ativa** é tratado: `helpers/forms.mjs` (gancho `updateItem`) chama `Actor#refreshForm`, e `MMRPGItem#_preDelete` desliga antes de apagar.
+- **Rank efetivo** vem do efeito sobre `system.rank`; a ficha edita `_source.system.rank` e mostra o efetivo ao lado.
+- **Imagens** são trocadas com `actor.update` e `TokenDocument#update`, dentro de `try/catch`: se falhar, a forma ativa mesmo assim.
+
+## 6. Testes
 
 | Arquivo | O que cobre |
 |---|---|
-| `tests/rules.test.mjs` | regras puras: d616, Edge/Trouble, defesa, dano, cura, deslocamento, `resolveAction` |
+| `tests/rules.test.mjs` | regras puras: d616, Edge/Trouble, defesa, dano, cura, deslocamento, `resolveAction`, formas |
 | `tests/content.test.mjs` | formato de importação (validação, concessões, ids estáveis) |
 | `tests/foundry.test.mjs` | o sistema carregado num Foundry simulado (`tests/support/foundry-stub.mjs`) |
 
@@ -81,7 +107,7 @@ O Foundry simulado implementa só o necessário: campos de dados com validação
 
 `scripts/validate.mjs` faz as checagens estáticas e roda dentro do `npm run check`.
 
-## 6. Como estender
+## 7. Como estender
 
 **Novo tipo de item**
 1. Crie o modelo em `module/data/` e exporte em `_module.mjs`.
@@ -99,10 +125,11 @@ O Foundry simulado implementa só o necessário: campos de dados com validação
 
 **Textos**: toda string da interface vai em `lang/*.json`, com as mesmas chaves nos dois arquivos (o validador confere). Sem emojis na interface.
 
-## 7. Limites conhecidos
+## 8. Limites conhecidos
 
 - Escrito e testado sem um Foundry real, v14 ou v13 (veja o README).
 - Gabarito de área: posicionado no token do atacante, sem interação.
 - Efeitos "desde o começo/fim do turno" não são automatizados: use duração em rodadas ou remova à mão.
 - A compatibilidade declarada é `minimum: 13`. Nenhuma versão foi marcada como *verificada* no manifesto, porque nenhuma foi aberta num Foundry real.
 - As diferenças entre v13 e v14 ficam em `module/helpers/compat.mjs` (modo de mensagem, registro de fichas, helpers de Handlebars). Código novo que dependa da versão deve passar por ali, e `tests/foundry-v13.test.mjs` roda a bateria de integração com o simulador na geração 13.
+- Formas: a troca de retrato e token nunca foi testada num Foundry real. Se o personagem trocar o retrato à mão enquanto uma forma com imagem estiver ativa, ao desativar volta o retrato guardado na primeira troca. Pontos de atributo e Karma ganhos com um Rank novo não são distribuídos sozinhos (use `changes` ou ajuste à mão).

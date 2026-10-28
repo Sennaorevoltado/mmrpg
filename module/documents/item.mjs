@@ -25,9 +25,26 @@ export default class MMRPGItem extends Item {
       this.updateSource({ img: MMRPG.itemIcons[this.type] });
     }
 
+    // Uma forma copiada ou arrastada nunca chega ativa: quem liga é o personagem.
+    if (this.type === "form" && (data.system?.active || data.system?.activatedAt)) {
+      this.updateSource({ "system.active": false, "system.activatedAt": 0 });
+    }
+
     // Armas e equipamentos novos já vêm com uma ação em branco.
     if (["weapon", "gear"].includes(this.type) && data.system?.actions === undefined) {
       this.updateSource({ "system.actions": [ActionData.blank(this.type)] });
+    }
+  }
+
+  /** Apagar uma forma ativa a desliga antes (concessões, efeito e imagens saem da ficha). */
+  async _preDelete(options, user) {
+    if ((await super._preDelete(options, user)) === false) return false;
+    if (this.type === "form" && this.system.active && this.actor) {
+      try {
+        await this.actor.setFormActive(this, false, { announce: false });
+      } catch (err) {
+        console.error(`${MMRPG.id} | falha ao desativar a forma antes de apagar`, err);
+      }
     }
   }
 

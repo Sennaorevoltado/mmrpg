@@ -47,7 +47,7 @@ const sheetFor = async (SheetClass, document) => new SheetClass({ document });
 test("hook init registra classes, modelos, fichas, condições e configurações", () => {
   assert.equal(CONFIG.MMRPG, MMRPG);
   assert.deepEqual(Object.keys(CONFIG.Actor.dataModels).sort(), ["character", "npc"]);
-  assert.deepEqual(Object.keys(CONFIG.Item.dataModels).sort(), ["gear", "occupation", "origin", "power", "tag", "trait", "weapon"]);
+  assert.deepEqual(Object.keys(CONFIG.Item.dataModels).sort(), ["form", "gear", "occupation", "origin", "power", "tag", "trait", "weapon"]);
   assert.equal(CONFIG.statusEffects.length, MMRPG.statuses.length);
   assert.equal(CONFIG.specialStatusEffects.DEFEATED, "dead");
   assert.ok(CONFIG.Dice.terms.m, "dado Marvel registrado");
@@ -978,6 +978,317 @@ test("janela de importação renderiza", async () => {
   const app = ContentImporter.open();
   assertClean(await app.renderToString(), "janela de importação");
   await app.close();
+});
+
+
+/* -------------------------------------------- */
+/*  Formas (armaduras, transformações)          */
+/* -------------------------------------------- */
+
+/** Personagem com uma armadura (Rank 4, Melee 8, Saúde +20, concede dois itens) e uma transformação. */
+async function makeFormsScene() {
+  const hero = await Actor.create({
+    name: "Engenheiro",
+    type: "character",
+    system: { rank: 2, abilities: { mle: { value: 2 } }, health: { value: 30, max: 30 }, focus: { value: 20, max: 20 } }
+  });
+  const power = await Item.create({ name: "Repulsor", type: "power", system: { powerSet: "basic" } });
+  const trait = await Item.create({ name: "Tech Reliance", type: "trait" });
+  const tag = await Item.create({ name: "Extreme Appearance", type: "tag" });
+  const grants = [
+    { uuid: power.uuid, name: power.name, type: "power" },
+    { uuid: trait.uuid, name: trait.name, type: "trait" }
+  ];
+  const [suit, other, beast] = await hero.createEmbeddedDocuments("Item", [
+    {
+      name: "Armadura Mark I",
+      type: "form",
+      system: {
+        kind: "suit",
+        rank: { mode: "set", value: 4 },
+        changes: [
+          { key: "system.abilities.mle.value", type: "override", value: "8", priority: null },
+          { key: "system.health.max", type: "add", value: "20", priority: null }
+        ],
+        grants,
+        portrait: "armadura.webp",
+        token: "armadura-token.webp"
+      }
+    },
+    { name: "Armadura Mark II", type: "form", system: { kind: "suit", rank: { mode: "set", value: 5 } } },
+    {
+      name: "Forma Bestial",
+      type: "form",
+      system: {
+        kind: "transformation",
+        rank: { mode: "add", value: 1 },
+        grants: [{ uuid: tag.uuid, name: tag.name, type: "tag" }]
+      }
+    }
+  ]);
+  return { hero, suit, other, beast, power, trait, tag };
+}
+
+test("forma nova: dados válidos, ícone padrão e nunca chega ativa", async () => {
+  const form = await Item.create({ name: "Teste", type: "form", system: { active: true, activatedAt: 99 } });
+  assert.deepEqual(form.system.validate(), []);
+  assert.equal(form.img, MMRPG.itemIcons.form);
+  assert.equal(form.system.active, false, "cópia nova começa desativada");
+  assert.equal(form.system.activatedAt, 0);
+});
+
+test("ativar uma armadura: Rank, atributos, reservas e concessões; desativar desfaz tudo", async () => {
+  const { hero, suit } = await makeFormsScene();
+  assert.equal(hero.system.rank, 2);
+
+  assert.equal(await hero.setFormActive(suit, true, { announce: false }), true);
+  assert.equal(suit.system.active, true);
+  assert.equal(hero.system.rank, 4, "Rank pelo menos 4");
+  assert.equal(hero._source.system.rank, 2, "o Rank base não muda");
+  assert.equal(hero.system.abilities.mle.value, 8);
+  assert.equal(hero.system.abilities.mle.multiplier, damageMultiplier(4, 0));
+  assert.equal(hero.system.health.max, 50);
+  assert.ok(hero.items.some((i) => i.type === "power" && i.name === "Repulsor"), "poder concedido");
+  assert.ok(hero.items.some((i) => i.type === "trait" && i.name === "Tech Reliance"), "traço concedido");
+  assert.equal(hero.effects.filter((e) => e.getFlag("mmrpg", "formId") === suit.id).length, 1, "um efeito gerenciado");
+  assert.deepEqual(hero.activeForms.map((f) => f.name), ["Armadura Mark I"]);
+
+  await hero.setFormActive(suit, false, { announce: false });
+  assert.equal(suit.system.active, false);
+  assert.equal(hero.system.rank, 2);
+  assert.equal(hero.system.abilities.mle.value, 2);
+  assert.equal(hero.system.health.max, 30);
+  assert.ok(!hero.items.some((i) => i.name === "Repulsor" || i.name === "Tech Reliance"), "concessões removidas");
+  assert.equal(hero.effects.size ?? hero.effects.contents.length, 0, "efeito removido");
+  assert.equal(await hero.setFormActive(suit, false, { announce: false }), false, "já estava desativada");
+});
+
+test("o dano acompanha o corpo ao trocar de forma e ao voltar", async () => {
+  const { hero, suit } = await makeFormsScene();
+  await hero.update({ "system.health.value": 20 }); // 10 de dano
+  await hero.setFormActive(suit, true, { announce: false });
+  assert.equal(hero.system.health.max, 50);
+  assert.equal(hero.system.health.value, 40, "10 de dano continuam");
+  await hero.update({ "system.health.value": 12 }); // 38 de dano na armadura
+  await hero.setFormActive(suit, false, { announce: false });
+  assert.equal(hero.system.health.max, 30);
+  assert.equal(hero.system.health.value, 0, "o dano maior que a Saúde base zera, nunca fica negativo");
+
+  // Sem acompanhar, o valor atual fica como está e só é cortado no máximo novo.
+  await suit.update({ "system.carryDamage": false });
+  await hero.update({ "system.health.value": 30 });
+  await hero.setFormActive(suit, true, { announce: false });
+  assert.equal(hero.system.health.value, 30);
+  await hero.update({ "system.health.value": 45 });
+  await hero.setFormActive(suit, false, { announce: false });
+  assert.equal(hero.system.health.value, 30, "cortado no máximo base");
+});
+
+test("só uma forma por categoria; categorias diferentes convivem", async () => {
+  const { hero, suit, other, beast } = await makeFormsScene();
+  await hero.setFormActive(suit, true, { announce: false });
+  await hero.setFormActive(beast, true, { announce: false });
+  assert.deepEqual(hero.activeForms.map((f) => f.name).sort(), ["Armadura Mark I", "Forma Bestial"]);
+  assert.equal(hero.system.rank, 5, "armadura pelo menos 4, transformação soma 1");
+
+  await hero.setFormActive(other, true, { announce: false });
+  assert.equal(suit.system.active, false, "a outra armadura saiu");
+  assert.equal(other.system.active, true);
+  assert.equal(beast.system.active, true, "a transformação continua");
+  assert.equal(hero.system.rank, 6, "Rank 5 da segunda armadura + 1");
+  assert.ok(!hero.items.some((i) => i.name === "Repulsor"), "concessões da armadura anterior saíram");
+  assert.ok(hero.items.some((i) => i.name === "Extreme Appearance"), "as da transformação ficaram");
+});
+
+test("concessões: o que o personagem já tinha não some ao desativar; duas formas dividem o mesmo item", async () => {
+  const { hero, suit, power } = await makeFormsScene();
+  await hero.createEmbeddedDocuments("Item", [{ name: "Repulsor", type: "power", system: { powerSet: "basic" } }]);
+  await hero.setFormActive(suit, true, { announce: false });
+  assert.equal(hero.items.filter((i) => i.name === "Repulsor").length, 1, "não duplica o que já existe");
+  await hero.setFormActive(suit, false, { announce: false });
+  assert.equal(hero.items.filter((i) => i.name === "Repulsor").length, 1, "o item próprio fica");
+
+  // Armadura e forma alternativa concedendo o mesmo poder: sair de uma não tira o item da outra.
+  const [alt] = await hero.createEmbeddedDocuments("Item", [
+    { name: "Modo Furtivo", type: "form", system: { kind: "alternate", grants: [{ uuid: power.uuid, name: power.name, type: "power" }] } }
+  ]);
+  await hero.deleteEmbeddedDocuments("Item", hero.items.filter((i) => i.name === "Repulsor").map((i) => i.id));
+  await hero.setFormActive(suit, true, { announce: false });
+  await hero.setFormActive(alt, true, { announce: false });
+  await hero.setFormActive(suit, false, { announce: false });
+  assert.ok(hero.items.some((i) => i.name === "Repulsor"), "a forma alternativa ainda precisa do poder");
+  await hero.setFormActive(alt, false, { announce: false });
+  assert.ok(!hero.items.some((i) => i.name === "Repulsor"));
+});
+
+test("armadura emprestada concede os itens, mas não mexe em Rank nem em valores", async () => {
+  const { hero, suit } = await makeFormsScene();
+  await suit.update({ "system.borrowed": true });
+  await hero.setFormActive(suit, true, { announce: false });
+  assert.equal(hero.system.rank, 2);
+  assert.equal(hero.system.abilities.mle.value, 2);
+  assert.equal(hero.system.health.max, 30);
+  assert.ok(hero.items.some((i) => i.name === "Repulsor"));
+  assert.equal(hero.effects.contents.length, 0, "sem efeito");
+});
+
+test("editar uma forma ativa reaplica o efeito; apagar uma forma ativa a desliga antes", async () => {
+  const { hero, suit } = await makeFormsScene();
+  await hero.setFormActive(suit, true, { announce: false });
+  await suit.update({ "system.rank": { mode: "set", value: 6 } });
+  await new Promise((resolve) => setTimeout(resolve, 0));
+  await hero.setFormActive(suit, true, { announce: false }); // espera a fila terminar
+  assert.equal(hero.system.rank, 6, "a edição vale sem desativar e ativar à mão");
+  assert.equal(hero.effects.contents.filter((e) => e.getFlag("mmrpg", "formId") === suit.id).length, 1, "continua um só efeito");
+
+  await suit.delete();
+  assert.equal(hero.system.rank, 2);
+  assert.equal(hero.system.health.max, 30);
+  assert.ok(!hero.items.some((i) => i.name === "Repulsor"), "concessões saíram junto");
+  assert.equal(hero.effects.contents.length, 0);
+});
+
+test("a forma troca o retrato e o token e volta ao original", async () => {
+  const { hero, suit, beast } = await makeFormsScene();
+  await hero.update({ img: "heroi.webp", "prototypeToken.texture.src": "heroi-token.webp" });
+  const tokenDoc = { texture: { src: "heroi-token.webp" }, async update(data) { this.texture.src = data["texture.src"]; } };
+  hero.tokens.push(tokenDoc);
+
+  await hero.setFormActive(suit, true, { announce: false });
+  assert.equal(hero.img, "armadura.webp");
+  assert.equal(hero.prototypeToken.texture.src, "armadura-token.webp");
+  assert.equal(tokenDoc.texture.src, "armadura-token.webp", "o token na cena também muda");
+
+  // Uma transformação sem imagem não mexe nas imagens da armadura.
+  await hero.setFormActive(beast, true, { announce: false });
+  assert.equal(hero.img, "armadura.webp");
+
+  await hero.setFormActive(suit, false, { announce: false });
+  assert.equal(hero.img, "heroi.webp");
+  assert.equal(hero.prototypeToken.texture.src, "heroi-token.webp");
+  assert.equal(tokenDoc.texture.src, "heroi-token.webp");
+  assert.equal(hero.getFlag("mmrpg", "formBase"), undefined, "o original só é guardado enquanto há troca");
+});
+
+test("a troca de forma posta uma mensagem no chat, se a configuração permitir", async () => {
+  const { hero, suit } = await makeFormsScene();
+  const before = game.messages.size;
+  await hero.setFormActive(suit, true);
+  assert.equal(game.messages.size, before + 1);
+  const message = [...game.messages].at(-1);
+  assert.ok(message.content.includes("Engenheiro") && message.content.includes("Armadura Mark I"));
+  assert.ok(message.content.includes("Rank 2 para 4"));
+  assert.ok(message.content.includes("Repulsor"));
+
+  env.settings.set("mmrpg", "announceForms", false);
+  await hero.setFormActive(suit, false);
+  assert.equal(game.messages.size, before + 1, "com a configuração desligada, nada é postado");
+  env.settings.set("mmrpg", "announceForms", true);
+});
+
+test("fichas mostram a aba Formas e o Rank efetivo; a ficha da forma tem os campos", async () => {
+  const { hero, suit } = await makeFormsScene();
+  const { CharacterSheet } = await import("../module/apps/sheets/actor-sheet.mjs");
+  const MMRPGItemSheet = (await import("../module/apps/sheets/item-sheet.mjs")).default;
+
+  let html = await (await sheetFor(CharacterSheet, hero)).renderToString();
+  assertClean(html, "ficha com formas");
+  assert.ok(html.includes("Armadura Mark I") && html.includes("Forma Bestial"));
+  assert.ok(html.includes('data-action="toggleForm"'));
+  assert.ok(html.includes("Ativar"));
+
+  await hero.setFormActive(suit, true, { announce: false });
+  html = await (await sheetFor(CharacterSheet, hero)).renderToString();
+  assertClean(html, "ficha com forma ativa");
+  assert.ok(html.includes("Desativar"));
+  assert.ok(html.includes("Rank efetivo"), "mostra o Rank com a forma");
+
+  html = await (await sheetFor(MMRPGItemSheet, suit)).renderToString();
+  assertClean(html, "ficha da forma");
+  assert.ok(html.includes('name="system.rank.mode"') && html.includes('data-change-field="key"'));
+  assert.ok(html.includes("system.abilities.mle.value"));
+  assert.ok(html.includes('data-action="toggleForm"'));
+});
+
+test("a ficha da forma edita e remove alterações e alterna a forma", async () => {
+  const { hero, suit } = await makeFormsScene();
+  const MMRPGItemSheet = (await import("../module/apps/sheets/item-sheet.mjs")).default;
+  const sheet = await sheetFor(MMRPGItemSheet, suit);
+  const actions = MMRPGItemSheet.DEFAULT_OPTIONS.actions;
+
+  await actions.addChange.call(sheet);
+  assert.equal(suit.system.changes.length, 3);
+  await actions.removeChange.call(sheet, null, { dataset: { index: "2" } });
+  assert.equal(suit.system.changes.length, 2);
+
+  await actions.toggleForm.call(sheet);
+  assert.equal(suit.system.active, true);
+  await actions.toggleForm.call(sheet);
+  assert.equal(suit.system.active, false);
+
+  const { CharacterSheet } = await import("../module/apps/sheets/actor-sheet.mjs");
+  const actorActions = CharacterSheet.DEFAULT_OPTIONS.actions;
+  const actorSheet = await sheetFor(CharacterSheet, hero);
+  await actorActions.toggleForm.call(actorSheet, null, { dataset: { itemId: suit.id } });
+  assert.equal(suit.system.active, true);
+  await actorActions.createItem.call(actorSheet, null, { dataset: { type: "form", kind: "transformation" } });
+  const created = hero.items.filter((i) => i.type === "form" && i.system.kind === "transformation");
+  assert.equal(created.length, 2);
+});
+
+test("importar formas: valida alterações, liga concessões e exporta de volta", async () => {
+  const file = {
+    format: "mmrpg-content",
+    version: 1,
+    items: [
+      { type: "power", name: "Poder da Armadura", system: { powerSet: "basic" } },
+      {
+        type: "form",
+        name: "Armadura Importada",
+        folder: "Armaduras",
+        system: {
+          kind: "suit",
+          active: true,
+          rank: { mode: "set", value: 4 },
+          changes: [{ key: "system.abilities.res.value", type: "upgrade", value: 7 }],
+          grants: [{ type: "power", name: "Poder da Armadura" }]
+        }
+      }
+    ]
+  };
+  const parsed = parseContent(file);
+  assert.deepEqual(parsed.errors, []);
+  const form = parsed.items.find((i) => i.type === "form");
+  assert.equal(form.system.active, false, "importada nunca chega ativa");
+  assert.equal(form.system.changes[0].value, "7");
+  assert.equal(form.system.changes[0].priority, null);
+
+  const report = await importItems(parsed.items, { destination: "compendia", onDuplicate: "update" });
+  assert.deepEqual(report.failed, []);
+  assert.deepEqual(report.unresolved, []);
+  const pack = compendia.findPack("form");
+  const doc = pack.documents.contents.find((d) => d.name === "Armadura Importada");
+  assert.ok(doc.system.grants[0].uuid, "concessão ligada ao poder");
+  assert.deepEqual(doc.system.validate(), []);
+
+  // A forma importada funciona numa ficha.
+  const hero = await Actor.create({ name: "Importada", type: "character", system: { rank: 1, abilities: { res: { value: 2 } } } });
+  const [onSheet] = await hero.createEmbeddedDocuments("Item", [doc.toObject()]);
+  await hero.setFormActive(onSheet, true, { announce: false });
+  assert.equal(hero.system.rank, 4);
+  assert.equal(hero.system.abilities.res.value, 7);
+  assert.ok(hero.items.some((i) => i.name === "Poder da Armadura"));
+
+  const exported = await exportPackItems(["form"]);
+  const out = exported.items.find((i) => i.name === "Armadura Importada");
+  assert.equal(out.folder, "Armaduras");
+  assert.deepEqual(parseContent(exported).errors, []);
+
+  // Erros de formato nas alterações.
+  const bad = parseContent({ ...file, items: [{ type: "form", name: "Ruim", system: { changes: [{ key: "system.rank", type: "triplicar", value: 1 }] } }] });
+  assert.ok(bad.errors.some((e) => e.includes("triplicar")));
+  const noValue = parseContent({ ...file, items: [{ type: "form", name: "Ruim 2", system: { changes: [{ key: "system.rank" }] } }] });
+  assert.ok(noValue.errors.some((e) => e.includes("value")));
 });
 
 /* -------------------------------------------- */

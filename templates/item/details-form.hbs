@@ -1,0 +1,87 @@
+<div class="mmrpg-detail-grid">
+  <label class="mmrpg-field">
+    <span>{{localize "MMRPG.Form.kind"}}</span>
+    <select name="system.kind" {{#unless editable}}disabled{{/unless}}>
+      {{#each formKindOptions}}
+        <option value="{{value}}" {{#if (eq value ../source.kind)}}selected{{/if}}>{{label}}</option>
+      {{/each}}
+    </select>
+  </label>
+  <label class="mmrpg-field inline">
+    <input type="checkbox" name="system.borrowed" {{#if source.borrowed}}checked{{/if}} {{#unless editable}}disabled{{/unless}}>
+    <span>{{localize "MMRPG.Form.borrowed"}}</span>
+  </label>
+  <p class="mmrpg-muted wide">{{localize "MMRPG.Form.kindHint"}} {{localize "MMRPG.Form.borrowedHint"}}</p>
+
+  <label class="mmrpg-field">
+    <span>{{localize "MMRPG.Form.rankMode"}}</span>
+    <select name="system.rank.mode" {{#unless editable}}disabled{{/unless}}>
+      {{#each rankModeOptions}}
+        <option value="{{value}}" {{#if (eq value ../source.rank.mode)}}selected{{/if}}>{{label}}</option>
+      {{/each}}
+    </select>
+  </label>
+  <label class="mmrpg-field">
+    <span>{{localize "MMRPG.Form.rankValue"}}</span>
+    <input type="number" name="system.rank.value" value="{{source.rank.value}}" step="1" {{#unless editable}}disabled{{/unless}}>
+  </label>
+  <label class="mmrpg-field inline wide">
+    <input type="checkbox" name="system.carryDamage" {{#if source.carryDamage}}checked{{/if}} {{#unless editable}}disabled{{/unless}}>
+    <span>{{localize "MMRPG.Form.carryDamage"}}</span>
+  </label>
+  <p class="mmrpg-muted wide">{{localize "MMRPG.Form.carryDamageHint"}}</p>
+
+  <label class="mmrpg-field">
+    <span>{{localize "MMRPG.Form.portrait"}}</span>
+    <input type="text" name="system.portrait" value="{{source.portrait}}" {{#unless editable}}disabled{{/unless}}>
+  </label>
+  <label class="mmrpg-field">
+    <span>{{localize "MMRPG.Form.token"}}</span>
+    <input type="text" name="system.token" value="{{source.token}}" {{#unless editable}}disabled{{/unless}}>
+  </label>
+  {{#if editable}}
+    <div class="mmrpg-field inline">
+      <button type="button" class="mmrpg-icon-button" data-action="editImage" data-edit="system.portrait" title="{{localize 'MMRPG.Sheet.changeImage'}}"><i class="fa-solid fa-image"></i></button>
+      <button type="button" class="mmrpg-icon-button" data-action="editImage" data-edit="system.token" title="{{localize 'MMRPG.Sheet.changeImage'}}"><i class="fa-solid fa-circle-user"></i></button>
+    </div>
+  {{/if}}
+  <p class="mmrpg-muted wide">{{localize "MMRPG.Form.imagesHint"}}</p>
+</div>
+
+<section class="mmrpg-form-changes">
+  <header class="mmrpg-section-head">
+    <h3>{{localize "MMRPG.Form.changes"}}</h3>
+    {{#if editable}}
+      <button type="button" class="mmrpg-icon-button" data-action="addChange" title="{{localize 'MMRPG.Form.addChange'}}">
+        <i class="fa-solid fa-plus"></i>
+      </button>
+    {{/if}}
+  </header>
+  <p class="mmrpg-muted">{{localize "MMRPG.Form.changesHint"}}</p>
+  <datalist id="{{changeListId}}">
+    {{#each changeKeySuggestions}}<option value="{{this}}"></option>{{/each}}
+  </datalist>
+  {{#if formChanges.length}}
+    <ul class="mmrpg-item-list">
+      {{#each formChanges}}
+        <li class="mmrpg-item mmrpg-change-row">
+          <input type="text" class="mmrpg-change-key" list="{{../changeListId}}" data-change-field="key" data-index="{{index}}" value="{{key}}" placeholder="{{localize 'MMRPG.Form.changeKey'}}" {{#unless ../editable}}disabled{{/unless}}>
+          <select data-change-field="type" data-index="{{index}}" {{#unless ../editable}}disabled{{/unless}}>
+            {{#each types}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}
+          </select>
+          <input type="text" class="mmrpg-change-value" data-change-field="value" data-index="{{index}}" value="{{value}}" placeholder="{{localize 'MMRPG.Form.changeValue'}}" {{#unless ../editable}}disabled{{/unless}}>
+          <input type="number" class="mmrpg-change-priority" data-change-field="priority" data-index="{{index}}" value="{{priority}}" step="1" placeholder="{{localize 'MMRPG.Form.changePriority'}}" title="{{localize 'MMRPG.Form.changePriorityHint'}}" {{#unless ../editable}}disabled{{/unless}}>
+          {{#if ../editable}}
+            <button type="button" class="mmrpg-icon-button" data-action="removeChange" data-index="{{index}}" title="{{localize 'MMRPG.Sheet.delete'}}">
+              <i class="fa-solid fa-trash"></i>
+            </button>
+          {{/if}}
+        </li>
+      {{/each}}
+    </ul>
+  {{else}}
+    <p class="mmrpg-empty">{{localize "MMRPG.Form.noChanges"}}</p>
+  {{/if}}
+</section>
+
+{{> "systems/mmrpg/templates/item/grants.hbs"}}

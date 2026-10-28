@@ -28,6 +28,7 @@ export default class MMRPGActorSheet extends HandlebarsApplicationMixin(ActorShe
       editItem: MMRPGActorSheet.#onEditItem,
       deleteItem: MMRPGActorSheet.#onDeleteItem,
       toggleEquipped: MMRPGActorSheet.#onToggleEquipped,
+      toggleForm: MMRPGActorSheet.#onToggleForm,
       resetUses: MMRPGActorSheet.#onResetUses,
       createEffect: MMRPGActorSheet.#onCreateEffect,
       editEffect: MMRPGActorSheet.#onEditEffect,
@@ -97,6 +98,7 @@ export default class MMRPGActorSheet extends HandlebarsApplicationMixin(ActorShe
     context.karmaPercent = percent(system.karma.value, system.karma.max);
 
     Object.assign(context, this.#prepareItems());
+    Object.assign(context, this.#prepareForms());
     context.effects = this.#prepareEffects();
     context.statuses = MMRPG.statuses.map((s) => ({ id: s.id, label: loc(`MMRPG.Status.${s.id}`), img: s.img, active: actor.statuses.has(s.id) }));
 
@@ -180,6 +182,29 @@ export default class MMRPGActorSheet extends HandlebarsApplicationMixin(ActorShe
     };
   }
 
+  /** Formas agrupadas por categoria, formas ativas e Rank efetivo. */
+  #prepareForms() {
+    const forms = this.actor.forms.sort((a, b) => a.sort - b.sort);
+    const view = (item) => {
+      const s = item.system;
+      const badges = [];
+      if (s.rank.mode === "set") badges.push(loc("MMRPG.Form.badgeRankSet", { value: s.rank.value }));
+      if (s.rank.mode === "add") badges.push(loc("MMRPG.Form.badgeRankAdd", { value: `${s.rank.value >= 0 ? "+" : ""}${s.rank.value}` }));
+      if (s.grants.length) badges.push(loc("MMRPG.Form.badgeGrants", { count: s.grants.length }));
+      if (s.changes.length) badges.push(loc("MMRPG.Form.badgeChanges", { count: s.changes.length }));
+      if (s.portrait || s.token) badges.push(loc("MMRPG.Form.badgeImages"));
+      return { id: item.id, name: item.name, img: item.img, active: s.active, borrowed: s.borrowed, badges };
+    };
+    const formGroups = Object.keys(MMRPG.formKinds).map((kind) => ({
+      kind,
+      label: loc(MMRPG.formKindPlurals[kind]),
+      items: forms.filter((f) => f.system.kind === kind).map(view)
+    }));
+    const activeForms = this.actor.activeForms.map((f) => ({ name: f.name, kindLabel: loc(MMRPG.formKinds[f.system.kind]) }));
+    const rankChanged = Number(this.actor.system.rank) !== Number(this.actor._source.system.rank);
+    return { formGroups, activeForms, rankChanged };
+  }
+
   /** Efeitos ativos do ator. */
   #prepareEffects() {
     return this.actor.effects.contents.map((e) => ({
@@ -257,6 +282,10 @@ export default class MMRPGActorSheet extends HandlebarsApplicationMixin(ActorShe
     const type = target.dataset.type;
     const data = { name: loc(`TYPES.Item.${type}`), type };
     if (target.dataset.powerSet) data.system = { powerSet: target.dataset.powerSet };
+    if (type === "form" && target.dataset.kind) {
+      data.system = { kind: target.dataset.kind };
+      data.name = loc(MMRPG.formKinds[target.dataset.kind]);
+    }
     const [item] = await this.actor.createEmbeddedDocuments("Item", [data]);
     item?.sheet.render({ force: true });
   }
@@ -279,6 +308,11 @@ export default class MMRPGActorSheet extends HandlebarsApplicationMixin(ActorShe
   static async #onToggleEquipped(event, target) {
     const item = this.actor.items.get(target.dataset.itemId);
     if (item) await item.update({ "system.equipped": !item.system.equipped });
+  }
+
+  static async #onToggleForm(event, target) {
+    const item = this.actor.items.get(target.dataset.itemId);
+    if (item) await this.actor.setFormActive(item, !item.system.active);
   }
 
   static async #onResetUses() {

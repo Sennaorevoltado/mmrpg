@@ -6,6 +6,14 @@
     <input class="mmrpg-name" type="text" name="name" value="{{item.name}}" placeholder="{{localize 'MMRPG.Sheet.name'}}" {{#unless editable}}disabled{{/unless}}>
     <div class="mmrpg-header-row">
       <span class="mmrpg-chip">{{typeLabel}}</span>
+      {{#if isForm}}
+        <span class="mmrpg-chip {{#if formActive}}active{{/if}}">{{#if formActive}}{{localize "MMRPG.Form.active"}}{{else}}{{localize "MMRPG.Form.inactive"}}{{/if}}</span>
+        {{#if canToggleForm}}
+          <button type="button" class="mmrpg-roll-button small" data-action="toggleForm">
+            {{#if formActive}}{{localize "MMRPG.Form.deactivate"}}{{else}}{{localize "MMRPG.Form.activate"}}{{/if}}
+          </button>
+        {{/if}}
+      {{/if}}
       <label class="mmrpg-field inline grow">
         <span>{{localize "MMRPG.Item.source"}}</span>
         <input type="text" name="system.source" value="{{source.source}}" {{#unless editable}}disabled{{/unless}}>

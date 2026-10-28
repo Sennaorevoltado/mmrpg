@@ -284,6 +284,7 @@
 .mmrpg-chip.fantastic,
 .mmrpg-chip.ultimate { background: var(--mm-gold); border-color: var(--mm-gold); color: #1a1200; font-weight: 800; }
 .mmrpg-chip.warn { border-color: var(--mm-gold); color: var(--mm-gold); }
+.mmrpg-chip.active { background: var(--mm-green); border-color: var(--mm-green); color: #06150c; font-weight: 700; }
 
 /* ---------- Listas de itens ---------- */
 
@@ -450,3 +451,18 @@ prose-mirror { display: block; min-height: 4rem; background: var(--mm-surface); 
 .mmrpg-buttons,
 .mmrpg-card-footer { display: flex; gap: 0.3rem; margin-top: 0.3rem; flex-wrap: wrap; }
 .mmrpg-card.is-locked .mmrpg-reroll { display: none; }
+
+/* ---------- Formas ---------- */
+
+.mmrpg-form.is-active { border-left-color: var(--mm-green); background: var(--mm-surface-2); }
+.mmrpg-form-toggle.is-on { background: transparent; color: var(--mm-green); border-color: var(--mm-green); }
+.mmrpg-form-toggle.is-on:hover { background: transparent; color: #fff; border-color: var(--mm-red); }
+.mmrpg-active-forms { gap: 0.3rem; }
+.mmrpg-change-row { flex-wrap: wrap; }
+.mmrpg-change-key { flex: 2 1 12rem; min-width: 0; }
+.mmrpg-change-value { flex: 1 1 5rem; min-width: 0; }
+.mmrpg-change-priority { flex: 0 0 4.5rem; min-width: 0; }
+.mmrpg-form-changes { margin-bottom: 0.75rem; }
+.mmrpg-form-card p { margin: 0.15rem 0; }
+.mmrpg-detail-grid > p.wide { grid-column: 1 / -1; margin: 0; }
+

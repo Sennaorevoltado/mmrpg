@@ -61,6 +61,7 @@ const checkChanges = (label, changes = []) => {
 };
 for (const entry of all) {
   for (const effect of entry.effects ?? []) checkChanges(`${entry.type} "${entry.name}"`, effect.changes);
+  if (entry.type === "form") checkChanges(`form "${entry.name}"`, entry.system.changes);
   for (const action of entry.system.actions ?? []) {
     for (const effect of action.effects ?? []) checkChanges(`${entry.type} "${entry.name}" (ação ${action.id})`, effect.changes);
   }

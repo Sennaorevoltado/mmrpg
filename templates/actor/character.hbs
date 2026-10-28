@@ -6,6 +6,7 @@
     <a data-action="switchTab" data-tab="powers">{{localize "MMRPG.Tabs.powers"}}</a>
     <a data-action="switchTab" data-tab="gear">{{localize "MMRPG.Tabs.gear"}}</a>
     <a data-action="switchTab" data-tab="traits">{{localize "MMRPG.Tabs.traits"}}</a>
+    <a data-action="switchTab" data-tab="forms">{{localize "MMRPG.Tabs.forms"}}{{#if activeForms.length}} ({{activeForms.length}}){{/if}}</a>
     <a data-action="switchTab" data-tab="effects">{{localize "MMRPG.Tabs.effects"}}</a>
     <a data-action="switchTab" data-tab="mods">{{localize "MMRPG.Tabs.mods"}}</a>
     <a data-action="switchTab" data-tab="bio">{{localize "MMRPG.Tabs.bio"}}</a>
@@ -43,6 +44,10 @@
       {{> "systems/mmrpg/templates/actor/parts/items.hbs" list=occupations type="occupation" title=(localize "MMRPG.Sheet.occupation") showEquip=false showQty=false}}
       {{> "systems/mmrpg/templates/actor/parts/items.hbs" list=traits type="trait" title=(localize "MMRPG.Sheet.traits") showEquip=false showQty=false}}
       {{> "systems/mmrpg/templates/actor/parts/items.hbs" list=tags type="tag" title=(localize "MMRPG.Sheet.tags") showEquip=false showQty=false}}
+    </section>
+
+    <section class="mmrpg-panel" data-tab="forms">
+      {{> "systems/mmrpg/templates/actor/parts/forms.hbs"}}
     </section>
 
     <section class="mmrpg-panel" data-tab="effects">

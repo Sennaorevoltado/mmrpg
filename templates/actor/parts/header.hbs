@@ -9,6 +9,12 @@
         <span>{{localize "MMRPG.Sheet.rank"}}</span>
         <input type="number" name="system.rank" value="{{source.rank}}" min="1" step="1" {{#unless editable}}disabled{{/unless}}>
       </label>
+      {{#if rankChanged}}
+        <div class="mmrpg-field">
+          <span>{{localize "MMRPG.Form.effectiveRank"}}</span>
+          <span class="mmrpg-chip warn" title="{{localize 'MMRPG.Form.effectiveRankHint'}}">{{system.rank}}</span>
+        </div>
+      {{/if}}
       <label class="mmrpg-field">
         <span>{{localize "MMRPG.Sheet.size"}}</span>
         <select name="system.size" {{#unless editable}}disabled{{/unless}}>
@@ -38,5 +44,12 @@
       {{/each}}
       <span class="mmrpg-chip"><strong>{{localize "MMRPG.Sheet.reach"}}</strong> {{system.reach}}</span>
     </div>
+    {{#if activeForms.length}}
+      <div class="mmrpg-header-row mmrpg-active-forms">
+        {{#each activeForms}}
+          <span class="mmrpg-chip active" title="{{kindLabel}}"><strong>{{name}}</strong></span>
+        {{/each}}
+      </div>
+    {{/if}}
   </div>
 </header>

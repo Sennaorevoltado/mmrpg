@@ -472,6 +472,11 @@ class BaseDocument {
     setProperty(this.flags, `${scope}.${key}`, value);
     return this;
   }
+  async unsetFlag(scope, key) {
+    const bag = this.flags?.[scope];
+    if (bag) delete bag[key];
+    return this;
+  }
 
   toObject() {
     return deepClone({ ...this._source, effects: this.effects.contents.map((e) => e._source) });
@@ -502,6 +507,9 @@ class BaseDocument {
   async _preCreate() {
     return true;
   }
+  async _preDelete() {
+    return true;
+  }
   async _onCreateDescendantDocuments() {}
 
   async createEmbeddedDocuments(name, dataArray, options = {}) {
@@ -528,12 +536,17 @@ class BaseDocument {
 
   async deleteEmbeddedDocuments(name, ids) {
     const coll = name === "ActiveEffect" ? this.effects : this.items;
-    for (const id of ids) coll.delete(id);
+    for (const id of ids) {
+      // Como no Foundry, o item pode se preparar para sair da ficha antes de ser removido.
+      if (name === "Item") await coll.get(id)?._preDelete({}, game.user);
+      coll.delete(id);
+    }
     this.prepareData();
     return ids;
   }
 
   async delete() {
+    await this._preDelete({}, game.user);
     this.parent?.items?.delete(this.id);
     this.parent?.prepareData?.();
     return this;
@@ -615,8 +628,10 @@ class Actor extends BaseDocument {
     game.actors.set(actor.id, actor);
     return actor;
   }
-  getActiveTokens() {
-    return [];
+  /** Tokens simulados na cena (os testes enchem esta lista). */
+  tokens = [];
+  getActiveTokens(linked = false, document = false) {
+    return document ? this.tokens : this.tokens.map((t) => ({ document: t }));
   }
   async toggleStatusEffect(statusId, { active } = {}) {
     const existing = this.effects.find((e) => e.statuses.has(statusId));

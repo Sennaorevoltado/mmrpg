@@ -425,6 +425,28 @@ class BaseDocument {
   async _preCreate() {
     return true;
   }
+  async _preDelete() {
+    return true;
+  }
+  updateSource(changes) {
+    const { system, ...rest } = expandObject(changes);
+    mergeObject(this, rest);
+    if (system) this.system.updateSource(system);
+    return changes;
+  }
+  async setFlag(scope, key, value) {
+    setProperty(this.flags, `${scope}.${key}`, deepClone(value));
+    return this;
+  }
+  async unsetFlag(scope, key) {
+    const parts = `${scope}.${key}`.split(".");
+    const holder = parts.slice(0, -1).reduce((obj, part) => obj?.[part], this.flags);
+    if (holder) delete holder[parts.at(-1)];
+    return this;
+  }
+  getActiveTokens() {
+    return this.tokens ?? [];
+  }
 
   prepareData() {
     this.system.reset();
@@ -447,7 +469,7 @@ class BaseDocument {
     });
   }
 
-  async createEmbeddedDocuments(name, dataArray) {
+  async createEmbeddedDocuments(name, dataArray, options = {}) {
     const created = [];
     for (const data of dataArray) {
       if (name === "ActiveEffect") {
@@ -456,6 +478,7 @@ class BaseDocument {
         created.push(effect);
       } else if (name === "Item") {
         const item = new CONFIG.Item.documentClass(deepClone(data), { parent: this });
+        await item._preCreate(deepClone(data), options, game.user.id);
         item.prepareData();
         this.items.set(item.id, item);
         created.push(item);
@@ -469,6 +492,7 @@ class BaseDocument {
 
   async deleteEmbeddedDocuments(name, ids) {
     const collection = name === "ActiveEffect" ? this.effects : this.items;
+    for (const id of ids) await collection.get(id)?._preDelete?.({}, game.user.id);
     for (const id of ids) collection.delete(id);
     this.prepareData();
     return ids;
@@ -477,7 +501,7 @@ class BaseDocument {
   async update(changes) {
     const expanded = expandObject(changes);
     const { system, ...rest } = expanded;
-    Object.assign(this, rest);
+    mergeObject(this, rest);
     if (system) this.system.updateSource(system);
     this.prepareData();
     return this;
@@ -562,6 +586,7 @@ class Item extends BaseDocument {
   }
   static async create(data, options = {}) {
     const item = new CONFIG.Item.documentClass(deepClone(data), options.parent ? { parent: options.parent } : {});
+    await item._preCreate(deepClone(data), options, game.user.id);
     if (options.parent) {
       options.parent.items.set(item.id, item);
       options.parent.prepareData();
@@ -640,6 +665,10 @@ class DocumentSheetV1 {
     };
   }
   activateListeners() {}
+  /** Dados do formulário: o teste põe em `sheet.__submit` o que o formulário enviaria. */
+  _getSubmitData(updateData = {}) {
+    return { ...structuredClone(this.__submit ?? {}), ...updateData };
+  }
 }
 
 class ActorSheet extends DocumentSheetV1 {
@@ -841,7 +870,15 @@ export function installFoundry({ lang = "pt-BR", generation = 14 } = {}) {
     release: { generation },
     system: { version: "test" },
     i18n,
-    settings: { get: () => "publicroll" },
+    settings: {
+      values: {},
+      get(scope, key) {
+        return key in this.values ? this.values[key] : "publicroll";
+      },
+      register(scope, key, data) {
+        this.values[key] = data.default;
+      },
+    },
     user: { id: "u1", isGM: true, targets: new Set() },
     actors: new Collection(),
     items: new Collection(),

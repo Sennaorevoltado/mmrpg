@@ -15,6 +15,7 @@ import Handlebars from "handlebars";
 import { MARVEL_MULTIVERSE } from "../module/config.mjs";
 import { TEMPLATE_PATHS } from "../module/helpers/templates.mjs";
 import { ITEM_TYPES } from "../module/helpers/importer.mjs";
+import { FORM_CHANGE_TYPES, FORM_KINDS, FORM_RANK_MODES } from "../module/helpers/forms.mjs";
 import { walk, collectLiteralKeys, collectConfigKeys, flatten } from "./lib/keys.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
@@ -146,6 +147,12 @@ for (const type of ITEM_TYPES) dynamic.add(`MARVEL_MULTIVERSE.Import.Folder.${ty
 for (const type of declared("Actor")) dynamic.add(`TYPES.Actor.${type}`);
 for (const type of declared("Item")) dynamic.add(`TYPES.Item.${type}`);
 for (const size of Object.keys(MARVEL_MULTIVERSE.sizes)) dynamic.add(`MARVEL_MULTIVERSE.SizeEffect.${size}`);
+for (const kind of FORM_KINDS) {
+  dynamic.add(`MARVEL_MULTIVERSE.Form.Kind.${kind}`);
+  dynamic.add(`MARVEL_MULTIVERSE.Form.KindPlural.${kind}`);
+}
+for (const mode of FORM_RANK_MODES) dynamic.add(`MARVEL_MULTIVERSE.Form.RankMode.${mode}`);
+for (const type of FORM_CHANGE_TYPES) dynamic.add(`MARVEL_MULTIVERSE.Form.ChangeType.${type}`);
 
 const literal = collectLiteralKeys(root);
 for (const [key, files] of literal) {

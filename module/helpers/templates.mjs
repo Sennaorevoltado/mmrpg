@@ -6,6 +6,7 @@ export const TEMPLATE_PATHS = [
   "actor/parts/actor-damage.hbs",
   "actor/parts/actor-details.hbs",
   "actor/parts/actor-effects.hbs",
+  "actor/parts/actor-forms.hbs",
   "actor/parts/actor-items.hbs",
   "actor/parts/actor-occupation.hbs",
   "actor/parts/actor-origin.hbs",

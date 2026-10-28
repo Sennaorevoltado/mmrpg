@@ -190,6 +190,8 @@
       "TabBiography": "Biography",
       "TabGear": "Gear",
       "TabEffects": "Effects",
+      "TabForms": "Forms",
+      "Forms": "Forms",
       "Powers": "Powers",
       "DefaultElement": "Default Element",
       "TraitsTags": "Traits & Tags",
@@ -242,8 +244,82 @@
         "origin": "Origins",
         "occupation": "Occupations",
         "weapon": "Weapons",
-        "item": "Gear"
+        "item": "Gear",
+        "form": "Forms"
       }
+    },
+    "Form": {
+      "Kind": {
+        "suit": "Armor",
+        "alternate": "Alternate form",
+        "transformation": "Transformation"
+      },
+      "KindPlural": {
+        "suit": "Armors",
+        "alternate": "Alternate forms",
+        "transformation": "Transformations"
+      },
+      "None": "No forms yet. Use + to create an armor, alternate form or transformation, or drag one from the Items directory.",
+      "Toggle": "Turn on/off",
+      "TurnOn": "Turn on",
+      "TurnOff": "Turn off",
+      "Active": "On",
+      "Borrowed": "Borrowed",
+      "RankSet": "Min. Rank {value}",
+      "RankAdd": "Rank {value}",
+      "AnnounceOn": "{actor} turns on {form} ({kind}).",
+      "AnnounceOff": "{actor} turns off {form} ({kind}).",
+      "AnnounceRank": "Rank {from} to {to}.",
+      "AnnounceGrants": "Gains:",
+      "AnnounceRemoved": "Loses:",
+      "SettingName": "Announce forms in chat",
+      "SettingHint": "Posts a message in the chat when a character turns an armor, alternate form or transformation on or off.",
+      "TabChanges": "Changes",
+      "TabGrants": "Grants",
+      "StatusOn": "This form is on.",
+      "StatusOff": "This form is off.",
+      "NotOwned": "Put this form on a character sheet to be able to turn it on.",
+      "KindLabel": "Category",
+      "RankLabel": "Rank while on",
+      "RankMode": {
+        "none": "Does not change",
+        "set": "At least",
+        "add": "Adds"
+      },
+      "BorrowedLong": "Borrowed: grants the items, but changes neither Rank nor values",
+      "CarryDamage": "Damage taken follows the body when maximum Health or Focus change",
+      "Portrait": "Portrait while on",
+      "Token": "Token image while on",
+      "Restrictions": "Restrictions",
+      "ChangesHint": "Values changed while the form is on. Pick a field from the list or type its path.",
+      "NoChanges": "No changes.",
+      "ChangeAdd": "Add change",
+      "ChangeRemove": "Remove change",
+      "ChangeKey": "Field",
+      "ChangeValue": "Value",
+      "ChangeType": {
+        "add": "Add",
+        "multiply": "Multiply",
+        "override": "Replace",
+        "upgrade": "At least",
+        "downgrade": "At most"
+      },
+      "Key": {
+        "healthMax": "Maximum Health",
+        "focusMax": "Maximum Focus",
+        "healthDamageReduction": "Health damage reduction",
+        "focusDamageReduction": "Focus damage reduction",
+        "run": "Run speed",
+        "init": "Initiative",
+        "abilityValue": "{ability}: score",
+        "abilityDefense": "{ability}: Defense"
+      },
+      "GrantsHint": "What the form gives while it is on. Drag powers, traits and tags from the Items directory here, or type a name (\"Name (note)\" adds a note).",
+      "GrantNone": "None.",
+      "GrantPlaceholder": "Name or Name (note)",
+      "GrantAdd": "Add",
+      "GrantRemove": "Remove",
+      "DropIgnored": "Only powers, traits and tags can be dropped here."
     },
     "Item": {
       "Name": "Name",
@@ -283,6 +359,7 @@
       "TabOrigin": "Origin",
       "TabOccupation": "Occupation",
       "TabItem": "Item",
+      "TabForm": "Form",
       "Grants": {
         "traits": "Grants traits",
         "tags": "Grants tags",
@@ -309,7 +386,8 @@
       "tag": "Tag",
       "origin": "Origin",
       "occupation": "Occupation",
-      "power": "Power"
+      "power": "Power",
+      "form": "Form"
     }
   }
 }

@@ -109,6 +109,38 @@ test("importar duas vezes não duplica itens nem pastas", async () => {
   assert.equal(game.folders.size, folders);
 });
 
+test("formas (armaduras, formas alternativas, transformações) entram na pasta Formas, com o que concedem", async () => {
+  reset();
+  const form = {
+    type: "form",
+    name: "Armadura de Teste",
+    folder: "Armaduras de Batalha/Perfil do Tony",
+    system: {
+      kind: "suit",
+      rank: { mode: "set", value: 4 },
+      changes: [{ key: "system.health.max", type: "add", value: "20", priority: null }],
+      powers: [{ name: "Flight 2" }, { name: "Elemental Blast", note: "Energy" }],
+      traits: [{ name: "Tech Reliance" }],
+      tags: [{ name: "Extreme Appearance", note: "Flashy" }],
+    },
+  };
+  assert.ok(ITEM_TYPES.includes("form"));
+  const parsed = parseContent(pack([form]));
+  assert.equal(parsed.skipped, 0);
+  assert.deepEqual(await importItems(parsed.items), { created: 1, skipped: 0 });
+
+  const item = game.items.find((i) => i.name === "Armadura de Teste");
+  assert.equal(item.type, "form");
+  assert.equal(item.system.kind, "suit");
+  assert.equal(item.system.active, false);
+  assert.deepEqual(item.system.rank.toObject?.() ?? item.system.rank, { mode: "set", value: 4 });
+  assert.equal(item.system.powers.length, 2);
+  assert.equal(item.folder.name, "Perfil do Tony");
+  assert.equal(item.folder.folder.name, "Armaduras de Batalha");
+  assert.equal(item.folder.folder.folder.name, "Formas");
+  assert.equal(item.folder.folder.folder.folder.name, "Conteúdo MMRPG");
+});
+
 test("o fluxo completo pergunta antes, importa e avisa o resultado", async () => {
   reset();
   const result = await importContent({ file: file(pack(mini), "meu-grupo.json") });
@@ -295,6 +327,20 @@ test("o conteúdo privado do grupo é aceito pelo sistema", { skip: !hasReal && 
   }
   assert.deepEqual(missing, [], "concessões sem item correspondente");
 
+  // Formas: o que concedem existe no arquivo, salvo itens que o resumo do grupo não traz.
+  const KNOWN_ABSENT = new Set(["power:Salvation", "power:Summonable", "power:Mysterium", "power:Iconic Item", "power:Warp Portal", "trait:Symbiotic Spider-Blinder"]);
+  const forms = parsed.items.filter((i) => i.type === "form");
+  assert.ok(forms.length > 0, "o arquivo tem formas");
+  const absent = new Set();
+  for (const entry of forms) {
+    for (const [field, type] of [["tags", "tag"], ["traits", "trait"], ["powers", "power"]]) {
+      for (const grant of entry.system[field] ?? []) {
+        if (!have.has(`${type}:${grant.name}`) && !KNOWN_ABSENT.has(`${type}:${grant.name}`)) absent.add(`${entry.name} -> ${type}:${grant.name}`);
+      }
+    }
+  }
+  assert.deepEqual([...absent], [], "formas concedem itens que não existem no arquivo");
+
   // Nomes não se repetem dentro do mesmo tipo.
   const seen = new Set();
   for (const i of parsed.items) {
@@ -307,6 +353,30 @@ test("o conteúdo privado do grupo é aceito pelo sistema", { skip: !hasReal && 
   const result = await importItems(parsed.items);
   assert.equal(result.created, parsed.items.length);
   assert.equal(game.items.size, parsed.items.length);
+
+  // Cada forma liga e desliga numa ficha sem erro, e desligar devolve o personagem ao que era.
+  const hero = sampleCharacter();
+  const formKinds = new Set();
+  for (const entry of forms) {
+    const [form] = await hero.createEmbeddedDocuments("Item", [{ name: entry.name, type: "form", system: structuredClone(entry.system) }]);
+    formKinds.add(form.system.kind);
+    assert.ok(["suit", "alternate", "transformation"].includes(form.system.kind), `${entry.name}: categoria ${form.system.kind}`);
+    assert.ok(["none", "set", "add"].includes(form.system.rank.mode), `${entry.name}: Rank ${form.system.rank.mode}`);
+
+    const rankBefore = hero.system.attributes.rank.value;
+    assert.equal(await hero.setFormActive(form, true, { announce: false }), true, entry.name);
+    assert.equal(form.system.active, true);
+    if (form.system.rank.mode === "set") assert.ok(hero.system.attributes.rank.value >= form.system.rank.value, `${entry.name}: Rank`);
+    if (form.system.rank.mode === "add") assert.equal(hero.system.attributes.rank.value, rankBefore + form.system.rank.value, `${entry.name}: Rank somado`);
+    for (const change of form.system.changes) assert.notEqual(foundry.utils.getProperty(hero, change.key), undefined, `${entry.name}: ${change.key}`);
+
+    await hero.setFormActive(form, false, { announce: false });
+    assert.equal(hero.system.attributes.rank.value, rankBefore, `${entry.name}: Rank volta`);
+    assert.equal(hero.effects.size, 0, `${entry.name}: efeito sai`);
+    assert.deepEqual([...new Set(hero.items.map((i) => i.type))], ["form"], `${entry.name}: concessões saem`);
+    await hero.deleteEmbeddedDocuments("Item", [form.id]);
+  }
+  assert.deepEqual([...formKinds].sort(), ["alternate", "suit", "transformation"], "as três categorias aparecem no conteúdo");
 
   // Soltar uma origem com concessões numa ficha cria tudo com o texto do conteúdo importado.
   const vampire = game.items.find((i) => i.type === "origin" && i.name === "Monstrous: Vampire");

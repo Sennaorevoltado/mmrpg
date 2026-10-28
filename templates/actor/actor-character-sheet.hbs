@@ -133,9 +133,10 @@
   </header>
 
   {{!-- Abas --}}
-  <nav class="sheet-tabs tabs mm-tabs -four" data-group="primary">
+  <nav class="sheet-tabs tabs mm-tabs -five" data-group="primary">
     <div class="sheet-tabs-wrapper">
       <a class="item" data-tab="abilities">{{localize "MARVEL_MULTIVERSE.Sheet.TabPowers"}}</a>
+      <a class="item" data-tab="forms">{{localize "MARVEL_MULTIVERSE.Sheet.TabForms"}}</a>
       <a class="item" data-tab="biography">{{localize "MARVEL_MULTIVERSE.Sheet.TabBiography"}}</a>
       <a class="item" data-tab="gear">{{localize "MARVEL_MULTIVERSE.Sheet.TabGear"}}</a>
       <a class="item" data-tab="effects">{{localize "MARVEL_MULTIVERSE.Sheet.TabEffects"}}</a>
@@ -167,6 +168,16 @@
             {{> "systems/mmrpg/templates/actor/parts/actor-traits.hbs"}}
             {{> "systems/mmrpg/templates/actor/parts/actor-tags.hbs"}}
           </div>
+        </div>
+      </div>
+    </div>
+
+    {{!-- Formas: armaduras, formas alternativas e transformações --}}
+    <div class="tab forms" data-group="primary" data-tab="forms">
+      <div class="mm-styled-container mm-forms-block">
+        <h3>{{localize "MARVEL_MULTIVERSE.Sheet.Forms"}}</h3>
+        <div class="mm-styled-container-body">
+          {{> "systems/mmrpg/templates/actor/parts/actor-forms.hbs"}}
         </div>
       </div>
     </div>

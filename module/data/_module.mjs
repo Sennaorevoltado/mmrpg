@@ -12,3 +12,4 @@ export {default as MarvelMultiverseOrigin} from "./origin.mjs";
 export {default as MarvelMultiverseTag} from "./tag.mjs";
 export {default as MarvelMultiverseTrait} from "./trait.mjs";
 export {default as MarvelMultiversePower} from "./power.mjs";
+export {default as MarvelMultiverseForm} from "./form.mjs";

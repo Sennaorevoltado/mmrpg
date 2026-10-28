@@ -1,6 +1,6 @@
 # Marvel Multiverse RPG (não oficial) para Foundry VTT, em português do Brasil
 
-Sistema de fãs para jogar **Marvel Multiverse RPG** no [Foundry VTT](https://foundryvtt.com), com ficha de personagem e de NPC, itens (poderes, traços, tags, origens, ocupações, armas e equipamentos) e a rolagem **d616**, tudo em português do Brasil. Também tem a interface em inglês.
+Sistema de fãs para jogar **Marvel Multiverse RPG** no [Foundry VTT](https://foundryvtt.com), com ficha de personagem e de NPC, itens (poderes, traços, tags, origens, ocupações, armas, equipamentos e **formas**: armaduras, formas alternativas e transformações) e a rolagem **d616**, tudo em português do Brasil. Também tem a interface em inglês.
 
 É uma adaptação, em português e para o Foundry v13 e v14, do sistema de [mjording / Rollbones Projects](https://github.com/mjording/marvel-multiverse) (licença MIT). Veja [NOTICE](NOTICE) e [LICENSE](LICENSE).
 
@@ -21,7 +21,7 @@ Compatível com Foundry **v13 e v14**. As fichas usam a API de janelas antiga do
 - **Atributos** Corpo a Corpo, Agilidade, Resiliência, Vigilância, Ego e Lógica, com a Defesa (10 + valor) e o bônus de teste fora de combate calculados.
 - **Rank, Karma, Saúde e Foco**, redução de dano de cada recurso, velocidade (corrida, escalada, natação, salto, voo etc.), iniciativa (Vigilância) e manobra de equipe.
 - **Multiplicador de dano** de cada atributo de ataque (igual ao Rank).
-- Abas de **Poderes** (agrupados por conjunto), **Traços e tags**, **Biografia**, **Equipamento** e **Efeitos**.
+- Abas de **Poderes** (agrupados por conjunto), **Formas**, **Biografia**, **Equipamento** e **Efeitos**; traços e tags ficam ao lado dos poderes.
 - **Tamanho**: ao escolher o tamanho, a ficha cria o Efeito Ativo correspondente (Defesa, alcance, movimento, token).
 - **Origem e Ocupação**: ao arrastar uma para a ficha, ela cria os traços, tags e poderes que concede.
 - Clique no nome de um atributo para rolar o teste; clique em um poder, arma ou equipamento para mostrar o cartão no chat e, se o item tem um atributo de ataque, rolar.
@@ -35,6 +35,23 @@ A rolagem é `{1d6, 1dm, 1d6} + atributo`: o dado do meio é o **dado Marvel** (
 - **Dano**: calcula `dado Marvel x (multiplicador - redução de dano do alvo) + atributo`, em dobro no Fantástico. Se houver alvos marcados (tecla T), mostra um resultado por alvo. O sistema mostra o número no chat; **não tira Saúde automaticamente**.
 
 Saúde e Foco máximos são campos que você preenche na ficha.
+
+### Formas: armaduras, formas alternativas e transformações
+
+Na aba **Formas** da ficha (e num bloco da ficha de NPC) ficam as formas do personagem, em três listas: **Armaduras**, **Formas alternativas** e **Transformações**. O botão **+** de cada lista cria uma forma da categoria; você também pode arrastar uma do diretório de Itens.
+
+- **Ligar e desligar:** o ícone de liga/desliga da linha (ou clicar no nome, ou usar a forma pela barra de macros). Só uma forma de cada categoria fica ligada: ligar outra armadura desliga a anterior; uma armadura e uma transformação podem estar ligadas juntas. A forma ligada fica destacada, com o selo "Ligada".
+- **Ao ligar,** o sistema aplica um Efeito Ativo na ficha com as alterações da forma e cria os poderes, traços e tags que ela concede (marcados como "da forma"). **Ao desligar,** tira o efeito e só esses itens (o que o personagem já tinha continua). Itens repetidos em duas formas ligadas não são duplicados.
+- **Ficha da forma** (editar o item), em três abas:
+  - *Forma:* categoria, **Rank** (não altera, **pelo menos** X, ou **soma** X), **Emprestada** (concede os itens, mas não muda Rank nem valores), se o dano sofrido acompanha o corpo quando a Saúde ou o Foco máximos mudam, retrato e imagem de token para usar enquanto a forma estiver ligada, restrições e descrição.
+  - *Alterações:* mudanças em valores da ficha (por exemplo Saúde máxima, atributos, redução de dano, velocidade), cada uma com o campo, o tipo (somar, multiplicar, substituir, pelo menos, no máximo) e o valor.
+  - *Concessões:* poderes, traços e tags. Arraste itens do diretório para a aba ou digite o nome (`Nome (nota)` põe uma nota; num poder elemental a nota pode ser o elemento).
+- **Saúde e Foco:** se a forma muda o máximo, o dano sofrido acompanha (40 de 50 de Saúde, uma armadura de +20, vira 60 de 70; ao desligar, volta a 40 de 50).
+- **Imagens:** ao ligar, troca o retrato e a imagem do token (inclusive de tokens já na cena); ao desligar, devolve as originais.
+- **Chat:** cada troca de forma mostra um aviso com o Rank antes e depois e o que foi ganho ou perdido. O Narrador pode desligar o aviso em Configurações do Jogo (opção "Avisar formas no chat").
+- Forma copiada, arrastada para outra ficha ou importada **sempre chega desligada**. Apagar uma forma ligada desliga antes. Editar uma forma ligada refaz o efeito e as concessões.
+
+A forma **não** muda a rolagem sozinha: ela muda os números da ficha (Rank, atributos etc.), e as rolagens usam esses números.
 
 ## Conteúdo (poderes, traços, origens...)
 
@@ -60,9 +77,11 @@ Formato do arquivo (`format` e `items` são obrigatórios; `system` usa os mesmo
 }
 ```
 
-Tipos aceitos: `power`, `trait`, `tag`, `origin`, `occupation`, `weapon` e `item`. O conjunto de um poder (`powerSet`) é gravado com o nome em inglês (`Basic`, `Elemental Control`, `Healing`, `Illusion`, `Luck`, `Magic`, `Martial Arts`, `Melee Weapons`, `Narrative`, `Omniversal Travel`, `Phasing`, `Plasticity`, `Power Control`, `Ranged Weapons`, `Resize`, `Shield Bearer`, `Sixth Sense`, `Spider-Powers`, `Super-Speed`, `Super-Strength`, `Tactics`, `Telekinesis`, `Telepathy`, `Teleportation`, `Translation`, `Weather Control`); a ficha mostra o nome em português.
+Tipos aceitos: `power`, `trait`, `tag`, `origin`, `occupation`, `weapon`, `item` e `form`. O conjunto de um poder (`powerSet`) é gravado com o nome em inglês (`Basic`, `Elemental Control`, `Healing`, `Illusion`, `Luck`, `Magic`, `Martial Arts`, `Melee Weapons`, `Narrative`, `Omniversal Travel`, `Phasing`, `Plasticity`, `Power Control`, `Ranged Weapons`, `Resize`, `Shield Bearer`, `Sixth Sense`, `Spider-Powers`, `Super-Speed`, `Super-Strength`, `Tactics`, `Telekinesis`, `Telepathy`, `Teleportation`, `Translation`, `Weather Control`); a ficha mostra o nome em português.
 
 Origens e ocupações listam o que concedem em `tags`, `traits` e (origens) `powers`, por nome (com `note` opcional, por exemplo `{ "name": "Connections", "note": "Criminal" }` cria "Connections (Criminal)"). Se existir um item de mesmo nome e tipo no mundo, a ficha copia os dados dele.
+
+Uma forma (`form`) traz em `system`: `kind` (`suit`, `alternate` ou `transformation`), `rank` (`{ "mode": "none|set|add", "value": 4 }`), `changes` (lista de `{ "key": "system.health.max", "type": "add", "value": "20" }`) e as listas `powers`, `traits` e `tags` do que concede, no mesmo formato das origens.
 
 Quem não for o Narrador não vê o botão. O arquivo é só uma lista de dados: nada nele é executado.
 

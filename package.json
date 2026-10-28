@@ -1,6 +1,6 @@
 {
   "name": "mmrpg",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Marvel Multiverse RPG (não oficial) para Foundry VTT, em português do Brasil. Baseado no sistema de mjording / Rollbones Projects (MIT).",
   "type": "module",
   "private": true,

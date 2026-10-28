@@ -33,6 +33,7 @@ export async function loadSystem(options = {}) {
     occupation: models.MarvelMultiverseOccupation,
     tag: models.MarvelMultiverseTag,
     power: models.MarvelMultiversePower,
+    form: models.MarvelMultiverseForm,
   };
 
   await preloadHandlebarsTemplates();

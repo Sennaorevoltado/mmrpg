@@ -1,7 +1,7 @@
 {
   "id": "mmrpg",
   "title": "Marvel Multiverse RPG (não oficial)",
-  "description": "Sistema não oficial e em português do Brasil de Marvel Multiverse RPG para Foundry VTT. Ficha completa de personagem e NPC, poderes, traits, tags, origens, ocupações, armas, itens e rolagem d616. Não inclui conteúdo dos livros.",
+  "description": "Sistema não oficial e em português do Brasil de Marvel Multiverse RPG para Foundry VTT. Ficha completa de personagem e NPC, poderes, traits, tags, origens, ocupações, armas, itens, formas (armaduras, formas alternativas e transformações) e rolagem d616. Não inclui conteúdo dos livros.",
   "authors": [
     {
       "name": "Comunidade (base: mjording / Rollbones Projects)"
@@ -10,7 +10,7 @@
   "url": "https://github.com/Sennaorevoltado/mmrpg",
   "license": "LICENSE",
   "readme": "README.md",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "compatibility": {
     "minimum": "13",
     "verified": "13"
@@ -45,7 +45,8 @@
       "tag": {},
       "origin": {},
       "occupation": {},
-      "power": {}
+      "power": {},
+      "form": {}
     }
   },
   "socket": true,

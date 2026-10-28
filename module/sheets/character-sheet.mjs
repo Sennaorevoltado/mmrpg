@@ -1,5 +1,7 @@
 import { onManageActiveEffect, prepareActiveEffectCategories } from "../helpers/effects.mjs";
 import { legacySheets, rootOf } from "../helpers/compat.mjs";
+import { FORM_KINDS, toInt } from "../helpers/forms.mjs";
+import { grantItemData } from "../helpers/grants.mjs";
 
 const { ActorSheet } = legacySheets();
 
@@ -98,6 +100,7 @@ export class MarvelMultiverseCharacterSheet extends ActorSheet {
     const weapons = [];
     const traits = [];
     const tags = [];
+    const forms = new Map(FORM_KINDS.map((kind) => [kind, []]));
     const groups = new Map(Object.values(cfg.powersets).map((set) => [set.label, { label: set.label, name: localize(set.name), items: [] }]));
 
     for (const i of context.items) {
@@ -121,6 +124,12 @@ export class MarvelMultiverseCharacterSheet extends ActorSheet {
         case "tag":
           tags.push(i);
           break;
+        case "form": {
+          const kind = forms.has(i.system.kind) ? i.system.kind : "suit";
+          i.summary = this._formSummary(i.system);
+          forms.get(kind).push(i);
+          break;
+        }
         case "power": {
           const label = powerSetOf(i);
           if (!groups.has(label)) groups.set(label, { label, name: label, items: [] });
@@ -137,6 +146,30 @@ export class MarvelMultiverseCharacterSheet extends ActorSheet {
     context.traits = traits;
     context.tags = tags;
     context.powerGroups = [...groups.values()].filter((g) => g.items.length);
+    context.formGroups = FORM_KINDS.map((kind) => ({
+      kind,
+      label: localize(`MARVEL_MULTIVERSE.Form.KindPlural.${kind}`),
+      items: forms.get(kind),
+    }));
+    context.hasForms = context.formGroups.some((g) => g.items.length);
+  }
+
+  /**
+   * Resumo de uma linha da forma: o que ela faz com o Rank e se é emprestada.
+   * @param {object} system
+   * @returns {string}
+   * @protected
+   */
+  _formSummary(system) {
+    const parts = [];
+    const value = toInt(system.rank?.value);
+    if (system.rank?.mode === "set" && value > 0) {
+      parts.push(game.i18n.format("MARVEL_MULTIVERSE.Form.RankSet", { value }));
+    } else if (system.rank?.mode === "add" && value !== 0) {
+      parts.push(game.i18n.format("MARVEL_MULTIVERSE.Form.RankAdd", { value: value > 0 ? `+${value}` : String(value) }));
+    }
+    if (system.borrowed) parts.push(localize("MARVEL_MULTIVERSE.Form.Borrowed"));
+    return parts.join(", ");
   }
 
   /* -------------------------------------------- */
@@ -173,7 +206,12 @@ export class MarvelMultiverseCharacterSheet extends ActorSheet {
     const pick = (selector) => target.closest?.(selector);
 
     let el;
-    if ((el = pick(".item-edit"))) {
+    if ((el = pick(".form-toggle"))) {
+      event.preventDefault();
+      const id = el.closest(".item")?.dataset.itemId;
+      const form = id ? this.actor.items.get(id) : null;
+      if (form) this.actor.setFormActive(form, !form.system.active);
+    } else if ((el = pick(".item-edit"))) {
       event.preventDefault();
       const id = el.closest(".item")?.dataset.itemId;
       this.actor.items.get(id)?.sheet.render(true);
@@ -249,36 +287,13 @@ export class MarvelMultiverseCharacterSheet extends ActorSheet {
    * @protected
    */
   async _grantItems(entries = [], type) {
-    const have = new Set(this.actor.items.map((i) => `${i.type}:${i.name}`));
+    const have = new Set(this.actor.items.map((i) => `${i.type}:${i.name.toLowerCase()}`));
     const toCreate = [];
 
-    for (const raw of entries) {
-      const entry = typeof raw === "string" ? { name: raw } : raw;
-      if (!entry?.name) continue;
-
-      const wanted = String(entry.name).toLowerCase();
-      const world = game.items.find((i) => i.type === type && i.name.toLowerCase() === wanted);
-      const source = entry.system && Object.keys(entry.system).length
-        ? { name: entry.name, img: entry.img, system: entry.system }
-        : world
-          ? world.toObject()
-          : { name: entry.name };
-
-      const data = foundry.utils.deepClone(source);
-      delete data._id;
-      delete data.folder;
-      delete data.ownership;
-      data.type = type;
-      data.system ??= {};
-
-      // Nota da concessão ("Connections" + "Criminal"): fica no nome, "Connections (Criminal)".
-      if (entry.note) data.name = `${data.name} (${entry.note})`;
-
-      if (type === "power" && !data.system.element && this.actor.system.defaultElement) {
-        data.system.element = this.actor.system.defaultElement;
-      }
-
-      const key = `${type}:${data.name}`;
+    for (const entry of entries) {
+      const data = grantItemData(entry, type, { defaultElement: this.actor.system.defaultElement });
+      if (!data) continue;
+      const key = `${type}:${data.name.toLowerCase()}`;
       if (have.has(key) && !data.system.multiple) continue;
       have.add(key);
       toCreate.push(data);

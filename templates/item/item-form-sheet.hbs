@@ -1,0 +1,146 @@
+<form class="{{cssClass}}" autocomplete="off">
+  <header class="sheet-header">
+    <div class="mm-styled-field -lg -img">
+      <img class="profile-img" src="{{item.img}}" data-edit="img" title="{{item.name}}" />
+      <div class="mm-styled-input">
+        <input name="name" type="text" value="{{item.name}}" placeholder="{{localize 'MARVEL_MULTIVERSE.Item.Name'}}"/>
+      </div>
+    </div>
+  </header>
+
+  <nav class="sheet-tabs tabs mm-tabs -three" data-group="primary">
+    <a class="item" data-tab="attributes">{{localize "MARVEL_MULTIVERSE.Item.TabForm"}}</a>
+    <a class="item" data-tab="changes">{{localize "MARVEL_MULTIVERSE.Form.TabChanges"}}</a>
+    <a class="item" data-tab="grants">{{localize "MARVEL_MULTIVERSE.Form.TabGrants"}}</a>
+  </nav>
+
+  <section class="sheet-body">
+    {{!-- A forma: categoria, Rank, imagens e descrição --}}
+    <div class="tab flexcol -gap-sm" data-group="primary" data-tab="attributes">
+      <div class="mm-form-status{{#if formActive}} -active{{/if}}">
+        {{#if formOwned}}
+          <span>{{#if formActive}}{{localize "MARVEL_MULTIVERSE.Form.StatusOn"}}{{else}}{{localize "MARVEL_MULTIVERSE.Form.StatusOff"}}{{/if}}</span>
+          <button type="button" class="form-item-toggle">
+            <i class="fas {{#if formActive}}fa-toggle-on{{else}}fa-toggle-off{{/if}}"></i>
+            {{#if formActive}}{{localize "MARVEL_MULTIVERSE.Form.TurnOff"}}{{else}}{{localize "MARVEL_MULTIVERSE.Form.TurnOn"}}{{/if}}
+          </button>
+        {{else}}
+          <span>{{localize "MARVEL_MULTIVERSE.Form.NotOwned"}}</span>
+        {{/if}}
+      </div>
+      <div class="mm-styled-field -fill">
+        <label class="mm-styled-label -align-left"><span>{{localize "MARVEL_MULTIVERSE.Form.KindLabel"}}</span></label>
+        <div class="mm-styled-input">
+          <select name="system.kind">
+            {{selectOptions formKinds selected=system.kind}}
+          </select>
+        </div>
+      </div>
+      <div class="mm-styled-field -fill">
+        <label class="mm-styled-label -align-left"><span>{{localize "MARVEL_MULTIVERSE.Form.RankLabel"}}</span></label>
+        <div class="mm-styled-input mm-rank-fields">
+          <select name="system.rank.mode">
+            {{selectOptions rankModes selected=system.rank.mode}}
+          </select>
+          <input type="number" name="system.rank.value" value="{{system.rank.value}}" data-dtype="Number"/>
+        </div>
+      </div>
+      <div class="mm-styled-field -fill">
+        <label class="mm-styled-label -align-left" for="system.borrowed"><span>{{localize "MARVEL_MULTIVERSE.Form.BorrowedLong"}}</span></label>
+        <div class="mm-styled-input">
+          <input type="checkbox" id="system.borrowed" name="system.borrowed" {{checked system.borrowed}}/>
+        </div>
+      </div>
+      <div class="mm-styled-field -fill">
+        <label class="mm-styled-label -align-left" for="system.carryDamage"><span>{{localize "MARVEL_MULTIVERSE.Form.CarryDamage"}}</span></label>
+        <div class="mm-styled-input">
+          <input type="checkbox" id="system.carryDamage" name="system.carryDamage" {{checked system.carryDamage}}/>
+        </div>
+      </div>
+      <div class="mm-styled-field -fill">
+        <label class="mm-styled-label -align-left"><span>{{localize "MARVEL_MULTIVERSE.Form.Portrait"}}</span></label>
+        <div class="mm-styled-input">
+          <file-picker type="image" name="system.portrait" value="{{system.portrait}}"></file-picker>
+        </div>
+      </div>
+      <div class="mm-styled-field -fill">
+        <label class="mm-styled-label -align-left"><span>{{localize "MARVEL_MULTIVERSE.Form.Token"}}</span></label>
+        <div class="mm-styled-input">
+          <file-picker type="image" name="system.token" value="{{system.token}}"></file-picker>
+        </div>
+      </div>
+      <div class="mm-styled-field -fill">
+        <label class="mm-styled-label -align-left"><span>{{localize "MARVEL_MULTIVERSE.Form.Restrictions"}}</span></label>
+        <div class="mm-styled-input">
+          <input type="text" name="system.restrictions" value="{{system.restrictions}}" data-dtype="String"/>
+        </div>
+      </div>
+      <div class="mm-styled-field -fill">
+        <label class="mm-styled-label -align-left"><span>{{localize "MARVEL_MULTIVERSE.Item.Description"}}</span></label>
+        <div class="mm-styled-input">
+          {{editor system.description target="system.description" button=false engine="prosemirror" collaborate=false editable=editable}}
+        </div>
+      </div>
+    </div>
+
+    {{!-- Alterações de valores enquanto a forma está ligada --}}
+    <div class="tab flexcol -gap-sm" data-group="primary" data-tab="changes">
+      <p class="mm-hint">{{localize "MARVEL_MULTIVERSE.Form.ChangesHint"}}</p>
+      <datalist id="mm-change-keys">
+        {{#each changeKeyOptions as |option|}}
+          <option value="{{option.key}}">{{option.label}}</option>
+        {{/each}}
+      </datalist>
+      {{#unless changeRows.length}}
+        <p class="mm-empty">{{localize "MARVEL_MULTIVERSE.Form.NoChanges"}}</p>
+      {{/unless}}
+      <ol class="mm-change-list">
+        {{#each changeRows as |row|}}
+          <li class="mm-change-row">
+            <input type="text" name="system.changes.{{row.index}}.key" value="{{row.key}}" list="mm-change-keys" placeholder="{{localize 'MARVEL_MULTIVERSE.Form.ChangeKey'}}"/>
+            <select name="system.changes.{{row.index}}.type">
+              {{selectOptions @root.changeTypes selected=row.type}}
+            </select>
+            <input type="text" name="system.changes.{{row.index}}.value" value="{{row.value}}" placeholder="{{localize 'MARVEL_MULTIVERSE.Form.ChangeValue'}}"/>
+            <input type="hidden" name="system.changes.{{row.index}}.priority" value="{{row.priority}}"/>
+            <a class="item-control change-remove" data-index="{{row.index}}" title="{{localize 'MARVEL_MULTIVERSE.Form.ChangeRemove'}}">
+              <i class="fas fa-trash"></i>
+            </a>
+          </li>
+        {{/each}}
+      </ol>
+      <button type="button" class="change-add">
+        <i class="fas fa-plus"></i> {{localize "MARVEL_MULTIVERSE.Form.ChangeAdd"}}
+      </button>
+    </div>
+
+    {{!-- Poderes, traços e tags que a forma concede enquanto ligada --}}
+    <div class="tab flexcol -gap-sm mm-grant-drop" data-group="primary" data-tab="grants">
+      <p class="mm-hint">{{localize "MARVEL_MULTIVERSE.Form.GrantsHint"}}</p>
+      {{#each grantSections as |section|}}
+        <div class="mm-grant-section" data-grant-field="{{section.field}}">
+          <h4>{{section.label}}</h4>
+          {{#unless section.entries.length}}
+            <p class="mm-empty">{{localize "MARVEL_MULTIVERSE.Form.GrantNone"}}</p>
+          {{/unless}}
+          <ul class="mm-grant-chips">
+            {{#each section.entries as |entry|}}
+              <li class="mm-chip">
+                <span>{{entry.label}}</span>
+                <a class="grant-remove" data-field="{{section.field}}" data-index="{{entry.index}}" title="{{localize 'MARVEL_MULTIVERSE.Form.GrantRemove'}}">
+                  <i class="fas fa-times"></i>
+                </a>
+              </li>
+            {{/each}}
+          </ul>
+          <div class="mm-grant-add">
+            <input type="text" data-grant-input="{{section.field}}" placeholder="{{localize 'MARVEL_MULTIVERSE.Form.GrantPlaceholder'}}"/>
+            <button type="button" class="grant-add" data-field="{{section.field}}">
+              <i class="fas fa-plus"></i> {{localize "MARVEL_MULTIVERSE.Form.GrantAdd"}}
+            </button>
+          </div>
+        </div>
+      {{/each}}
+    </div>
+  </section>
+</form>

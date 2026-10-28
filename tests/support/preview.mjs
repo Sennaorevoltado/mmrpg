@@ -9,7 +9,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { loadSystem } from "./load-system.mjs";
-import { renderTemplate, ROOT } from "./foundry-stub.mjs";
+import { renderTemplate, ROOT, ChatMessage } from "./foundry-stub.mjs";
 
 const out = path.resolve(process.argv[2] ?? "preview");
 const hostile = process.argv.includes("--hostile");
@@ -65,6 +65,28 @@ const hero = new CONFIG.Actor.documentClass({
     { name: "Comunicador", type: "item" },
     { name: "Mutação", type: "origin" },
     { name: "Estudante", type: "occupation" },
+    {
+      name: "Armadura Mark III",
+      type: "form",
+      system: {
+        kind: "suit",
+        active: true,
+        activatedAt: 1,
+        rank: { mode: "set", value: 5 },
+        restrictions: "Precisa de energia no reator",
+        changes: [
+          { key: "system.health.max", type: "add", value: "20" },
+          { key: "system.abilities.res.value", type: "upgrade", value: "6" },
+        ],
+        powers: [{ name: "Flight 2" }, { name: "Elemental Blast", note: "Energy" }, { name: "Sturdy 1" }],
+        traits: [{ name: "Tech Reliance" }],
+        tags: [{ name: "Extreme Appearance", note: "Flashy" }],
+        description: "<p>A armadura de combate do herói.</p>",
+      },
+    },
+    { name: "Armadura Hulkbuster", type: "form", system: { kind: "suit", rank: { mode: "set", value: 6 }, borrowed: true } },
+    { name: "Forma Bestial", type: "form", system: { kind: "alternate", rank: { mode: "add", value: 1 } } },
+    { name: "Simbionte", type: "form", system: { kind: "transformation", rank: { mode: "add", value: 2 } } },
   ],
 });
 
@@ -99,11 +121,15 @@ const fontFaces = [
 const core = hostile ? fs.readFileSync(new URL("./preview-core.css", import.meta.url), "utf8") : "";
 
 /** Na prévia os caminhos `systems/mmrpg/...` apontam para a pasta do projeto. */
-const withLocalPaths = (html) => html.replaceAll('src="systems/mmrpg/', `src="file://${ROOT}/`);
+const withLocalPaths = (html) =>
+  html
+    .replaceAll('src="systems/mmrpg/', `src="file://${ROOT}/`)
+    // O <file-picker> é do Foundry (campo de texto com botão de procurar): aqui vira um campo simples.
+    .replace(/<file-picker[^>]*name="([^"]+)"[^>]*value="([^"]*)"[^>]*><\/file-picker>/g, '<input type="text" name="$1" value="$2"/>');
 
 /** Ícones do Font Awesome (que o Foundry traz) trocados por símbolos simples. */
 const iconCss = `.fas::before{font-style:normal;font-family:Arial,sans-serif;font-weight:bold}
-.fa-plus::before{content:"+"}.fa-edit::before{content:"\\270E"}.fa-trash::before{content:"\\2715"}.fa-times::before{content:"\\2715"}.fa-check::before{content:"\\2713"}`;
+.fa-toggle-on::before{content:"\\25CF"}.fa-toggle-off::before{content:"\\25CB"}.fa-plus::before{content:"+"}.fa-edit::before{content:"\\270E"}.fa-trash::before{content:"\\2715"}.fa-times::before{content:"\\2715"}.fa-check::before{content:"\\2713"}`;
 
 /** Envolve o formulário da ficha na "janela" do Foundry. */
 function windowHtml({ title, classes, width, height, body, tab }) {
@@ -147,6 +173,7 @@ await sheetPage("personagem-poderes", MarvelMultiverseCharacterSheet, hero, { ta
 await sheetPage("personagem-biografia", MarvelMultiverseCharacterSheet, hero, { tab: "biography" });
 await sheetPage("personagem-equipamento", MarvelMultiverseCharacterSheet, hero, { tab: "gear" });
 await sheetPage("personagem-efeitos", MarvelMultiverseCharacterSheet, hero, { tab: "effects" });
+await sheetPage("personagem-formas", MarvelMultiverseCharacterSheet, hero, { tab: "forms" });
 await sheetPage("npc", MarvelMultiverseNPCSheet, npc);
 
 const items = {
@@ -160,6 +187,14 @@ const items = {
   }),
 };
 for (const [name, item] of Object.entries(items)) await sheetPage(name, MarvelMultiverseItemSheet, item, { title: item.name });
+
+// Ficha da forma (a armadura ligada que está na ficha do herói), uma página por aba.
+const suit = hero.items.find((i) => i.name === "Armadura Mark III");
+for (const tab of ["attributes", "changes", "grants"]) {
+  await sheetPage(`item-forma-${tab}`, MarvelMultiverseItemSheet, suit, { tab, title: suit.name });
+}
+const looseSuit = new CONFIG.Item.documentClass({ name: "Armadura Solta", type: "form", system: { kind: "alternate" } });
+await sheetPage("item-forma-solta", MarvelMultiverseItemSheet, looseSuit, { tab: "attributes", title: looseSuit.name });
 
 // Cartão de rolagem no chat.
 const roll = await renderTemplate("systems/mmrpg/templates/dice/roll.hbs", {
@@ -176,6 +211,21 @@ const roll = await renderTemplate("systems/mmrpg/templates/dice/roll.hbs", {
 fs.writeFileSync(
   path.join(out, "chat.html"),
   `<!doctype html><html><head><meta charset="utf-8"><style>${fontFaces}${iconCss}${core}body{margin:0;background:#2b2b30;width:320px;padding:8px}.chat{background:#ddd;padding:8px}${css}</style></head><body><div class="chat">${roll}</div></body></html>`
+);
+
+// Aviso de forma no chat.
+const caster = new CONFIG.Actor.documentClass({
+  name: "Aranha de Teste",
+  type: "character",
+  system: { attributes: { rank: { value: 3 } }, health: { value: 38, max: 50 } },
+  items: [{ name: "Armadura Mark III", type: "form", system: { kind: "suit", rank: { mode: "set", value: 5 }, powers: [{ name: "Flight 2" }, { name: "Sturdy 1" }] } }],
+});
+ChatMessage.created.length = 0;
+await caster.setFormActive(caster.forms[0], true);
+const card = ChatMessage.created.at(-1).content;
+fs.writeFileSync(
+  path.join(out, "chat-forma.html"),
+  `<!doctype html><html><head><meta charset="utf-8"><style>${fontFaces}${iconCss}${core}body{margin:0;background:#2b2b30;width:320px;padding:8px}.chat{background:#ddd;padding:8px}${css}</style></head><body><div class="chat">${card}</div></body></html>`
 );
 
 console.log(`Prévia gerada em ${out}`);

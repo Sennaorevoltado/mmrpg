@@ -120,3 +120,32 @@ export async function confirmDialog({ title, content }) {
   }
   return Boolean(await globalThis.Dialog.confirm({ title, content: body }));
 }
+
+/** Modos numéricos do Foundry equivalentes aos tipos de alteração de um Active Effect. */
+const CHANGE_MODES = { multiply: 1, add: 2, downgrade: 3, upgrade: 4, override: 5 };
+
+/**
+ * Dados de uma alteração de Active Effect com o tipo (v14) e o modo numérico (v13) juntos.
+ * O Foundry ignora o campo que a sua versão não usa.
+ *
+ * @param {{key: string, type?: string, mode?: number, value: *, priority?: number|null}} change
+ * @returns {{key: string, type: string, mode: number, value: string, priority: number|null}}
+ */
+export function changeData(change) {
+  const type = changeTypeOf(change);
+  const priority = change.priority === null || change.priority === undefined || change.priority === "" ? null : Number(change.priority);
+  return {
+    key: change.key,
+    type,
+    mode: CHANGE_MODES[type],
+    value: String(change.value),
+    priority: Number.isFinite(priority) ? Math.trunc(priority) : null,
+  };
+}
+
+/** Tipo de alteração (add, multiply...) de uma alteração do Foundry, em qualquer versão. */
+export function changeTypeOf(change) {
+  if (typeof change.type === "string" && change.type in CHANGE_MODES) return change.type;
+  const found = Object.entries(CHANGE_MODES).find(([, mode]) => mode === Number(change.mode));
+  return found ? found[0] : "add";
+}

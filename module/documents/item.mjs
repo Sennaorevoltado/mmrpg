@@ -15,12 +15,41 @@ export class MarvelMultiverseItem extends Item {
   }
 
   /**
+   * Uma forma nunca nasce ligada: copiá-la ou arrastá-la para outra ficha a deixa desligada.
+   * @override
+   */
+  async _preCreate(data, options, user) {
+    const allowed = await super._preCreate(data, options, user);
+    if (allowed === false) return false;
+    if (this.type === "form") this.updateSource({ "system.active": false, "system.activatedAt": 0 });
+  }
+
+  /**
+   * Apagar uma forma ligada desliga antes (tira o efeito, as concessões e devolve as imagens).
+   * @override
+   */
+  async _preDelete(options, user) {
+    const allowed = await super._preDelete(options, user);
+    if (allowed === false) return false;
+    if (this.type === "form" && this.system.active && this.actor) {
+      try {
+        await this.actor.setFormActive(this, false, { announce: false });
+      } catch (err) {
+        console.warn("mmrpg | não foi possível desligar a forma antes de apagá-la", err);
+      }
+    }
+  }
+
+  /**
    * Usa o item: mostra a descrição no chat e, se o item tem um atributo de ataque, rola d616.
    * @returns {Promise<MarvelMultiverseRoll|void>}
    */
   async roll() {
     const actor = this.actor;
     if (!actor) return;
+
+    // Usar uma forma (pela barra de macros, por exemplo) liga ou desliga.
+    if (this.type === "form") return actor.setFormActive(this, !this.system.active);
 
     const config = CONFIG.MARVEL_MULTIVERSE;
     const esc = (text) => Handlebars.escapeExpression(String(text ?? ""));

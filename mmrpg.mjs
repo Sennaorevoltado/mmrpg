@@ -16,6 +16,7 @@ import { MarvelMultiverseItemSheet } from "./module/sheets/item-sheet.mjs";
 import { preloadHandlebarsTemplates } from "./module/helpers/templates.mjs";
 import { registerDocumentSheet, unregisterCoreSheets, foundryGeneration, rootOf } from "./module/helpers/compat.mjs";
 import { addImportButton, importContent } from "./module/helpers/importer.mjs";
+import { registerFormHooks, registerFormSettings } from "./module/helpers/form-hooks.mjs";
 import { MARVEL_MULTIVERSE } from "./module/config.mjs";
 // Modelos de dados e dados
 import * as models from "./module/data/_module.mjs";
@@ -71,6 +72,7 @@ Hooks.once("init", () => {
     occupation: models.MarvelMultiverseOccupation,
     tag: models.MarvelMultiverseTag,
     power: models.MarvelMultiversePower,
+    form: models.MarvelMultiverseForm,
   };
 
   // Dado Marvel (dm) e rolagem d616.
@@ -83,6 +85,10 @@ Hooks.once("init", () => {
   CONFIG.Dice.terms.m = dice.MarvelDie;
 
   _configureFonts();
+
+  // Formas (armaduras, formas alternativas e transformações).
+  registerFormSettings();
+  registerFormHooks();
 
   // Fichas: tira as do núcleo e registra as do sistema.
   unregisterCoreSheets("Actor");

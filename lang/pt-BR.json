@@ -190,6 +190,8 @@
       "TabBiography": "Biografia",
       "TabGear": "Equipamento",
       "TabEffects": "Efeitos",
+      "TabForms": "Formas",
+      "Forms": "Formas",
       "Powers": "Poderes",
       "DefaultElement": "Elemento padrão",
       "TraitsTags": "Traços e tags",
@@ -242,8 +244,82 @@
         "origin": "Origens",
         "occupation": "Ocupações",
         "weapon": "Armas",
-        "item": "Equipamentos"
+        "item": "Equipamentos",
+        "form": "Formas"
       }
+    },
+    "Form": {
+      "Kind": {
+        "suit": "Armadura",
+        "alternate": "Forma alternativa",
+        "transformation": "Transformação"
+      },
+      "KindPlural": {
+        "suit": "Armaduras",
+        "alternate": "Formas alternativas",
+        "transformation": "Transformações"
+      },
+      "None": "Nenhuma forma ainda. Use + para criar uma armadura, forma alternativa ou transformação, ou arraste uma do diretório de Itens.",
+      "Toggle": "Ligar/desligar",
+      "TurnOn": "Ligar",
+      "TurnOff": "Desligar",
+      "Active": "Ligada",
+      "Borrowed": "Emprestada",
+      "RankSet": "Rank mín. {value}",
+      "RankAdd": "Rank {value}",
+      "AnnounceOn": "{actor} liga {form} ({kind}).",
+      "AnnounceOff": "{actor} desliga {form} ({kind}).",
+      "AnnounceRank": "Rank {from} para {to}.",
+      "AnnounceGrants": "Ganha:",
+      "AnnounceRemoved": "Perde:",
+      "SettingName": "Avisar formas no chat",
+      "SettingHint": "Mostra uma mensagem no chat quando um personagem liga ou desliga uma armadura, forma alternativa ou transformação.",
+      "TabChanges": "Alterações",
+      "TabGrants": "Concessões",
+      "StatusOn": "Esta forma está ligada.",
+      "StatusOff": "Esta forma está desligada.",
+      "NotOwned": "Coloque esta forma na ficha de um personagem para poder ligá-la.",
+      "KindLabel": "Categoria",
+      "RankLabel": "Rank enquanto ligada",
+      "RankMode": {
+        "none": "Não altera",
+        "set": "Pelo menos",
+        "add": "Soma"
+      },
+      "BorrowedLong": "Emprestada: concede os itens, mas não muda Rank nem valores",
+      "CarryDamage": "O dano sofrido acompanha o corpo quando a Saúde ou o Foco máximos mudam",
+      "Portrait": "Retrato enquanto ligada",
+      "Token": "Imagem do token enquanto ligada",
+      "Restrictions": "Restrições",
+      "ChangesHint": "Valores alterados enquanto a forma está ligada. Escolha um campo da lista ou digite o caminho dele.",
+      "NoChanges": "Nenhuma alteração.",
+      "ChangeAdd": "Adicionar alteração",
+      "ChangeRemove": "Remover alteração",
+      "ChangeKey": "Campo",
+      "ChangeValue": "Valor",
+      "ChangeType": {
+        "add": "Somar",
+        "multiply": "Multiplicar",
+        "override": "Substituir",
+        "upgrade": "Pelo menos",
+        "downgrade": "No máximo"
+      },
+      "Key": {
+        "healthMax": "Saúde máxima",
+        "focusMax": "Foco máximo",
+        "healthDamageReduction": "Redução de dano da Saúde",
+        "focusDamageReduction": "Redução de dano do Foco",
+        "run": "Velocidade de corrida",
+        "init": "Iniciativa",
+        "abilityValue": "{ability}: valor",
+        "abilityDefense": "{ability}: Defesa"
+      },
+      "GrantsHint": "O que a forma concede enquanto está ligada. Arraste poderes, traços e tags do diretório de Itens para cá, ou digite um nome (\"Nome (nota)\" põe uma nota).",
+      "GrantNone": "Nenhum.",
+      "GrantPlaceholder": "Nome ou Nome (nota)",
+      "GrantAdd": "Adicionar",
+      "GrantRemove": "Remover",
+      "DropIgnored": "Só dá para soltar aqui poderes, traços e tags."
     },
     "Item": {
       "Name": "Nome",
@@ -283,6 +359,7 @@
       "TabOrigin": "Origem",
       "TabOccupation": "Ocupação",
       "TabItem": "Equipamento",
+      "TabForm": "Forma",
       "Grants": {
         "traits": "Concede traços",
         "tags": "Concede tags",
@@ -309,7 +386,8 @@
       "tag": "Tag",
       "origin": "Origem",
       "occupation": "Ocupação",
-      "power": "Poder"
+      "power": "Poder",
+      "form": "Forma"
     }
   }
 }

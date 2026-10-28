@@ -10,7 +10,7 @@ import { confirmDialog, rootOf } from "./compat.mjs";
 export const CONTENT_FORMAT = "mmrpg-content";
 
 /** Tipos de item que o sistema entende. */
-export const ITEM_TYPES = ["power", "trait", "tag", "origin", "occupation", "weapon", "item"];
+export const ITEM_TYPES = ["power", "trait", "tag", "origin", "occupation", "weapon", "item", "form"];
 
 /** Quantos itens vão por vez ao banco de dados do Foundry. */
 const BATCH_SIZE = 100;

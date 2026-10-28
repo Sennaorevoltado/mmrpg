@@ -1,10 +1,11 @@
 /**
- * Foundry simulado para testes de integração.
+ * Foundry simulado para os testes.
  *
- * NÃO é o Foundry: implementa só o suficiente da API (campos de dados, documentos, rolagens,
- * ApplicationV2, Handlebars) para carregar o sistema, validar os esquemas de dados, montar o
- * contexto das fichas e renderizar os templates. Serve para achar erros de código e de dados
- * antes de abrir o Foundry de verdade; não substitui um teste num mundo v14.
+ * NÃO é o Foundry: implementa só o suficiente da API (campos de dados, documentos, efeitos ativos,
+ * janelas antigas ActorSheet/ItemSheet, Handlebars) para carregar o sistema, validar os esquemas,
+ * montar o contexto das fichas e renderizar os modelos. Serve para achar erros de código, de dados
+ * e de texto antes de abrir o Foundry de verdade; NÃO substitui um teste num mundo v13/v14 real.
+ * As rolagens de dados não são simuladas: o que depende do sorteio fica de fora dos testes.
  */
 
 import fs from "node:fs";
@@ -100,6 +101,11 @@ class DataField {
 }
 
 class StringField extends DataField {
+  get initialValue() {
+    const v = super.initialValue;
+    if (v !== undefined) return v;
+    return this.options.blank === false ? undefined : this.options.nullable ? null : "";
+  }
   checkType(value, where) {
     if (typeof value !== "string") return [`${where}: precisa ser texto`];
     if (value === "") return this.options.blank === false ? [`${where}: não pode ficar em branco`] : [];
@@ -267,87 +273,51 @@ class TypeDataModel extends DataModel {
   prepareDerivedData() {}
 }
 
-/* -------------------------------------------- */
-/*  Rolagens                                    */
-/* -------------------------------------------- */
-
-/** Gerador de números reproduzível para os testes. */
-export const dice = {
-  queue: [],
-  /** Define as próximas faces (d6) a serem sorteadas. */
-  push(...faces) {
-    this.queue.push(...faces);
-  },
-  next() {
-    return this.queue.length ? this.queue.shift() : 1 + Math.floor(Math.random() * 6);
-  }
+/** Os valores já preparados do modelo (com cálculos derivados e efeitos), como `toObject(false)`. */
+DataModel.prototype.liveObject = function liveObject() {
+  const out = {};
+  for (const key of Object.keys(this.constructor.schema.fields)) out[key] = deepClone(this[key]);
+  return out;
 };
+
+/* -------------------------------------------- */
+/*  Dados                                       */
+/* -------------------------------------------- */
 
 class Die {
   static DENOMINATION = "d";
-  constructor({ number = 1, faces = 6 } = {}) {
+  constructor({ number = 1, faces = 6, modifiers = [] } = {}) {
     this.number = number;
     this.faces = faces;
+    this.modifiers = modifiers;
     this.results = [];
-    this._evaluated = false;
   }
-  async evaluate() {
-    this.results = Array.from({ length: this.number }, () => ({ result: dice.next(), active: true }));
-    this._evaluated = true;
-    return this;
+  /** Sorteia uma face (os testes trocam `Die.nextFace` para controlar o resultado). */
+  roll() {
+    const result = { result: Die.nextFace(this.faces), active: true };
+    this.results.push(result);
+    return result;
   }
   get total() {
-    if (!this._evaluated) return undefined;
-    return this.results.filter((r) => r.active !== false && !r.discarded).reduce((s, r) => s + r.result, 0);
+    return this.results.filter((r) => r.active !== false && !r.discarded).reduce((sum, r) => sum + r.result, 0);
+  }
+  static nextFace(faces) {
+    return 1 + Math.floor(Math.random() * faces);
   }
 }
 
 class Roll {
   constructor(formula, data = {}, options = {}) {
     this.formula = formula;
+    this._formula = formula;
     this.data = data;
     this.options = options;
-    this._evaluated = false;
     this.terms = [];
-    this.#parse();
-  }
-  #parse() {
-    const tokens = this.formula.replace(/\s+/g, "").match(/[+-]?(\d+d[a-z0-9]+|\d+)/gi) ?? [];
-    for (const raw of tokens) {
-      const sign = raw.startsWith("-") ? -1 : 1;
-      const body = raw.replace(/^[+-]/, "");
-      const m = body.match(/^(\d+)d([a-z0-9]+)$/i);
-      if (m) {
-        const Term = CONFIG.Dice.terms[m[2].toLowerCase()] ?? Die;
-        const faces = Number(m[2]) || 6;
-        this.terms.push(new Term({ number: Number(m[1]), faces }));
-      } else {
-        this.terms.push({ number: sign * Number(body), isNumeric: true });
-      }
-    }
-  }
-  get dice() {
-    return this.terms.filter((t) => t instanceof Die);
-  }
-  async evaluate() {
-    return this._evaluate();
-  }
-  async _evaluate() {
-    for (const t of this.dice) await t.evaluate();
-    this._evaluated = true;
-    this._total = this.#sum();
-    return this;
-  }
-  #sum() {
-    return this.terms.reduce((s, t) => s + (t instanceof Die ? t.total : t.number), 0);
-  }
-  get total() {
-    return this._evaluated ? this._total : undefined;
-  }
-  async render() {
-    return `<div class="roll">${this.total}</div>`;
   }
 }
+
+class PoolTerm {}
+class ParentheticalTerm {}
 
 /* -------------------------------------------- */
 /*  Documentos                                  */
@@ -374,26 +344,31 @@ class Collection extends Map {
   }
 }
 
-const REGISTRY = new Map();
-
 class ActiveEffect {
   static documentName = "ActiveEffect";
   constructor(data = {}, { parent = null } = {}) {
     this.parent = parent;
     this.id = data._id ?? randomID();
-    this._source = deepClone(data);
-    Object.assign(this, { name: "", img: null, origin: null, changes: [], flags: {}, description: "", disabled: false, duration: {}, transfer: false }, deepClone(data));
-    this.statuses = new Set(data.statuses ?? []);
-    this.sheet = { render() {} };
+    this._id = this.id;
+    Object.assign(
+      this,
+      { name: "", img: "icons/svg/aura.svg", origin: null, changes: [], flags: {}, description: "", disabled: false, duration: {}, transfer: false, statuses: [] },
+      deepClone(data)
+    );
+    this.duration = { label: "", ...this.duration };
+    this.sourceName = this.parent?.name ?? "";
   }
-  get documentName() {
-    return "ActiveEffect";
-  }
-  get uuid() {
-    return `${this.parent?.uuid ?? "ActiveEffect"}.ActiveEffect.${this.id}`;
+  get isTemporary() {
+    return false;
   }
   getFlag(scope, key) {
     return getProperty(this.flags, `${scope}.${key}`);
+  }
+  static async create(data, { parent } = {}) {
+    const effect = new ActiveEffect(data, { parent });
+    parent.effects.set(effect.id, effect);
+    parent.prepareData();
+    return effect;
   }
   async update(changes) {
     mergeObject(this, expandObject(changes));
@@ -401,62 +376,54 @@ class ActiveEffect {
   }
   async delete() {
     this.parent.effects.delete(this.id);
+    this.parent.prepareData();
     return this;
+  }
+  toObject() {
+    return deepClone({ _id: this.id, name: this.name, img: this.img, changes: this.changes, flags: this.flags, disabled: this.disabled, transfer: this.transfer });
   }
 }
 
 class BaseDocument {
-  constructor(data = {}, { parent = null, pack = null, folder = null } = {}) {
+  constructor(data = {}, { parent = null } = {}) {
     this.parent = parent;
-    this.pack = pack;
-    this.folder = folder;
     this.id = data._id ?? randomID();
+    this._id = this.id;
     this.name = data.name ?? "";
     this.type = data.type;
     this.img = data.img ?? null;
     this.sort = data.sort ?? 0;
+    this.folder = data.folder ? (globalThis.game?.folders?.get?.(data.folder) ?? null) : null;
     this.flags = deepClone(data.flags ?? {});
-    this.prototypeToken = deepClone(data.prototypeToken ?? {});
+    this.prototypeToken = deepClone(data.prototypeToken ?? { width: 1, height: 1 });
     this.effects = new Collection();
-    this.sheet = { render() {} };
     const Model = CONFIG[this.constructor.documentName].dataModels[this.type];
+    if (!Model) throw new Error(`Tipo de ${this.constructor.documentName} sem modelo de dados: ${this.type}`);
     this.system = new Model(data.system ?? {}, { parent: this });
     for (const e of data.effects ?? []) {
       const effect = new ActiveEffect(e, { parent: this });
       this.effects.set(effect.id, effect);
     }
-    REGISTRY.set(this.uuid, this);
-    this.prepareData();
-  }
-
-  get _source() {
-    return {
-      _id: this.id,
-      name: this.name,
-      type: this.type,
-      img: this.img,
-      flags: this.flags,
-      system: this.system.toObject()
-    };
+    this.sheet = { render() {} };
   }
 
   get documentName() {
     return this.constructor.documentName;
   }
   get uuid() {
-    if (this.pack) return `Compendium.${this.pack}.${this.constructor.documentName}.${this.id}`;
     return this.parent ? `${this.parent.uuid}.${this.constructor.documentName}.${this.id}` : `${this.constructor.documentName}.${this.id}`;
   }
   get isOwner() {
     return true;
   }
-  get limited() {
-    return false;
+  getFlag(scope, key) {
+    return getProperty(this.flags, `${scope}.${key}`);
   }
-  get statuses() {
-    const set = new Set();
-    for (const e of this.effects.contents) for (const s of e.statuses) set.add(s);
-    return set;
+  getRollData() {
+    return deepClone(this.system.liveObject());
+  }
+  async _preCreate() {
+    return true;
   }
 
   prepareData() {
@@ -465,59 +432,22 @@ class BaseDocument {
     this.system.prepareDerivedData?.();
   }
 
-  getFlag(scope, key) {
-    return getProperty(this.flags, `${scope}.${key}`);
-  }
-  async setFlag(scope, key, value) {
-    setProperty(this.flags, `${scope}.${key}`, value);
-    return this;
-  }
-  async unsetFlag(scope, key) {
-    const bag = this.flags?.[scope];
-    if (bag) delete bag[key];
-    return this;
-  }
-
-  toObject() {
-    return deepClone({ ...this._source, effects: this.effects.contents.map((e) => e._source) });
+  /** `toObject()` guarda os dados de origem; `toObject(false)` os dados já preparados. */
+  toObject(source = true) {
+    return deepClone({
+      _id: this.id,
+      name: this.name,
+      type: this.type,
+      img: this.img,
+      sort: this.sort,
+      flags: this.flags,
+      system: source ? this.system.toObject() : this.system.liveObject(),
+      effects: this.effects.contents.map((e) => e.toObject()),
+      ...(this.items ? { items: this.items.contents.map((i) => i.toObject(source)) } : {}),
+    });
   }
 
-  updateSource(changes) {
-    const flat = expandObject(changes);
-    const { system, ...rest } = flat;
-    for (const [k, v] of Object.entries(rest)) {
-      if (k === "flags") mergeObject(this.flags, v);
-      else if (k === "prototypeToken") mergeObject(this.prototypeToken, v);
-      else if (k === "folder") {
-        // No Foundry, `folder` vira o documento da pasta; aqui só os compêndios têm pastas de verdade.
-        this.folder = this.pack ? (game.packs.get(this.pack)?.folders.get(v) ?? null) : v;
-      } else this[k] = v;
-    }
-    if (system) this.system.updateSource(system);
-    this.prepareData();
-  }
-
-  async update(changes, options = {}) {
-    const expanded = expandObject(changes);
-    if ((await this._preUpdate(expanded, options, game.user)) === false) return this;
-    this.updateSource(expanded);
-    await Hooks.callAll(`update${this.constructor.documentName}`, this, expanded, options, game.user.id);
-    return this;
-  }
-
-  async _preUpdate() {
-    return true;
-  }
-
-  async _preCreate() {
-    return true;
-  }
-  async _preDelete() {
-    return true;
-  }
-  async _onCreateDescendantDocuments() {}
-
-  async createEmbeddedDocuments(name, dataArray, options = {}) {
+  async createEmbeddedDocuments(name, dataArray) {
     const created = [];
     for (const data of dataArray) {
       if (name === "ActiveEffect") {
@@ -526,50 +456,41 @@ class BaseDocument {
         created.push(effect);
       } else if (name === "Item") {
         const item = new CONFIG.Item.documentClass(deepClone(data), { parent: this });
-        await item._preCreate(data, options, game.user);
+        item.prepareData();
         this.items.set(item.id, item);
-        REGISTRY.set(item.uuid, item);
         created.push(item);
       } else {
         throw new Error(`Coleção embutida desconhecida: ${name}`);
       }
     }
-    if (name === "Item") await this._onCreateDescendantDocuments(this, "items", created, dataArray, options, game.user.id);
     this.prepareData();
     return created;
   }
 
   async deleteEmbeddedDocuments(name, ids) {
-    const coll = name === "ActiveEffect" ? this.effects : this.items;
-    for (const id of ids) {
-      // Como no Foundry, o item pode se preparar para sair da ficha antes de ser removido.
-      if (name === "Item") await coll.get(id)?._preDelete({}, game.user);
-      coll.delete(id);
-    }
+    const collection = name === "ActiveEffect" ? this.effects : this.items;
+    for (const id of ids) collection.delete(id);
     this.prepareData();
     return ids;
   }
 
-  async delete() {
-    await this._preDelete({}, game.user);
-    this.parent?.items?.delete(this.id);
-    this.parent?.prepareData?.();
+  async update(changes) {
+    const expanded = expandObject(changes);
+    const { system, ...rest } = expanded;
+    Object.assign(this, rest);
+    if (system) this.system.updateSource(system);
+    this.prepareData();
     return this;
   }
 }
 
-/** Prioridade padrão das alterações de efeito por tipo, como no Foundry. */
-const CHANGE_PRIORITY = { multiply: 10, add: 20, downgrade: 30, upgrade: 40, override: 50 };
-const CHANGE_MODE_NAMES = { 1: "multiply", 2: "add", 3: "downgrade", 4: "upgrade", 5: "override" };
+/** Prioridade padrão das alterações de efeito, por modo (como no Foundry). */
+const CHANGE_PRIORITY = { 1: 10, 2: 20, 3: 30, 4: 40, 5: 50 };
 
-/** Aplica uma alteração de efeito a um ator simulado (conversão pelo tipo do valor atual). */
+/** Aplica uma alteração de efeito (modo do Foundry: 1 multiplicar, 2 somar, 3 no máximo, 4 pelo menos, 5 substituir). */
 function applyChange(actor, change) {
-  const kind = change.type ?? CHANGE_MODE_NAMES[change.mode] ?? "add";
   const current = getProperty(actor, change.key);
-  if (current === undefined) {
-    if (String(change.key).startsWith("system.")) throw new Error(`Chave de efeito inexistente no ator: ${change.key}`);
-    return;
-  }
+  if (current === undefined) throw new Error(`Chave de efeito inexistente no ator: ${change.key}`);
   let delta = change.value;
   if (typeof current === "number") {
     delta = Number(change.value);
@@ -578,14 +499,14 @@ function applyChange(actor, change) {
     delta = String(change.value) === "true";
   }
   let result = current;
-  switch (kind) {
-    case "multiply": result = current * delta; break;
-    case "add": result = typeof current === "number" ? current + delta : String(current) + String(delta); break;
-    case "downgrade": result = Math.min(current, delta); break;
-    case "upgrade": result = Math.max(current, delta); break;
-    case "override": result = delta; break;
+  switch (change.mode) {
+    case 1: result = current * delta; break;
+    case 2: result = typeof current === "number" ? current + delta : String(current) + String(delta); break;
+    case 3: result = Math.min(current, delta); break;
+    case 4: result = Math.max(current, delta); break;
+    case 5: result = delta; break;
+    default: throw new Error(`Modo de efeito desconhecido em ${change.key}: ${change.mode}`);
   }
-  // Não usa setProperty: ele troca por {} tudo que não é objeto simples (como o modelo de dados do sistema).
   const parts = String(change.key).split(".");
   const holder = parts.slice(0, -1).reduce((obj, part) => obj[part], actor);
   holder[parts.at(-1)] = result;
@@ -610,280 +531,160 @@ class Actor extends BaseDocument {
     this.system.prepareDerivedData?.();
   }
 
-  /** Efeitos do ator e efeitos transferidos pelos itens, na ordem de prioridade. */
+  /** Efeitos do ator e dos itens (que transferem), como no Foundry. */
+  *allApplicableEffects() {
+    for (const effect of this.effects) yield effect;
+    for (const item of this.items ?? []) for (const effect of item.effects) if (effect.transfer) yield effect;
+  }
+
   applyActiveEffects() {
-    const effects = [...this.effects.contents];
-    for (const item of this.items?.contents ?? []) {
-      for (const e of item.effects.contents) if (e.transfer) effects.push(e);
-    }
     const changes = [];
-    for (const effect of effects) {
+    for (const effect of this.allApplicableEffects()) {
       if (effect.disabled) continue;
-      for (const c of effect.changes ?? []) {
-        const kind = c.type ?? CHANGE_MODE_NAMES[c.mode] ?? "add";
-        changes.push({ ...c, priority: c.priority ?? CHANGE_PRIORITY[kind] });
-      }
+      for (const c of effect.changes ?? []) changes.push({ ...c, priority: c.priority ?? CHANGE_PRIORITY[c.mode] });
     }
     changes.sort((a, b) => a.priority - b.priority);
     for (const change of changes) applyChange(this, change);
   }
+
   static async create(data) {
     const actor = new CONFIG.Actor.documentClass(deepClone(data));
-    await actor._preCreate(data, {}, game.user);
     game.actors.set(actor.id, actor);
     return actor;
-  }
-  /** Tokens simulados na cena (os testes enchem esta lista). */
-  tokens = [];
-  getActiveTokens(linked = false, document = false) {
-    return document ? this.tokens : this.tokens.map((t) => ({ document: t }));
-  }
-  async toggleStatusEffect(statusId, { active } = {}) {
-    const existing = this.effects.find((e) => e.statuses.has(statusId));
-    const want = active ?? !existing;
-    if (want && !existing) await this.createEmbeddedDocuments("ActiveEffect", [{ name: statusId, statuses: [statusId] }]);
-    if (!want && existing) await existing.delete();
-    return want;
-  }
-  async rollInitiative() {
-    return null;
   }
 }
 
 class Item extends BaseDocument {
   static documentName = "Item";
+  static DEFAULT_ICON = "icons/svg/item-bag.svg";
   get actor() {
     return this.parent instanceof Actor ? this.parent : null;
   }
   static async create(data, options = {}) {
-    if (options.pack) {
-      const pack = game.packs.get(options.pack);
-      if (!pack) throw new Error(`Compêndio inexistente: ${options.pack}`);
-      if (pack.locked) throw new Error(`Compêndio bloqueado: ${options.pack}`);
-      const folder = data.folder ? pack.folders.get(data.folder) ?? null : null;
-      if (data.folder && !folder) throw new Error(`Pasta inexistente no compêndio: ${data.folder}`);
-      const item = new CONFIG.Item.documentClass(deepClone({ ...data, folder: undefined }), { pack: pack.collection, folder });
-      await item._preCreate(data, options, game.user);
-      pack.documents.set(item.id, item);
-      pack.index.set(item.id, { _id: item.id, uuid: item.uuid, name: item.name, type: item.type });
-      return item;
+    const item = new CONFIG.Item.documentClass(deepClone(data), options.parent ? { parent: options.parent } : {});
+    if (options.parent) {
+      options.parent.items.set(item.id, item);
+      options.parent.prepareData();
+    } else {
+      game.items.set(item.id, item);
     }
-    const item = new CONFIG.Item.documentClass(deepClone(data));
-    await item._preCreate(data, options, game.user);
-    game.items.set(item.id, item);
     return item;
   }
-}
-
-/** Compêndio simulado: documentos, índice e pastas. */
-class CompendiumPack {
-  constructor({ name, label, type }) {
-    this.collection = `world.${name}`;
-    this.title = label;
-    this.metadata = { name, label, type, packageType: "world" };
-    this.locked = false;
-    this.documents = new Collection();
-    this.index = new Collection();
-    this.folders = new Collection();
+  static async fromDropData(data) {
+    return fromUuid(data.uuid);
   }
-  async getIndex() {
-    return this.index;
-  }
-  async getDocuments() {
-    return this.documents.contents;
-  }
-  async getDocument(id) {
-    return this.documents.get(id) ?? null;
+  static async createDocuments(list) {
+    const created = [];
+    for (const data of list) created.push(await Item.create(data));
+    return created;
   }
 }
 
-const CompendiumCollection = {
-  async createCompendium(metadata) {
-    if (!metadata?.name || !metadata?.label || metadata?.type !== "Item") throw new Error("metadados de compêndio inválidos");
-    if (game.packs.has(`world.${metadata.name}`)) throw new Error("compêndio já existe");
-    const pack = new CompendiumPack(metadata);
-    game.packs.set(pack.collection, pack);
-    return pack;
+class Folder {
+  static documentName = "Folder";
+  constructor(data = {}) {
+    this.id = randomID();
+    this.name = data.name;
+    this.type = data.type;
+    this.folder = data.folder ? (globalThis.game.folders.get(data.folder) ?? null) : null;
   }
-};
+  static async create(data) {
+    const folder = new Folder(data);
+    game.folders.set(folder.id, folder);
+    return folder;
+  }
+}
 
-class Combatant {}
+const REGISTRY = new Map();
 
 class ChatMessage {
   static documentName = "ChatMessage";
-  /** Chamadas à API da v13 feitas em uma v14 (e vice-versa), para os testes. */
-  static apiLog = [];
+  static created = [];
   static getSpeaker({ actor } = {}) {
     return { actor: actor?.id ?? null, alias: actor?.name ?? "" };
   }
-  static getWhisperRecipients(name) {
-    // Outro usuário GM, para distinguir "só o GM" de "só eu" nos testes.
-    return name === "GM" ? [{ id: "gm-mesa" }] : [];
-  }
-  /** v13: aplica o modo de rolagem (publicroll, gmroll, blindroll, selfroll) aos dados. */
-  static applyRollMode(data, rollMode) {
-    if (game.release.generation >= 14) throw new Error("applyRollMode não existe na v14 simulada");
-    ChatMessage.apiLog.push(`applyRollMode:${rollMode}`);
-    if (rollMode === "publicroll") {
-      data.whisper = [];
-      data.blind = false;
-    } else if (rollMode === "gmroll") {
-      data.whisper = ChatMessage.getWhisperRecipients("GM").map((u) => u.id);
-      data.blind = false;
-    } else if (rollMode === "blindroll") {
-      data.whisper = ChatMessage.getWhisperRecipients("GM").map((u) => u.id);
-      data.blind = true;
-    } else if (rollMode === "selfroll") {
-      data.whisper = [game.user.id];
-      data.blind = false;
-    } else {
-      throw new Error(`modo de rolagem inválido na v13: ${rollMode}`);
-    }
+  static async create(data) {
+    ChatMessage.created.push(deepClone(data));
     return data;
   }
-  static async create(data, options = {}) {
-    if (game.release.generation >= 14) {
-      if (options.rollMode !== undefined) throw new Error("rollMode não é a opção da v14");
-      if (options.messageMode && !["public", "gm", "blind", "self", "ic"].includes(options.messageMode)) {
-        throw new Error(`messageMode inválido na v14: ${options.messageMode}`);
-      }
-    } else if (options.messageMode !== undefined) {
-      throw new Error("messageMode não existe na v13");
-    }
-    const msg = new ChatMessage(data);
-    msg.messageMode = options.messageMode;
-    msg.whisper = data.whisper ?? [];
-    msg.blind = !!data.blind;
-    // Visibilidade efetiva, igual nas duas versões: é o que o jogador de fato vê.
-    if (options.messageMode) msg.effectiveMode = options.messageMode;
-    else if (msg.blind) msg.effectiveMode = "blind";
-    else if (msg.whisper.length === 1 && msg.whisper[0] === game.user.id) msg.effectiveMode = "self";
-    else if (msg.whisper.length) msg.effectiveMode = "gm";
-    else msg.effectiveMode = "public";
-    game.messages.set(msg.id, msg);
-    return msg;
-  }
-  constructor(data) {
-    this.id = randomID();
-    this.content = data.content ?? "";
-    this.speaker = data.speaker ?? {};
-    this.flags = deepClone(data.flags ?? {});
-    this.rolls = data.rolls ?? [];
-    this.author = game.user;
-  }
-  getFlag(scope, key) {
-    return getProperty(this.flags, `${scope}.${key}`);
-  }
-  async update(changes) {
-    for (const [key, value] of Object.entries(changes)) {
-      if (key === "content") this.content = value;
-      else setProperty(this, key, value);
-    }
-    return this;
-  }
 }
 
 /* -------------------------------------------- */
-/*  Aplicações (ApplicationV2)                  */
+/*  Fichas (API antiga, ApplicationV1)          */
 /* -------------------------------------------- */
 
-class ApplicationV2 {
-  static DEFAULT_OPTIONS = {};
-  static PARTS = {};
-  constructor(options = {}) {
-    this.options = { ...options };
-    this.id = options.id ?? "app";
-    this.rendered = false;
-    this.element = makeElement();
+class DocumentSheetV1 {
+  static get defaultOptions() {
+    return { classes: ["sheet"], width: 400, height: 400, tabs: [], editable: true };
   }
-  async _prepareContext() {
-    return {};
+  constructor(object, options = {}) {
+    this.object = object;
+    this.options = mergeObject(this.constructor.defaultOptions, options, { inplace: false });
   }
-  _onRender() {}
-  _onClose() {}
-  async render() {
-    this.rendered = true;
-    return this;
-  }
-  async close() {
-    this._onClose({});
-  }
-}
-
-/** Mixin que renderiza as PARTS com Handlebars (como o do Foundry, sem o tratamento de DOM). */
-function HandlebarsApplicationMixin(Base) {
-  return class extends Base {
-    /** Renderiza todas as partes e devolve o HTML (apenas para testes). */
-    async renderToString(options = {}) {
-      const context = await this._prepareContext(options);
-      let html = "";
-      for (const part of Object.values(this.constructor.PARTS)) {
-        html += await renderTemplate(part.template, context);
-      }
-      return html;
-    }
-  };
-}
-
-function makeElement() {
-  return { querySelectorAll: () => [], querySelector: () => null };
-}
-
-class DocumentSheetV2 extends ApplicationV2 {
-  constructor(options = {}) {
-    super(options);
-    this.document = options.document;
+  get document() {
+    return this.object;
   }
   get isEditable() {
     return true;
   }
-  async _prepareContext() {
-    return { document: this.document, editable: this.isEditable, owner: this.document.isOwner };
+  getData() {
+    return {
+      cssClass: "editable",
+      editable: true,
+      document: this.object,
+      data: this.object.toObject(false),
+      limited: false,
+      options: this.options,
+      owner: true,
+      title: this.object.name,
+    };
   }
+  activateListeners() {}
 }
-class ActorSheetV2 extends DocumentSheetV2 {
+
+class ActorSheet extends DocumentSheetV1 {
   get actor() {
-    return this.document;
+    return this.object;
+  }
+  getData() {
+    const context = super.getData();
+    context.actor = this.object;
+    context.items = context.data.items;
+    context.items.sort((a, b) => (a.sort || 0) - (b.sort || 0));
+    context.effects = context.data.effects;
+    return context;
+  }
+  _onDragStart() {}
+  async _onDropItemCreate(itemData) {
+    return this.actor.createEmbeddedDocuments("Item", Array.isArray(itemData) ? itemData : [itemData]);
   }
 }
-class ItemSheetV2 extends DocumentSheetV2 {
+
+class ItemSheet extends DocumentSheetV1 {
   get item() {
-    return this.document;
+    return this.object;
   }
-}
-
-class DialogV2 {
-  static answer = null;
-  static async prompt() {
-    return DialogV2.answer;
-  }
-  static async confirm() {
-    return true;
-  }
-}
-
-class FormDataExtended {
-  constructor(form) {
-    this.object = form?.data ?? {};
+  getData() {
+    const context = super.getData();
+    context.item = this.object;
+    return context;
   }
 }
 
 /* -------------------------------------------- */
-/*  Templates                                   */
+/*  Modelos Handlebars                          */
 /* -------------------------------------------- */
 
-function templatePath(p) {
+const compiled = new Map();
+
+function templateFile(p) {
   return path.join(ROOT, p.replace(/^systems\/mmrpg\//, ""));
 }
 
-const compiled = new Map();
-const partialNames = new Set();
-
 export async function loadTemplates(paths) {
   for (const p of paths) {
-    const src = fs.readFileSync(templatePath(p), "utf8");
+    const src = fs.readFileSync(templateFile(p), "utf8");
     Handlebars.registerPartial(p, src);
-    partialNames.add(p);
     compiled.set(p, Handlebars.compile(src));
   }
   return paths.map((p) => compiled.get(p));
@@ -893,6 +694,8 @@ export async function renderTemplate(p, data) {
   if (!compiled.has(p)) await loadTemplates([p]);
   return compiled.get(p)(data, { allowProtoMethodsByDefault: true, allowProtoPropertiesByDefault: true });
 }
+
+const escapeHtml = (v) => Handlebars.escapeExpression(String(v ?? ""));
 
 function registerCoreHelpers() {
   const H = Handlebars;
@@ -909,6 +712,36 @@ function registerCoreHelpers() {
   H.registerHelper("and", (...args) => args.slice(0, -1).every(Boolean));
   H.registerHelper("or", (...args) => args.slice(0, -1).some(Boolean));
   H.registerHelper("not", (a) => !a);
+  H.registerHelper("checked", (v) => (v ? "checked" : ""));
+  H.registerHelper("numberFormat", (value, opts) => {
+    const { decimals = 0, sign = false } = opts?.hash ?? {};
+    const n = Number(value ?? 0);
+    return new Intl.NumberFormat("en-US", {
+      minimumFractionDigits: decimals,
+      maximumFractionDigits: decimals,
+      signDisplay: sign ? "always" : "auto",
+      useGrouping: false,
+    }).format(n);
+  });
+  // {{selectOptions choices selected=x blank=""}}: choices é {valor: texto}; blank cria a opção vazia.
+  H.registerHelper("selectOptions", (choices, opts) => {
+    const { selected, blank } = opts?.hash ?? {};
+    if (choices === null || typeof choices !== "object") {
+      throw new Error(`{{selectOptions}} recebeu ${String(choices)} em vez de uma lista de opções`);
+    }
+    const html = [];
+    if (blank !== undefined) html.push(`<option value="">${escapeHtml(game.i18n.localize(blank))}</option>`);
+    for (const [value, label] of Object.entries(choices)) {
+      if (label !== null && typeof label === "object") throw new Error(`{{selectOptions}}: o texto da opção "${value}" precisa ser texto`);
+      html.push(`<option value="${escapeHtml(value)}"${String(selected) === String(value) ? " selected" : ""}>${escapeHtml(label)}</option>`);
+    }
+    return new H.SafeString(html.join(""));
+  });
+  H.registerHelper("editor", (content, opts) => {
+    const { target } = opts?.hash ?? {};
+    return new H.SafeString(`<div class="editor prosemirror"><div class="editor-content" data-edit="${escapeHtml(target)}">${content ?? ""}</div></div>`);
+  });
+  H.registerHelper("toLowerCase", (value) => String(value ?? "").toLowerCase());
 }
 
 /* -------------------------------------------- */
@@ -928,78 +761,41 @@ function flatten(obj, prefix = "", out = {}) {
  * Instala os globais do Foundry simulado.
  * @param {object} [options]
  * @param {string} [options.lang="pt-BR"]
- * @returns {object} Ferramentas de teste (chaves de tradução ausentes, notificações, hooks…).
+ * @param {number} [options.generation=14]   Geração do Foundry simulada (13 ou 14)
+ * @returns {object} Ferramentas de teste (chaves de tradução ausentes, notificações, fichas registradas...).
  */
-export function installFoundry({ lang = "pt-BR", generation = Number(process.env.MMRPG_FOUNDRY_GENERATION) || 14 } = {}) {
+export function installFoundry({ lang = "pt-BR", generation = 14 } = {}) {
   const strings = flatten(JSON.parse(fs.readFileSync(path.join(ROOT, "lang", `${lang}.json`), "utf8")));
   const missingKeys = new Set();
   const notices = { warn: [], info: [], error: [] };
-  const hooks = new Map();
-  const socketHandlers = [];
-  const emitted = [];
 
   const i18n = {
     localize(key) {
       if (key in strings) return strings[key];
-      if (/^(MMRPG|TYPES)\./.test(key)) missingKeys.add(key);
+      if (/^(MARVEL_MULTIVERSE|TYPES)\./.test(key)) missingKeys.add(key);
       return key;
     },
     format(key, data = {}) {
       return i18n.localize(key).replace(/\{(\w+)\}/g, (_, k) => (k in data ? String(data[k]) : `{${k}}`));
     },
-    has: (key) => key in strings
+    has: (key) => key in strings,
   };
 
-  const settingsStore = new Map();
-  const settings = {
-    settings: new Map(),
-    menus: new Map(),
-    register(scope, key, data) {
-      settings.settings.set(`${scope}.${key}`, data);
-      settingsStore.set(`${scope}.${key}`, data.default);
-    },
-    registerMenu(scope, key, data) {
-      settings.menus.set(`${scope}.${key}`, data);
-    },
-    get(scope, key) {
-      const id = `${scope}.${key}`;
-      if (!settings.settings.has(id)) throw new Error(`Configuração não registrada: ${id}`);
-      return settingsStore.get(id);
-    },
-    set(scope, key, value) {
-      settingsStore.set(`${scope}.${key}`, value);
-    }
-  };
-
-  const user = { id: "gm1", isGM: true, isActiveGM: true, color: "#cc2222", targets: new Set(), assignHotbarMacro() {} };
-  const registeredSheets = [];
-
-  // API de registro de fichas. Na v13 simulada a forma antiga (Actors.registerSheet) fica
-  // registrada em `deprecatedSheetCalls`, para o teste provar que o sistema não depende dela.
-  const deprecatedSheetCalls = [];
-  const unregisteredSheets = [];
-  const sheetRegistry = (documentName) => ({
-    registerSheet: (scope, cls, opts) => {
-      if (generation < 14) deprecatedSheetCalls.push({ documentName, scope, name: cls.name });
-      registeredSheets.push({ documentName, scope, cls, opts, via: "collection" });
-    },
-    unregisterSheet: (scope, cls) => {
-      if (generation < 14) deprecatedSheetCalls.push({ documentName, scope, name: cls?.name, unregister: true });
-      unregisteredSheets.push({ documentName, scope, name: cls?.name, via: "collection" });
-    }
+  const registered = [];
+  const unregistered = [];
+  const dialogs = [];
+  const dialogAnswer = { value: true };
+  const sheetCollection = (documentName) => ({
+    registerSheet: (scope, cls, opts) => registered.push({ documentName, scope, name: cls.name, opts, via: "collection" }),
+    unregisterSheet: (scope, cls) => unregistered.push({ documentName, scope, name: cls?.name, via: "collection" }),
   });
   const DocumentSheetConfig = {
-    registerSheet: (documentClass, scope, cls, opts) => {
-      registeredSheets.push({ documentName: documentClass.documentName ?? documentClass.name, scope, cls, opts, via: "config" });
-    },
-    unregisterSheet: (documentClass, scope, cls) => {
-      unregisteredSheets.push({ documentName: documentClass.documentName ?? documentClass.name, scope, name: cls?.name, via: "config" });
-    }
+    registerSheet: (documentClass, scope, cls, opts) =>
+      registered.push({ documentName: documentClass.documentName, scope, name: cls.name, opts, via: "config" }),
+    unregisterSheet: (documentClass, scope, cls) =>
+      unregistered.push({ documentName: documentClass.documentName, scope, name: cls?.name, via: "config" }),
   };
-  class LegacyActorSheet {}
-  class LegacyItemSheet {}
 
-  Handlebars.registerHelper; // garante uso do módulo importado
   registerCoreHelpers();
 
   const g = globalThis;
@@ -1008,138 +804,60 @@ export function installFoundry({ lang = "pt-BR", generation = Number(process.env
   g.Roll = Roll;
   g.Actor = Actor;
   g.Item = Item;
-  g.Combatant = Combatant;
+  g.Folder = Folder;
   g.ChatMessage = ChatMessage;
   g.ActiveEffect = ActiveEffect;
-  g.Folder = {
-    create: async (d, options = {}) => {
-      if (!options.pack) {
-        const world = { id: randomID(), name: d.name, type: d.type, folder: d.folder ? game.folders.get(d.folder) ?? null : null };
-        game.folders.set(world.id, world);
-        return world;
-      }
-      const pack = game.packs.get(options.pack);
-      if (!pack || pack.locked) throw new Error(`Compêndio indisponível: ${options.pack}`);
-      const folder = { id: randomID(), name: d.name, type: d.type, folder: d.folder ? pack.folders.get(d.folder) ?? null : null };
-      pack.folders.set(folder.id, folder);
-      return folder;
-    }
-  };
-  g.Macro = { create: async (d) => ({ id: randomID(), ...d }) };
+  g.ActorSheet = ActorSheet;
+  g.ItemSheet = ItemSheet;
+  g.Hooks = { once() {}, on() {}, callAll() {} };
 
   g.foundry = {
-    utils: {
-      randomID,
-      deepClone,
-      getProperty,
-      setProperty,
-      mergeObject,
-      expandObject,
-      saveDataToFile: () => {}
-    },
+    utils: { randomID, deepClone, getProperty, setProperty, mergeObject, expandObject },
     abstract: { DataModel, TypeDataModel },
     data: { fields: { DataField, StringField, HTMLField, NumberField, BooleanField, ObjectField, SchemaField, ArrayField, EmbeddedDataField } },
-    dice: { terms: { Die } },
-    documents: { collections: { Actors: sheetRegistry("Actor"), Items: sheetRegistry("Item"), CompendiumCollection } },
-    ...(generation < 14 ? { appv1: { sheets: { ActorSheet: LegacyActorSheet, ItemSheet: LegacyItemSheet } } } : {}),
+    dice: { terms: { Die, PoolTerm, ParentheticalTerm } },
+    documents: { collections: { Actors: sheetCollection("Actor"), Items: sheetCollection("Item") } },
+    // No Foundry 14 as janelas antigas moram em foundry.appv1; na 13 também (com os globais como apelido).
+    appv1: { sheets: { ActorSheet, ItemSheet } },
     applications: {
-      api: { ApplicationV2, HandlebarsApplicationMixin, DialogV2 },
-      sheets: { ActorSheetV2, ItemSheetV2 },
-      ux: {
-        TextEditor: { implementation: { enrichHTML: async (html) => html ?? "", getDragEventData: () => ({}) } },
-        FormDataExtended
-      },
       handlebars: { renderTemplate, loadTemplates },
-      apps: { FilePicker: { implementation: class FilePicker { browse() {} } }, DocumentSheetConfig }
-    }
+      apps: { DocumentSheetConfig },
+      api: { DialogV2: { confirm: async (options) => { dialogs.push(options); return dialogAnswer.value; } } },
+    },
   };
 
   g.CONFIG = {
     Actor: { dataModels: {}, documentClass: Actor },
     Item: { dataModels: {}, documentClass: Item },
-    Combatant: { documentClass: Combatant },
+    ChatMessage: {},
     Combat: {},
-    Dice: { terms: { d: Die }, rolls: [] },
-    statusEffects: [],
-    specialStatusEffects: {},
-    ...(generation >= 14
-      ? {
-          ChatMessage: {
-            modes: {
-              public: { label: "CHAT.MODES.public" },
-              gm: { label: "CHAT.MODES.gm" },
-              blind: { label: "CHAT.MODES.blind" },
-              self: { label: "CHAT.MODES.self" },
-              ic: { label: "CHAT.MODES.ic" }
-            }
-          }
-        }
-      : { ChatMessage: {} })
+    Dice: { terms: { d: Die }, rolls: [], types: [] },
+    fontDefinitions: {},
   };
-  if (generation < 14) {
-    g.CONFIG.Dice.rollModes = {
-      publicroll: { label: "CHAT.RollPublic" },
-      gmroll: { label: "CHAT.RollPrivate" },
-      blindroll: { label: "CHAT.RollBlind" },
-      selfroll: { label: "CHAT.RollSelf" }
-    };
-  }
-  g.CONST = {
-    ACTIVE_EFFECT_MODES: { MULTIPLY: 1, ADD: 2, DOWNGRADE: 3, UPGRADE: 4, OVERRIDE: 5 },
-    TOKEN_DISPLAY_MODES: { OWNER: 40 },
-    TOKEN_DISPOSITIONS: { HOSTILE: -1, NEUTRAL: 0, FRIENDLY: 1 }
-  };
-
-  g.Hooks = {
-    once(name, fn) {
-      hooks.set(name, [...(hooks.get(name) ?? []), { fn, once: true }]);
-    },
-    on(name, fn) {
-      hooks.set(name, [...(hooks.get(name) ?? []), { fn, once: false }]);
-    },
-    async callAll(name, ...args) {
-      const list = hooks.get(name) ?? [];
-      hooks.set(name, list.filter((h) => !h.once));
-      const results = [];
-      for (const h of list) results.push(await h.fn(...args));
-      return results;
-    }
-  };
-
-  // Configurações do núcleo que o sistema lê, com os nomes de cada versão.
-  if (generation >= 14) settings.register("core", "messageMode", { default: "public" });
-  else settings.register("core", "rollMode", { default: "publicroll" });
+  g.CONST = { ACTIVE_EFFECT_MODES: { MULTIPLY: 1, ADD: 2, DOWNGRADE: 3, UPGRADE: 4, OVERRIDE: 5 } };
 
   g.game = {
+    folders: new Collection(),
     release: { generation },
+    system: { version: "test" },
     i18n,
-    settings,
-    user,
-    users: { get: (id) => (id === user.id ? user : null), activeGM: user },
+    settings: { get: () => "publicroll" },
+    user: { id: "u1", isGM: true, targets: new Set() },
     actors: new Collection(),
     items: new Collection(),
-    messages: new Collection(),
-    packs: new Collection(),
     macros: { find: () => null },
-    folders: new Collection(),
-    combat: null,
-    world: { title: "Mundo de teste" },
-    socket: { on: (name, fn) => socketHandlers.push({ name, fn }), emit: (name, data) => emitted.push({ name, data }) },
-    dice: {}
   };
-
   g.ui = {
     notifications: {
       warn: (m) => notices.warn.push(m),
       info: (m) => notices.info.push(m),
-      error: (m) => notices.error.push(m)
-    }
+      error: (m) => notices.error.push(m),
+    },
   };
-  g.canvas = { tokens: { controlled: [] }, grid: null, scene: null, dimensions: { distance: 5 } };
   g.fromUuid = async (uuid) => REGISTRY.get(uuid) ?? null;
   g.fromUuidSync = (uuid) => REGISTRY.get(uuid) ?? null;
 
-  return { missingKeys, notices, hooks, socketHandlers, emitted, registeredSheets, unregisteredSheets, deprecatedSheetCalls, generation, REGISTRY, user, settings };
+  return { missingKeys, notices, registered, unregistered, generation, REGISTRY, dialogs, dialogAnswer };
 }
 
-export { Handlebars, Die, Roll, Actor, Item, ChatMessage, ApplicationV2, DialogV2, TypeDataModel, DataModel };
+export { Handlebars, Die, Roll, Actor, Item, Folder, ChatMessage, ActorSheet, ItemSheet, TypeDataModel, DataModel, ActiveEffect, Collection, deepClone };

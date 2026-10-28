@@ -1,78 +1,28 @@
-Marvel Multiverse RPG (não oficial) para Foundry VTT
-=====================================================
+Marvel Multiverse RPG (não oficial) para Foundry VTT, em português do Brasil
+===========================================================================
 
-Este é um projeto de fãs, sem fins lucrativos e sem qualquer vínculo com a Marvel,
-com a Disney ou com a Foundry Gaming LLC. "Marvel", "Marvel Multiverse Role-Playing
-Game" e os nomes de personagens são marcas e obras de seus respectivos titulares. O
-sistema não inclui texto, tabelas ou arte dos livros: quem usa cria ou importa o
-próprio conteúdo.
+Este é um projeto de fãs. Não tem relação com a Marvel Entertainment, LLC, com a The Walt Disney
+Company nem com os seus parceiros. "Marvel", os nomes dos personagens e o nome do jogo pertencem
+aos seus donos. O sistema não traz regras nem textos dos livros oficiais: quem quiser usá-los
+precisa ter os livros e montar o próprio conteúdo (veja o README, seção "Conteúdo").
 
-Este sistema foi escrito do zero para o Foundry VTT v14 (com suporte experimental à v13), mas se apoia em duas obras
-abertas (licença MIT) e usa fontes sob as licenças Apache 2.0 e SIL OFL 1.1. Os avisos de copyright
-delas são reproduzidos abaixo, como as licenças exigem.
+Base do código
+--------------
+Este sistema é uma adaptação do sistema "Marvel Multiverse RPG" para Foundry VTT, de mjording /
+Rollbones Projects / Foundry Systems & Mods (https://github.com/mjording/marvel-multiverse),
+licenciado sob a MIT License (veja o arquivo LICENSE, que mantém o aviso de copyright original).
+Dessa base vêm a estrutura das fichas, o visual (CSS), a rolagem d616 com Edge e Trouble, os
+efeitos de tamanho e os ícones dos dados (icons/). O que mudou aqui: tradução completa para
+português do Brasil, reescrita para funcionar no Foundry v13 e v14, correções de erros da base,
+testes automáticos e o importador de conteúdo.
 
------------------------------------------------------------------------------------
-1. Gaia: Prelúdio — https://github.com/LPfontes/gaia-preludio
-   Referência de organização para um sistema não oficial em Foundry v14: regras
-   separadas do restante do código, convenções de interface (por exemplo, sem emojis)
-   e estrutura de projeto.
+Fontes (fonts/)
+---------------
+Roboto e Roboto Slab (The Roboto Project Authors), sob a Apache License 2.0.
+Roboto Condensed (The Roboto Project Authors), sob a SIL Open Font License 1.1.
+Cada pasta de fonte traz o seu próprio arquivo LICENSE.
 
-   MIT License
-
-   Copyright (c) 2026 LPfontes
-
-   Permission is hereby granted, free of charge, to any person obtaining a copy
-   of this software and associated documentation files (the "Software"), to deal
-   in the Software without restriction, including without limitation the rights
-   to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-   copies of the Software, and to permit persons to whom the Software is
-   furnished to do so, subject to the following conditions:
-
-   The above copyright notice and this permission notice shall be included in all
-   copies or substantial portions of the Software.
-
-   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-   IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-   FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-   AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-   LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-   OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-   SOFTWARE.
-
------------------------------------------------------------------------------------
-2. marvel-multiverse (sistema da comunidade para Foundry VTT)
-   — https://github.com/mjording/marvel-multiverse
-   Referência para a mecânica do d616 e para a lista de atributos. O visual, o CSS e os
-   textos desta ficha são próprios; nenhuma imagem desse sistema foi copiada.
-
-   MIT License
-
-   Copyright (c) 2024 Rollbones Projects / Foundry Systems & Mods
-
-   Permission is hereby granted, free of charge, to any person obtaining a copy
-   of this software and associated documentation files (the "Software"), to deal
-   in the Software without restriction, including without limitation the rights
-   to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-   copies of the Software, and to permit persons to whom the Software is
-   furnished to do so, subject to the following conditions:
-
-   The above copyright notice and this permission notice shall be included in all
-   copies or substantial portions of the Software.
-
-   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-   IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-   FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-   AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-   LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-   OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-   SOFTWARE.
-
------------------------------------------------------------------------------------
-3. Fontes Roboto e Roboto Condensed (pasta fonts/)
-   — https://github.com/googlefonts/roboto
-   Roboto: Copyright 2011-2024 The Roboto Project Authors. Licença Apache 2.0.
-   Roboto Condensed: Copyright 2011 The Roboto Project Authors
-   (https://github.com/googlefonts/roboto-classic). Licença SIL Open Font License 1.1.
-   O texto de cada licença acompanha as fontes em fonts/roboto/LICENSE e
-   fonts/roboto-condensed/LICENSE. Os arquivos foram copiados sem alteração do
-   repositório do sistema acima, que já os distribui.
+Ícones (icons/)
+---------------
+Os ícones dos dados (1 a 6 e as faces vermelhas com "M", 2 a 6) são desenhos simples distribuídos
+com o projeto de mjording, sob a mesma MIT License. Não são o logotipo nem arte oficial da Marvel.

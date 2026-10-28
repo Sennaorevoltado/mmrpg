@@ -1,0 +1,17 @@
+<div class="mm-styled-container mm-damage-block">
+  <h3>{{localize "MARVEL_MULTIVERSE.Sheet.Damage"}}</h3>
+  <ul class="mm-styled-container-body mm-damage-rows">
+    {{#each damageRows as |row|}}
+      <li>
+        <h6 data-tooltip="{{row.name}}">{{row.label}}</h6>
+        <div class="mm-damage-multiply">
+          <img src="systems/mmrpg/icons/marvel-1.svg" title="{{localize 'MARVEL_MULTIVERSE.MarvelResult.M'}}" alt="M">
+          <span>x</span>
+          <span>{{row.multiplier}}</span>
+        </div>
+        <span>+</span>
+        <div class="mm-damage-addition">{{row.value}}</div>
+      </li>
+    {{/each}}
+  </ul>
+</div>

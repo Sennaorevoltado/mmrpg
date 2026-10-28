@@ -1,0 +1,200 @@
+<form class="{{cssClass}} {{actor.type}} flexcol" autocomplete="off">
+  {{!-- Cabeçalho --}}
+  <header class="sheet-header">
+    <div class="header-fields">
+      <div class="flexrow -gap-md">
+        <div class="flexcol -gap-sm -space-between">
+          {{!-- Retrato, Rank e Karma --}}
+          <div class="mm-hero-portrait-block">
+            <div class="mm-hero-portrait">
+              <img src="{{actor.img}}" data-edit="img" title="{{actor.name}}"/>
+            </div>
+            <div class="mm-rank-block">
+              <label class="mm-label" for="system.attributes.rank.value"><span>{{localize "MARVEL_MULTIVERSE.Sheet.Rank"}}</span></label>
+              <div class="mm-input">
+                <input type="number" id="system.attributes.rank.value" name="system.attributes.rank.value" value="{{system.attributes.rank.value}}" data-dtype="Number"/>
+              </div>
+            </div>
+            <div class="mm-karma-block">
+              <label class="mm-label" for="system.karma.value"><span>{{localize "MARVEL_MULTIVERSE.Resource.karma"}}</span></label>
+              <div class="mm-input">
+                <input type="number" id="system.karma.value" name="system.karma.value" value="{{system.karma.value}}" data-dtype="Number"/>
+                <input type="hidden" name="system.karma.max" value="{{system.karma.value}}"/>
+              </div>
+            </div>
+          </div>
+          {{!-- Dano --}}
+          {{> "systems/mmrpg/templates/actor/parts/actor-damage.hbs"}}
+        </div>
+        <div class="flexcol -static-children -gap-sm -space-between">
+          <div class="flexrow -nowrap -gap-sm">
+            <div class="mm-styled-field -flex-relative">
+              <label class="mm-styled-label -align-left" for="name"><span>{{localize "MARVEL_MULTIVERSE.Sheet.Codename"}}</span></label>
+              <div class="mm-styled-input">
+                <input id="name" name="name" type="text" value="{{actor.name}}" placeholder="{{localize 'MARVEL_MULTIVERSE.Sheet.Codename'}}"/>
+              </div>
+            </div>
+            <div class="mm-styled-field -flex-relative">
+              <label class="mm-styled-label -align-right"><span>{{localize "MARVEL_MULTIVERSE.Sheet.TeamManeuver"}}</span></label>
+              <div class="mm-styled-input team-maneuver">
+                <select name="system.teamManeuver.maneuverType">
+                  {{selectOptions teamManeuverTypes selected=system.teamManeuver.maneuverType blank=""}}
+                </select>
+                <select name="system.teamManeuver.level">
+                  {{selectOptions teamManeuverLevels selected=system.teamManeuver.level}}
+                </select>
+              </div>
+            </div>
+          </div>
+          <div class="flexrow -gap-sm">
+            {{!-- Saúde e Redução de Dano da Saúde --}}
+            <div class="flexrow -relative">
+              <div class="mm-stat-block">
+                <label class="mm-label" for="system.health.value">{{localize "MARVEL_MULTIVERSE.Resource.health"}}</label>
+                <div class="flexcol mm-input -static-children">
+                  <input type="number" id="system.health.value" name="system.health.value" value="{{system.health.value}}" data-dtype="Number"/>
+                  <hr />
+                  <input type="number" name="system.health.max" value="{{system.health.max}}" data-dtype="Number"/>
+                </div>
+              </div>
+              <div class="mm-stat-corner-block">
+                <label class="mm-label -sm">{{localize "MARVEL_MULTIVERSE.Sheet.DamageReduction"}}</label>
+                <div class="mm-input">
+                  {{#if (gt system.healthDamageReduction 0)}}-{{/if}}{{system.healthDamageReduction}}
+                </div>
+              </div>
+            </div>
+            {{!-- Foco e Redução de Dano do Foco --}}
+            <div class="flexrow -relative">
+              <div class="mm-stat-block -focus">
+                <label class="mm-label" for="system.focus.value">{{localize "MARVEL_MULTIVERSE.Resource.focus"}}</label>
+                <div class="flexcol mm-input -static-children">
+                  <input type="number" id="system.focus.value" name="system.focus.value" value="{{system.focus.value}}" data-dtype="Number"/>
+                  <hr />
+                  <input type="number" name="system.focus.max" value="{{system.focus.max}}" data-dtype="Number"/>
+                </div>
+              </div>
+              <div class="mm-stat-corner-block">
+                <label class="mm-label -sm">{{localize "MARVEL_MULTIVERSE.Sheet.DamageReduction"}}</label>
+                <div class="mm-input">
+                  {{#if (gt system.focusDamageReduction 0)}}-{{/if}}{{system.focusDamageReduction}}
+                </div>
+              </div>
+            </div>
+            {{!-- Velocidade e Iniciativa --}}
+            <div class="flexrow -relative">
+              <div class="mm-stat-block">
+                <label class="mm-label">{{localize "MARVEL_MULTIVERSE.Sheet.Speed"}}</label>
+                <div class="mm-speed-fields">
+                  {{#each movementRows as |row|}}
+                    <div class="flexrow -gap-sm">
+                      <span>{{row.label}}:</span><span>{{row.value}}</span>
+                    </div>
+                  {{/each}}
+                </div>
+              </div>
+              <div class="mm-stat-corner-block rollable roll-initiative" data-tooltip="{{localize 'MARVEL_MULTIVERSE.Sheet.RollInitiative'}}">
+                <label class="mm-label -sm">{{localize "MARVEL_MULTIVERSE.Sheet.Initiative"}}</label>
+                <div class="mm-input">
+                  {{numberFormat system.attributes.init.value decimals=0 sign=true}} {{#if system.attributes.init.edge}}<span>E</span>{{/if}}
+                </div>
+              </div>
+            </div>
+          </div>
+          {{!-- Atributos --}}
+          <div class="flexrow mm-styled-container mm-abilities-block">
+            <h3>{{localize "MARVEL_MULTIVERSE.Sheet.Abilities"}}</h3>
+            <ul class="mm-styled-container-body mm-ability-rows">
+              <li>
+                <div></div>
+                <div>{{localize "MARVEL_MULTIVERSE.Sheet.AbilityScore"}}</div>
+                <div>{{localize "MARVEL_MULTIVERSE.Sheet.DefenseScore"}}</div>
+                <div>{{localize "MARVEL_MULTIVERSE.Sheet.NonCombat"}}</div>
+              </li>
+              {{#each abilityRows as |row|}}
+                <li>
+                  <div class="mm-ability-name rollable" data-ability="{{row.key}}" data-tooltip="{{localize 'MARVEL_MULTIVERSE.Sheet.RollCheck'}}">{{row.label}}</div>
+                  <div>
+                    <input type="number" name="system.abilities.{{row.key}}.value" value="{{row.value}}" data-dtype="Number"/>
+                  </div>
+                  <div>
+                    <div>{{row.defense}}</div>
+                  </div>
+                  <div>
+                    <span class="rollable" data-ability="{{row.key}}" data-kind="noncom" data-tooltip="{{localize 'MARVEL_MULTIVERSE.Sheet.RollNonCombat'}}">{{numberFormat row.noncom decimals=0 sign=true}}</span>
+                  </div>
+                </li>
+              {{/each}}
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  {{!-- Abas --}}
+  <nav class="sheet-tabs tabs mm-tabs -four" data-group="primary">
+    <div class="sheet-tabs-wrapper">
+      <a class="item" data-tab="abilities">{{localize "MARVEL_MULTIVERSE.Sheet.TabPowers"}}</a>
+      <a class="item" data-tab="biography">{{localize "MARVEL_MULTIVERSE.Sheet.TabBiography"}}</a>
+      <a class="item" data-tab="gear">{{localize "MARVEL_MULTIVERSE.Sheet.TabGear"}}</a>
+      <a class="item" data-tab="effects">{{localize "MARVEL_MULTIVERSE.Sheet.TabEffects"}}</a>
+    </div>
+  </nav>
+
+  {{!-- Corpo --}}
+  <section class="sheet-body">
+    {{!-- Poderes, Traços e Tags --}}
+    <div class="tab" data-group="primary" data-tab="abilities">
+      <div class="flexrow -gap-sm -nowrap">
+        <div class="mm-styled-container mm-powers-block">
+          <h3>{{localize "MARVEL_MULTIVERSE.Sheet.Powers"}}</h3>
+          <div class="mm-styled-container-body">
+            <div class="mm-styled-field -sm">
+              <label class="mm-styled-label -align-left"><span>{{localize "MARVEL_MULTIVERSE.Sheet.DefaultElement"}}</span></label>
+              <div class="mm-styled-input">
+                <select name="system.defaultElement">
+                  {{selectOptions elements selected=system.defaultElement blank=""}}
+                </select>
+              </div>
+            </div>
+            {{> "systems/mmrpg/templates/actor/parts/actor-powers.hbs"}}
+          </div>
+        </div>
+        <div class="mm-styled-container mm-traitstags-block">
+          <h3>{{localize "MARVEL_MULTIVERSE.Sheet.TraitsTags"}}</h3>
+          <div class="mm-styled-container-body">
+            {{> "systems/mmrpg/templates/actor/parts/actor-traits.hbs"}}
+            {{> "systems/mmrpg/templates/actor/parts/actor-tags.hbs"}}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    {{!-- Biografia --}}
+    <div class="tab items" data-group="primary" data-tab="biography">
+      <div class="mm-bio-block">
+        <div class="flexcol -static-children">
+          {{> "systems/mmrpg/templates/actor/parts/actor-details.hbs"}}
+        </div>
+        {{> "systems/mmrpg/templates/actor/parts/actor-biography.hbs"}}
+      </div>
+    </div>
+
+    {{!-- Equipamento --}}
+    <div class="tab gear" data-group="primary" data-tab="gear">
+      <div class="mm-styled-container mm-gear-block">
+        <h3>{{localize "MARVEL_MULTIVERSE.Sheet.Gear"}}</h3>
+        <div class="mm-styled-container-body">
+          {{> "systems/mmrpg/templates/actor/parts/actor-weapons.hbs"}}
+          {{> "systems/mmrpg/templates/actor/parts/actor-items.hbs"}}
+        </div>
+      </div>
+    </div>
+
+    {{!-- Efeitos --}}
+    <div class="tab effects" data-group="primary" data-tab="effects">
+      {{> "systems/mmrpg/templates/actor/parts/actor-effects.hbs"}}
+    </div>
+  </section>
+</form>

@@ -1,6 +1,15 @@
-import ActorBase from "./actor-base.mjs";
+import MarvelMultiverseActorBase from "./actor-base.mjs";
 
-/** Personagem de jogador: a ficha nasce no modo criação. */
-export default class CharacterData extends ActorBase {
-  static FREE_BY_DEFAULT = false;
+export default class MarvelMultiverseCharacter extends MarvelMultiverseActorBase {
+  static defineSchema() {
+    const fields = foundry.data.fields;
+    const schema = MarvelMultiverseActorBase.defineSchema();
+
+    schema.teamManeuver = new fields.SchemaField({
+      maneuverType: new fields.StringField({ required: true, blank: true }),
+      level: new fields.NumberField({ min: 1, max: 3, integer: true }),
+    });
+
+    return schema;
+  }
 }

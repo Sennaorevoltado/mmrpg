@@ -1,96 +1,315 @@
 {
-  "TYPES": {
-    "Actor": {
-      "character": "Personagem",
-      "npc": "NPC"
-    }
-  },
-  "MMRPG": {
+  "MARVEL_MULTIVERSE": {
+    "edge": "Edge",
+    "trouble": "Trouble",
+    "RerollEdge": "Rolar este dado de novo e ficar com o melhor resultado (Edge)",
+    "RerollTrouble": "Rolar este dado de novo e ficar com o pior resultado (Trouble)",
+    "Fantastic": "Fantástico",
+    "NonCombat": "Fora de combate",
+    "DamageType": "Dano em",
+    "NewItem": "Novo: {type}",
+    "Issues": "Relatar problema",
+    "edgeMode": {
+      "edge": "Edge",
+      "normal": "Normal",
+      "trouble": "Trouble"
+    },
+    "MarvelResult": {
+      "M": "Dado Marvel (M)",
+      "2": "2",
+      "3": "3",
+      "4": "4",
+      "5": "5",
+      "6": "6"
+    },
+    "Size": {
+      "Microscopic": "Microscópico",
+      "Miniature": "Miniatura",
+      "Tiny": "Minúsculo",
+      "Little": "Pequenino",
+      "Small": "Pequeno",
+      "Average": "Médio",
+      "Big": "Grande",
+      "Huge": "Enorme",
+      "Gigantic": "Gigantesco",
+      "Titanic": "Titânico",
+      "Gargantuan": "Colossal"
+    },
+    "SizeEffect": {
+      "microscopic": "Tamanho: Microscópico",
+      "miniature": "Tamanho: Miniatura",
+      "tiny": "Tamanho: Minúsculo",
+      "little": "Tamanho: Pequenino",
+      "small": "Tamanho: Pequeno",
+      "average": "Tamanho: Médio",
+      "big": "Tamanho: Grande",
+      "huge": "Tamanho: Enorme",
+      "gigantic": "Tamanho: Gigantesco",
+      "titanic": "Tamanho: Titânico",
+      "gargantuan": "Tamanho: Colossal"
+    },
     "Ability": {
-      "mle": { "abbr": "CAC", "long": "Corpo a Corpo" },
-      "agl": { "abbr": "AGI", "long": "Agilidade" },
-      "res": { "abbr": "RES", "long": "Resiliência" },
-      "vig": { "abbr": "VIG", "long": "Vigilância" },
-      "ego": { "abbr": "EGO", "long": "Ego" },
-      "log": { "abbr": "LOG", "long": "Lógica" }
+      "Mel": {
+        "long": "Corpo a Corpo",
+        "abbr": "cac"
+      },
+      "Agl": {
+        "long": "Agilidade",
+        "abbr": "agi"
+      },
+      "Res": {
+        "long": "Resiliência",
+        "abbr": "res"
+      },
+      "Vig": {
+        "long": "Vigilância",
+        "abbr": "vig"
+      },
+      "Ego": {
+        "long": "Ego",
+        "abbr": "ego"
+      },
+      "Log": {
+        "long": "Lógica",
+        "abbr": "log"
+      }
     },
     "Resource": {
       "health": "Saúde",
       "focus": "Foco",
       "karma": "Karma"
     },
+    "AttackKind": {
+      "ranged": "À distância",
+      "close": "Corpo a corpo"
+    },
+    "Movement": {
+      "Run": "Corrida",
+      "Jump": "Salto",
+      "Climb": "Escalada",
+      "Swim": "Natação",
+      "Flight": "Voo",
+      "Glide": "Planar",
+      "Swingline": "Balanço",
+      "Levitation": "Levitação"
+    },
+    "Element": {
+      "air": "Ar",
+      "earth": "Terra",
+      "electricity": "Eletricidade",
+      "energy": "Energia",
+      "fire": "Fogo",
+      "force": "Força",
+      "hellfire": "Fogo Infernal",
+      "ice": "Gelo",
+      "iron": "Ferro",
+      "sound": "Som",
+      "water": "Água",
+      "chemical": "Químico",
+      "toxin": "Toxina",
+      "swarm": "Enxame"
+    },
+    "PowerSet": {
+      "basic": "Básicos",
+      "elementalControl": "Controle Elemental",
+      "healing": "Cura",
+      "illusion": "Ilusão",
+      "luck": "Sorte",
+      "magic": "Magia",
+      "martialArts": "Artes Marciais",
+      "meleeWeapons": "Armas Corpo a Corpo",
+      "narrative": "Narrativos",
+      "omniversalTravel": "Viagem Omniversal",
+      "phasing": "Intangibilidade",
+      "plasticity": "Plasticidade",
+      "powerControl": "Controle de Poder",
+      "rangedWeapons": "Armas à Distância",
+      "resize": "Mudança de Tamanho",
+      "shieldBearer": "Portador de Escudo",
+      "sixthSense": "Sexto Sentido",
+      "spiderPowers": "Poderes de Aranha",
+      "superSpeed": "Super-Velocidade",
+      "superStrength": "Super-Força",
+      "tactics": "Tática",
+      "telekinesis": "Telecinese",
+      "telepathy": "Telepatia",
+      "teleportation": "Teletransporte",
+      "translation": "Tradução",
+      "weatherControl": "Controle do Clima"
+    },
+    "TeamManeuver": {
+      "offensive": "Ofensiva",
+      "defensive": "Defensiva",
+      "rally": "Reagrupar"
+    },
+    "SheetLabels": {
+      "Actor": "Marvel Multiverse: ficha de personagem",
+      "NPC": "Marvel Multiverse: ficha de NPC",
+      "Item": "Marvel Multiverse: ficha de item"
+    },
+    "Effect": {
+      "Source": "Fonte",
+      "Duration": "Duração",
+      "Toggle": "Ligar/desligar efeito",
+      "Temporary": "Efeitos temporários",
+      "Passive": "Efeitos passivos",
+      "Inactive": "Efeitos inativos",
+      "Create": "Criar efeito",
+      "Edit": "Editar efeito",
+      "Delete": "Excluir efeito"
+    },
+    "Damage": {
+      "title": "Dano",
+      "button": "Dano",
+      "generic": "{amount} de dano em {type}",
+      "target": "{name}: {amount} de dano em {type}",
+      "breakdown": "dado Marvel {die} x {net} (multiplicador {multiplier} - redução de dano {reduction}) + {ability} {score}"
+    },
+    "Warn": {
+      "noAbility": "Atributo desconhecido para esta rolagem.",
+      "noDamageAbility": "Este cartão não é um ataque com atributo de dano (Corpo a Corpo, Agilidade, Ego ou Lógica).",
+      "macroOwnedOnly": "Só dá para criar macro de um item que está na ficha de um personagem.",
+      "macroItemMissing": "Não achei o item \"{name}\" numa ficha. Ele foi apagado ou a macro é antiga."
+    },
     "Sheet": {
-      "character": "Ficha de personagem",
-      "npc": "Ficha de NPC",
-      "abilities": "Atributos",
-      "codename": "Codinome",
-      "realName": "Nome real",
-      "rank": "Rank",
-      "changeImage": "Trocar imagem",
-      "score": "Pontuação",
-      "defense": "Defesa",
-      "noncombat": "Fora de combate",
-      "max": "Máximo"
+      "Rank": "Rank",
+      "Codename": "Codinome",
+      "TeamManeuver": "Manobra de equipe",
+      "DamageReduction": "Redução de dano",
+      "DamageReductionShort": "RD",
+      "Speed": "Velocidade",
+      "Initiative": "Iniciativa",
+      "RollInitiative": "Rolar iniciativa",
+      "Abilities": "Atributos",
+      "AbilityScore": "Valor",
+      "DefenseScore": "Defesa",
+      "NonCombat": "Fora de combate",
+      "RollCheck": "Rolar teste",
+      "RollNonCombat": "Rolar teste fora de combate",
+      "TabPowers": "Poderes",
+      "TabBiography": "Biografia",
+      "TabGear": "Equipamento",
+      "TabEffects": "Efeitos",
+      "Powers": "Poderes",
+      "DefaultElement": "Elemento padrão",
+      "TraitsTags": "Traços e tags",
+      "Gear": "Equipamento",
+      "Damage": "Dano",
+      "Occupation": "Ocupação",
+      "Origin": "Origem",
+      "RealName": "Nome real",
+      "Gender": "Gênero",
+      "Size": "Tamanho",
+      "Height": "Altura",
+      "Weight": "Peso",
+      "Eyes": "Olhos",
+      "Hair": "Cabelo",
+      "Teams": "Equipes",
+      "Base": "Base de operações",
+      "History": "História",
+      "Personality": "Personalidade",
+      "Features": "Marcas",
+      "FeaturesLong": "Marcas distintivas",
+      "AddPower": "Adicionar poder",
+      "NoPowers": "Nenhum poder ainda. Arraste poderes do diretório de Itens para esta ficha.",
+      "UseItem": "Usar (mostra no chat e rola, se tiver ataque)",
+      "Edit": "Editar",
+      "Delete": "Excluir",
+      "Create": "Criar",
+      "Traits": "Traços",
+      "Tags": "Tags",
+      "Weapons": "Armas",
+      "Items": "Itens",
+      "DropOccupation": "Arraste uma ocupação para cá",
+      "DropOrigin": "Arraste uma origem para cá"
     },
-    "Creation": {
-      "mode": "Modo de preenchimento",
-      "modeHint": "Criação mostra os pontos e o teto de cada atributo. Livre deixa os campos soltos, sem contadores.",
-      "modeGuided": "Criação",
-      "modeFree": "Livre",
-      "points": {
-        "open": "pontos restantes",
-        "done": "pontos restantes",
-        "over": "pontos a mais",
-        "unset": "orçamento não definido"
-      },
-      "cap": "Teto por atributo",
-      "overCap": "Acima do teto de {cap}: {names}.",
-      "undefinedBudget": "O orçamento do Rank {rank} ainda não foi definido.",
-      "defineBudget": "Definir orçamento",
-      "askGM": "Peça ao Narrador para defini-lo.",
-      "decrease": "Diminuir {ability}",
-      "increase": "Aumentar {ability}",
-      "bonusPoints": "Pontos extras",
-      "bonusCap": "Teto extra",
-      "bonusHint": "Ajustes de Origem, Ocupação, traits ou do Narrador. Podem ser negativos."
-    },
-    "Budget": {
-      "title": "Orçamento de atributos por Rank",
-      "menuName": "Orçamento de atributos",
-      "menuLabel": "Definir orçamento",
-      "menuHint": "Pontos para distribuir e teto de cada atributo, por Rank. É o que o modo criação das fichas usa.",
-      "hint": "Deixe em branco o que ainda não foi definido. O Rank 1 já vem preenchido; confira os outros no seu livro.",
-      "points": "Pontos",
-      "cap": "Teto",
-      "pointsOf": "Pontos do Rank {rank}",
-      "capOf": "Teto do Rank {rank}",
-      "reset": "Restaurar padrão",
-      "save": "Salvar",
-      "gmOnly": "Só o Narrador pode definir o orçamento."
-    },
-    "Settings": {
-      "strictBudget": {
-        "name": "Parar o botão + no limite",
-        "hint": "Ligado: no modo criação, o botão + para quando o atributo chega ao teto ou os pontos acabam. Desligado: a ficha só avisa."
+    "Import": {
+      "Button": "Importar conteúdo",
+      "Title": "Importar conteúdo",
+      "Confirm": "Importar {count} itens de \"{file}\" para este mundo? Itens que já existem são ignorados.",
+      "Running": "Importando conteúdo... pode levar um instante.",
+      "Done": "Importação concluída: {created} criados, {skipped} ignorados.",
+      "NotContent": "Este arquivo não é um arquivo de conteúdo deste sistema.",
+      "BadFile": "Não foi possível ler o arquivo: {error}",
+      "Empty": "O arquivo não tem itens para importar.",
+      "OnlyGM": "Só o Narrador pode importar conteúdo.",
+      "Failed": "A importação parou: {error}",
+      "Root": "Conteúdo MMRPG",
+      "Folder": {
+        "power": "Poderes",
+        "trait": "Traços",
+        "tag": "Tags",
+        "origin": "Origens",
+        "occupation": "Ocupações",
+        "weapon": "Armas",
+        "item": "Equipamentos"
       }
     },
-    "Appearance": {
-      "title": "Aparência da ficha",
-      "save": "Aplicar",
-      "hint": "Vale só para você, neste navegador. Cada jogador escolhe o seu.",
-      "uiTheme": {
-        "name": "Tema da ficha",
-        "hint": "Claro: fundo claro, como o papel impresso. Escuro: o mesmo desenho com fundo escuro.",
-        "light": "Claro",
-        "dark": "Escuro"
+    "Item": {
+      "Name": "Nome",
+      "Description": "Descrição",
+      "Effect": "Efeito",
+      "PowerSet": "Conjunto de poderes",
+      "Prerequisites": "Pré-requisitos",
+      "Elemental": "Poder elemental",
+      "Element": "Elemento",
+      "AttackAbility": "Atributo do ataque",
+      "AttackKind": "Tipo de ataque",
+      "AttackTarget": "Contra a defesa de",
+      "AttackRange": "Alcance do ataque",
+      "AttackMultiplier": "Multiplicador de dano",
+      "AttackEdgeMode": "Edge / Trouble do ataque",
+      "DamageType": "Dano em",
+      "Equipped": "Em uso",
+      "Category": "Categoria",
+      "RecommendedRank": "Rank recomendado",
+      "Reach": "Alcance corpo a corpo",
+      "DamageMultiplierBonus": "Bônus no multiplicador de dano",
+      "RollFormula": "Fórmula da rolagem",
+      "Rule": "Regra",
+      "Restriction": "Restrição",
+      "Multiple": "Pode ser escolhido mais de uma vez",
+      "Rarity": "Raridade",
+      "Examples": "Exemplos",
+      "SuggestedOccupation": "Ocupação sugerida",
+      "MinimumRank": "Rank mínimo",
+      "Limitation": "Limitação",
+      "Quantity": "Quantidade",
+      "Weight": "Peso",
+      "TabPower": "Poder",
+      "TabWeapon": "Arma",
+      "TabTrait": "Traço",
+      "TabTag": "Tag",
+      "TabOrigin": "Origem",
+      "TabOccupation": "Ocupação",
+      "TabItem": "Equipamento",
+      "Grants": {
+        "traits": "Concede traços",
+        "tags": "Concede tags",
+        "powers": "Concede poderes"
       },
-      "uiTextSize": {
-        "name": "Tamanho do texto",
-        "hint": "Aumenta todas as letras da ficha.",
-        "normal": "Normal",
-        "large": "Grande",
-        "xlarge": "Muito grande"
+      "Field": {
+        "action": "Ação",
+        "trigger": "Gatilho",
+        "duration": "Duração",
+        "range": "Alcance",
+        "cost": "Custo"
       }
+    }
+  },
+  "TYPES": {
+    "Actor": {
+      "character": "Personagem",
+      "npc": "NPC"
+    },
+    "Item": {
+      "item": "Equipamento",
+      "weapon": "Arma",
+      "trait": "Traço",
+      "tag": "Tag",
+      "origin": "Origem",
+      "occupation": "Ocupação",
+      "power": "Poder"
     }
   }
 }

@@ -1,17 +1,17 @@
 {
   "name": "mmrpg",
   "version": "1.0.0",
-  "private": true,
-  "description": "Sistema não oficial de Marvel Multiverse RPG para Foundry VTT (v14; v13 experimental)",
+  "description": "Marvel Multiverse RPG (não oficial) para Foundry VTT, em português do Brasil. Baseado no sistema de mjording / Rollbones Projects (MIT).",
   "type": "module",
+  "private": true,
+  "license": "MIT",
   "scripts": {
     "test": "node --test \"tests/*.test.mjs\"",
     "validate": "node scripts/validate.mjs",
-    "check": "npm run test && npm run validate",
-    "package": "node scripts/package.mjs"
+    "package": "node scripts/package.mjs",
+    "preview": "node tests/support/preview.mjs previews"
   },
   "devDependencies": {
     "handlebars": "^4.7.8"
-  },
-  "license": "MIT"
+  }
 }

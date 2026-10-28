@@ -1,0 +1,34 @@
+/*
+ * Aproximação do CSS geral do Foundry (v13/v14), só para a prévia.
+ * É propositalmente "hostil": põe margem, sombra, caixa alta e altura em tudo, para a ficha
+ * provar que se defende. NÃO é o CSS real do Foundry.
+ */
+*, *::before, *::after { box-sizing: border-box; }
+body { margin: 0; background: #2b2b30; font-family: "Signika", Arial, sans-serif; font-size: 14px; line-height: 1.5; color: #191813; }
+h1, h2, h3, h4, h5, h6 { font-family: "Modesto Condensed", Georgia, serif; font-weight: bold; margin: 12px 0 8px; text-shadow: 0 0 6px #ccc; letter-spacing: 1px; text-transform: uppercase; }
+h3 { font-size: 20px; border-bottom: 1px solid #888; }
+h4 { font-size: 16px; border-bottom: 1px solid #aaa; }
+button { background: #ddd; border: 1px solid #777; border-radius: 4px; color: #191813; font-size: 14px; height: 32px; padding: 0 10px; margin: 2px; display: flex; align-items: center; justify-content: center; gap: 4px; width: auto; box-shadow: 0 1px 3px rgba(0,0,0,.4); cursor: pointer; }
+input, select, textarea { height: 30px; width: 100%; background: rgba(0,0,0,.08); border: 1px solid #999; border-radius: 4px; padding: 3px 8px; color: #191813; font-size: 14px; margin: 2px 0; text-align: left; box-shadow: inset 0 0 4px rgba(0,0,0,.2); }
+input[type=number] { text-align: right; }
+input[type=checkbox], input[type=radio] { width: auto; height: auto; }
+label { display: block; font-weight: bold; margin: 4px 0; text-shadow: 0 0 2px #fff; }
+ul, ol { margin: 12px 0; padding-left: 26px; list-style: disc; }
+li { margin: 4px 0; }
+hr { border: 0; border-top: 1px solid #888; margin: 12px 0; height: 1px; }
+img { border: 1px solid #000; max-width: 100%; height: auto; }
+p { margin: 12px 0; }
+a { color: #8b0502; cursor: pointer; }
+
+.flexrow { display: flex; flex-direction: row; flex-wrap: wrap; gap: 4px; }
+.flexcol { display: flex; flex-direction: column; flex-wrap: nowrap; gap: 4px; }
+.tab { display: none; }
+.tab.active { display: block; }
+
+.window-app { display: flex; flex-direction: column; border: 1px solid #000; border-radius: 4px; overflow: hidden; margin: 8px; box-shadow: 0 0 20px #000; background: #444; }
+.window-app .window-header { display: flex; align-items: center; height: 30px; padding: 0 10px; background: #222; color: #eee; flex: 0 0 auto; }
+.window-app .window-header h4 { margin: 0; border: 0; font-size: 14px; text-shadow: none; text-transform: none; letter-spacing: 0; }
+.window-app .window-content { display: flex; flex-direction: column; flex: 1; min-height: 0; padding: 8px; overflow-y: auto; }
+.window-app .window-content > form { display: flex; flex-direction: column; flex: 1; min-height: 0; }
+
+.editor { min-height: 60px; background: rgba(0,0,0,.06); border: 1px solid #999; padding: 4px 8px; }

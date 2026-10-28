@@ -1,0 +1,14 @@
+{{#each occupations as |item|}}
+  <div class="item mm-input-item" data-item-id="{{item._id}}">
+    <div class="item-name">
+      <h4>
+        <a class="rollable" data-roll-type="item" data-tooltip="{{localize 'MARVEL_MULTIVERSE.Sheet.UseItem'}}"><span>{{item.name}}</span></a>
+        <a class="item-control item-delete" title="{{localize 'MARVEL_MULTIVERSE.Sheet.Delete'}}">
+          <i class="fas fa-trash"></i>
+        </a>
+      </h4>
+    </div>
+  </div>
+{{else}}
+  <span class="mm-empty">{{localize "MARVEL_MULTIVERSE.Sheet.DropOccupation"}}</span>
+{{/each}}

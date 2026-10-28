@@ -1,0 +1,43 @@
+<form class="{{cssClass}}" autocomplete="off">
+  <header class="sheet-header">
+    <div class="mm-styled-field -lg -img">
+      <img class="profile-img" src="{{item.img}}" data-edit="img" title="{{item.name}}" />
+      <div class="mm-styled-input">
+        <input name="name" type="text" value="{{item.name}}" placeholder="{{localize 'MARVEL_MULTIVERSE.Item.Name'}}"/>
+      </div>
+    </div>
+  </header>
+
+  <nav class="sheet-tabs tabs mm-tabs -two" data-group="primary">
+    <a class="item" data-tab="attributes">{{localize "MARVEL_MULTIVERSE.Item.TabOccupation"}}</a>
+    <a class="item" data-tab="effects">{{localize "MARVEL_MULTIVERSE.Sheet.TabEffects"}}</a>
+  </nav>
+
+  <section class="sheet-body">
+    <div class="tab flexcol -gap-sm" data-group="primary" data-tab="attributes">
+      <div class="mm-styled-field -fill">
+        <label class="mm-styled-label -align-left"><span>{{localize "MARVEL_MULTIVERSE.Item.Description"}}</span></label>
+        <div class="mm-styled-input">
+          {{editor system.description target="system.description" button=false engine="prosemirror" collaborate=false editable=editable}}
+        </div>
+      </div>
+      <div class="mm-styled-field -fill">
+        <label class="mm-styled-label -align-left"><span>{{localize "MARVEL_MULTIVERSE.Item.Examples"}}</span></label>
+        <div class="mm-styled-input">
+          <input type="text" name="system.examples" value="{{system.examples}}" data-dtype="String"/>
+        </div>
+      </div>
+      {{#each grants as |grant|}}
+        <div class="mm-styled-field -fill">
+          <label class="mm-styled-label -align-left"><span>{{grant.label}}</span></label>
+          <div class="mm-styled-input">
+            <div class="plain-text">{{grant.text}}</div>
+          </div>
+        </div>
+      {{/each}}
+    </div>
+    <div class="tab effects" data-group="primary" data-tab="effects">
+      {{> "systems/mmrpg/templates/item/parts/item-effects.hbs"}}
+    </div>
+  </section>
+</form>

@@ -1,0 +1,127 @@
+<form class="{{cssClass}}" autocomplete="off">
+  <header class="sheet-header">
+    <div class="mm-styled-field -lg -img">
+      <img class="profile-img" src="{{item.img}}" data-edit="img" title="{{item.name}}" />
+      <div class="mm-styled-input">
+        <input name="name" type="text" value="{{item.name}}" placeholder="{{localize 'MARVEL_MULTIVERSE.Item.Name'}}"/>
+      </div>
+    </div>
+  </header>
+
+  <nav class="sheet-tabs tabs mm-tabs -two" data-group="primary">
+    <a class="item" data-tab="attributes">{{localize "MARVEL_MULTIVERSE.Item.TabWeapon"}}</a>
+    <a class="item" data-tab="effects">{{localize "MARVEL_MULTIVERSE.Sheet.TabEffects"}}</a>
+  </nav>
+
+  <section class="sheet-body">
+    <div class="tab flexcol -gap-sm" data-group="primary" data-tab="attributes">
+      <div class="mm-styled-field -fill">
+        <label class="mm-styled-label -align-left"><span>{{localize "MARVEL_MULTIVERSE.Item.Description"}}</span></label>
+        <div class="mm-styled-input">
+          {{editor system.description target="system.description" button=false engine="prosemirror" collaborate=false editable=editable}}
+        </div>
+      </div>
+      <div class="mm-styled-field -fill">
+        <label class="mm-styled-label -align-left"><span>{{localize "MARVEL_MULTIVERSE.Item.Rule"}}</span></label>
+        <div class="mm-styled-input">
+          {{editor system.rule target="system.rule" button=false engine="prosemirror" collaborate=false editable=editable}}
+        </div>
+      </div>
+      <div class="flexrow -nowrap -gap-md">
+        <div class="mm-styled-field -flex-relative -sm">
+          <label class="mm-styled-label -align-left"><span>{{localize "MARVEL_MULTIVERSE.Item.Category"}}</span></label>
+          <div class="mm-styled-input">
+            <input type="text" name="system.category" value="{{system.category}}" data-dtype="String"/>
+          </div>
+        </div>
+        <div class="mm-styled-field -flex-relative -sm">
+          <label class="mm-styled-label -align-left"><span>{{localize "MARVEL_MULTIVERSE.Item.RecommendedRank"}}</span></label>
+          <div class="mm-styled-input">
+            <input type="text" name="system.recommendedRank" value="{{system.recommendedRank}}" data-dtype="String"/>
+          </div>
+        </div>
+        <div class="mm-styled-field -flex-relative -sm">
+          <label class="mm-styled-label -align-left"><span>{{localize "MARVEL_MULTIVERSE.Item.Equipped"}}</span></label>
+          <div class="mm-styled-input">
+            <input type="checkbox" name="system.equipped" {{checked system.equipped}}/>
+          </div>
+        </div>
+      </div>
+      <div class="flexrow -nowrap -gap-md">
+        <div class="mm-styled-field -flex-relative -sm">
+          <label class="mm-styled-label -align-left"><span>{{localize "MARVEL_MULTIVERSE.Item.Field.range"}}</span></label>
+          <div class="mm-styled-input">
+            <input type="text" name="system.range" value="{{system.range}}" data-dtype="String"/>
+          </div>
+        </div>
+        <div class="mm-styled-field -flex-relative -sm">
+          <label class="mm-styled-label -align-left"><span>{{localize "MARVEL_MULTIVERSE.Item.Reach"}}</span></label>
+          <div class="mm-styled-input">
+            <input type="text" name="system.reach" value="{{system.reach}}" data-dtype="String"/>
+          </div>
+        </div>
+        <div class="mm-styled-field -flex-relative -sm">
+          <label class="mm-styled-label -align-left"><span>{{localize "MARVEL_MULTIVERSE.Item.DamageMultiplierBonus"}}</span></label>
+          <div class="mm-styled-input">
+            <input type="text" name="system.damageMultiplierBonus" value="{{system.damageMultiplierBonus}}" data-dtype="String"/>
+          </div>
+        </div>
+      </div>
+      <div class="flexrow -nowrap -gap-md">
+        <div class="mm-styled-field -flex-relative -sm">
+          <label class="mm-styled-label -align-left"><span>{{localize "MARVEL_MULTIVERSE.Item.AttackAbility"}}</span></label>
+          <div class="mm-styled-input">
+            <select name="system.ability">
+              {{selectOptions abilities selected=system.ability blank=""}}
+            </select>
+          </div>
+        </div>
+        <div class="mm-styled-field -flex-relative -sm">
+          <label class="mm-styled-label -align-left"><span>{{localize "MARVEL_MULTIVERSE.Item.AttackKind"}}</span></label>
+          <div class="mm-styled-input">
+            <select name="system.attackKind">
+              {{selectOptions attackKinds selected=system.attackKind blank=""}}
+            </select>
+          </div>
+        </div>
+        <div class="mm-styled-field -flex-relative -sm">
+          <label class="mm-styled-label -align-left"><span>{{localize "MARVEL_MULTIVERSE.Item.DamageType"}}</span></label>
+          <div class="mm-styled-input">
+            <select name="system.damageType">
+              {{selectOptions damageTypes selected=system.damageType blank=""}}
+            </select>
+          </div>
+        </div>
+      </div>
+      <div class="flexrow -nowrap -gap-md">
+        <div class="mm-styled-field -flex-relative -sm">
+          <label class="mm-styled-label -align-left"><span>{{localize "MARVEL_MULTIVERSE.Item.AttackTarget"}}</span></label>
+          <div class="mm-styled-input">
+            <select name="system.attackTarget">
+              {{selectOptions allAbilities selected=system.attackTarget blank=""}}
+            </select>
+          </div>
+        </div>
+        <div class="mm-styled-field -flex-relative -sm">
+          <label class="mm-styled-label -align-left"><span>{{localize "MARVEL_MULTIVERSE.Item.AttackEdgeMode"}}</span></label>
+          <div class="mm-styled-input">
+            <select name="system.attackEdgeMode">
+              {{selectOptions attackEdgeModes selected=system.attackEdgeMode blank=""}}
+            </select>
+          </div>
+        </div>
+      </div>
+      <div class="flexrow -nowrap -gap-md">
+        <div class="mm-styled-field -flex-relative -sm">
+          <label class="mm-styled-label -align-left"><span>{{localize "MARVEL_MULTIVERSE.Item.RollFormula"}}</span></label>
+          <div class="mm-styled-input">
+            <input type="text" name="system.formula" value="{{system.formula}}" data-dtype="String"/>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="tab effects" data-group="primary" data-tab="effects">
+      {{> "systems/mmrpg/templates/item/parts/item-effects.hbs"}}
+    </div>
+  </section>
+</form>

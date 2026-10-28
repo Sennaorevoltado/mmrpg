@@ -1,96 +1,315 @@
 {
-  "TYPES": {
-    "Actor": {
-      "character": "Character",
-      "npc": "NPC"
-    }
-  },
-  "MMRPG": {
+  "MARVEL_MULTIVERSE": {
+    "edge": "Edge",
+    "trouble": "Trouble",
+    "RerollEdge": "Roll this die again and keep the better result (Edge)",
+    "RerollTrouble": "Roll this die again and keep the worse result (Trouble)",
+    "Fantastic": "Fantastic",
+    "NonCombat": "Non-combat",
+    "DamageType": "Damage to",
+    "NewItem": "New: {type}",
+    "Issues": "Report a problem",
+    "edgeMode": {
+      "edge": "Edge",
+      "normal": "Normal",
+      "trouble": "Trouble"
+    },
+    "MarvelResult": {
+      "M": "Marvel die (M)",
+      "2": "2",
+      "3": "3",
+      "4": "4",
+      "5": "5",
+      "6": "6"
+    },
+    "Size": {
+      "Microscopic": "Microscopic",
+      "Miniature": "Miniature",
+      "Tiny": "Tiny",
+      "Little": "Little",
+      "Small": "Small",
+      "Average": "Average",
+      "Big": "Big",
+      "Huge": "Huge",
+      "Gigantic": "Gigantic",
+      "Titanic": "Titanic",
+      "Gargantuan": "Gargantuan"
+    },
+    "SizeEffect": {
+      "microscopic": "Size: Microscopic",
+      "miniature": "Size: Miniature",
+      "tiny": "Size: Tiny",
+      "little": "Size: Little",
+      "small": "Size: Small",
+      "average": "Size: Average",
+      "big": "Size: Big",
+      "huge": "Size: Huge",
+      "gigantic": "Size: Gigantic",
+      "titanic": "Size: Titanic",
+      "gargantuan": "Size: Gargantuan"
+    },
     "Ability": {
-      "mle": { "abbr": "MLE", "long": "Melee" },
-      "agl": { "abbr": "AGL", "long": "Agility" },
-      "res": { "abbr": "RES", "long": "Resilience" },
-      "vig": { "abbr": "VIG", "long": "Vigilance" },
-      "ego": { "abbr": "EGO", "long": "Ego" },
-      "log": { "abbr": "LOG", "long": "Logic" }
+      "Mel": {
+        "long": "Melee",
+        "abbr": "mel"
+      },
+      "Agl": {
+        "long": "Agility",
+        "abbr": "agl"
+      },
+      "Res": {
+        "long": "Resilience",
+        "abbr": "res"
+      },
+      "Vig": {
+        "long": "Vigilance",
+        "abbr": "vig"
+      },
+      "Ego": {
+        "long": "Ego",
+        "abbr": "ego"
+      },
+      "Log": {
+        "long": "Logic",
+        "abbr": "log"
+      }
     },
     "Resource": {
       "health": "Health",
       "focus": "Focus",
       "karma": "Karma"
     },
+    "AttackKind": {
+      "ranged": "Ranged",
+      "close": "Close"
+    },
+    "Movement": {
+      "Run": "Run",
+      "Jump": "Jump",
+      "Climb": "Climb",
+      "Swim": "Swim",
+      "Flight": "Flight",
+      "Glide": "Glide",
+      "Swingline": "Swingline",
+      "Levitation": "Levitation"
+    },
+    "Element": {
+      "air": "Air",
+      "earth": "Earth",
+      "electricity": "Electricity",
+      "energy": "Energy",
+      "fire": "Fire",
+      "force": "Force",
+      "hellfire": "Hellfire",
+      "ice": "Ice",
+      "iron": "Iron",
+      "sound": "Sound",
+      "water": "Water",
+      "chemical": "Chemical",
+      "toxin": "Toxin",
+      "swarm": "Swarm"
+    },
+    "PowerSet": {
+      "basic": "Basic",
+      "elementalControl": "Elemental Control",
+      "healing": "Healing",
+      "illusion": "Illusion",
+      "luck": "Luck",
+      "magic": "Magic",
+      "martialArts": "Martial Arts",
+      "meleeWeapons": "Melee Weapons",
+      "narrative": "Narrative",
+      "omniversalTravel": "Omniversal Travel",
+      "phasing": "Phasing",
+      "plasticity": "Plasticity",
+      "powerControl": "Power Control",
+      "rangedWeapons": "Ranged Weapons",
+      "resize": "Resize",
+      "shieldBearer": "Shield Bearer",
+      "sixthSense": "Sixth Sense",
+      "spiderPowers": "Spider-Powers",
+      "superSpeed": "Super-Speed",
+      "superStrength": "Super-Strength",
+      "tactics": "Tactics",
+      "telekinesis": "Telekinesis",
+      "telepathy": "Telepathy",
+      "teleportation": "Teleportation",
+      "translation": "Translation",
+      "weatherControl": "Weather Control"
+    },
+    "TeamManeuver": {
+      "offensive": "Offensive",
+      "defensive": "Defensive",
+      "rally": "Rally"
+    },
+    "SheetLabels": {
+      "Actor": "Marvel Multiverse: character sheet",
+      "NPC": "Marvel Multiverse: NPC sheet",
+      "Item": "Marvel Multiverse: item sheet"
+    },
+    "Effect": {
+      "Source": "Source",
+      "Duration": "Duration",
+      "Toggle": "Turn effect on/off",
+      "Temporary": "Temporary effects",
+      "Passive": "Passive effects",
+      "Inactive": "Inactive effects",
+      "Create": "Create effect",
+      "Edit": "Edit effect",
+      "Delete": "Delete effect"
+    },
+    "Damage": {
+      "title": "Damage",
+      "button": "Damage",
+      "generic": "{amount} damage to {type}",
+      "target": "{name}: {amount} damage to {type}",
+      "breakdown": "Marvel die {die} x {net} (multiplier {multiplier} - damage reduction {reduction}) + {ability} {score}"
+    },
+    "Warn": {
+      "noAbility": "Unknown ability for this roll.",
+      "noDamageAbility": "This card is not an attack with a damage ability (Melee, Agility, Ego or Logic).",
+      "macroOwnedOnly": "Macros can only be made from an item that is on a character sheet.",
+      "macroItemMissing": "Could not find the item \"{name}\" on a sheet. It was deleted, or the macro is old."
+    },
     "Sheet": {
-      "character": "Character sheet",
-      "npc": "NPC sheet",
-      "abilities": "Abilities",
-      "codename": "Codename",
-      "realName": "Real name",
-      "rank": "Rank",
-      "changeImage": "Change image",
-      "score": "Score",
-      "defense": "Defense",
-      "noncombat": "Non-combat",
-      "max": "Maximum"
+      "Rank": "Rank",
+      "Codename": "Codename",
+      "TeamManeuver": "Team Maneuver",
+      "DamageReduction": "Damage Reduction",
+      "DamageReductionShort": "DR",
+      "Speed": "Speed",
+      "Initiative": "Initiative",
+      "RollInitiative": "Roll initiative",
+      "Abilities": "Abilities",
+      "AbilityScore": "Ability Score",
+      "DefenseScore": "Defense Score",
+      "NonCombat": "Non-Combat Checks",
+      "RollCheck": "Roll a check",
+      "RollNonCombat": "Roll a non-combat check",
+      "TabPowers": "Powers",
+      "TabBiography": "Biography",
+      "TabGear": "Gear",
+      "TabEffects": "Effects",
+      "Powers": "Powers",
+      "DefaultElement": "Default Element",
+      "TraitsTags": "Traits & Tags",
+      "Gear": "Gear",
+      "Damage": "Damage",
+      "Occupation": "Occupation",
+      "Origin": "Origin",
+      "RealName": "Real name",
+      "Gender": "Gender",
+      "Size": "Size",
+      "Height": "Height",
+      "Weight": "Weight",
+      "Eyes": "Eyes",
+      "Hair": "Hair",
+      "Teams": "Teams",
+      "Base": "Base of operations",
+      "History": "History",
+      "Personality": "Personality",
+      "Features": "Features",
+      "FeaturesLong": "Distinguishing features",
+      "AddPower": "Add power",
+      "NoPowers": "No powers yet. Drag powers from the Items directory onto this sheet.",
+      "UseItem": "Use (shows in chat, and rolls if it has an attack)",
+      "Edit": "Edit",
+      "Delete": "Delete",
+      "Create": "Create",
+      "Traits": "Traits",
+      "Tags": "Tags",
+      "Weapons": "Weapons",
+      "Items": "Items",
+      "DropOccupation": "Drag an occupation here",
+      "DropOrigin": "Drag an origin here"
     },
-    "Creation": {
-      "mode": "Fill-in mode",
-      "modeHint": "Creation shows the points and the cap for each ability. Free leaves the fields open, with no counters.",
-      "modeGuided": "Creation",
-      "modeFree": "Free",
-      "points": {
-        "open": "points left",
-        "done": "points left",
-        "over": "points over",
-        "unset": "budget not set"
-      },
-      "cap": "Cap per ability",
-      "overCap": "Above the cap of {cap}: {names}.",
-      "undefinedBudget": "The budget for Rank {rank} has not been set yet.",
-      "defineBudget": "Set budget",
-      "askGM": "Ask the Narrator to set it.",
-      "decrease": "Decrease {ability}",
-      "increase": "Increase {ability}",
-      "bonusPoints": "Extra points",
-      "bonusCap": "Extra cap",
-      "bonusHint": "Adjustments from Origin, Occupation, traits or the Narrator. They can be negative."
-    },
-    "Budget": {
-      "title": "Ability budget by Rank",
-      "menuName": "Ability budget",
-      "menuLabel": "Set budget",
-      "menuHint": "Points to spend and the cap for each ability, by Rank. The sheets' creation mode uses it.",
-      "hint": "Leave blank what has not been set yet. Rank 1 comes filled in; check the others in your book.",
-      "points": "Points",
-      "cap": "Cap",
-      "pointsOf": "Points for Rank {rank}",
-      "capOf": "Cap for Rank {rank}",
-      "reset": "Restore default",
-      "save": "Save",
-      "gmOnly": "Only the Narrator can set the budget."
-    },
-    "Settings": {
-      "strictBudget": {
-        "name": "Stop the + button at the limit",
-        "hint": "On: in creation mode, the + button stops when the ability reaches the cap or the points run out. Off: the sheet only warns."
+    "Import": {
+      "Button": "Import content",
+      "Title": "Import content",
+      "Confirm": "Import {count} items from \"{file}\" into this world? Items that already exist are skipped.",
+      "Running": "Importing content... this can take a moment.",
+      "Done": "Import finished: {created} created, {skipped} skipped.",
+      "NotContent": "This file is not a content file for this system.",
+      "BadFile": "Could not read the file: {error}",
+      "Empty": "The file has no items to import.",
+      "OnlyGM": "Only the Game Master can import content.",
+      "Failed": "The import stopped: {error}",
+      "Root": "MMRPG content",
+      "Folder": {
+        "power": "Powers",
+        "trait": "Traits",
+        "tag": "Tags",
+        "origin": "Origins",
+        "occupation": "Occupations",
+        "weapon": "Weapons",
+        "item": "Gear"
       }
     },
-    "Appearance": {
-      "title": "Sheet appearance",
-      "save": "Apply",
-      "hint": "Applies only to you, in this browser. Each player picks their own.",
-      "uiTheme": {
-        "name": "Sheet theme",
-        "hint": "Light: a light background, like the printed page. Dark: the same design on a dark background.",
-        "light": "Light",
-        "dark": "Dark"
+    "Item": {
+      "Name": "Name",
+      "Description": "Description",
+      "Effect": "Effect",
+      "PowerSet": "Power set",
+      "Prerequisites": "Prerequisites",
+      "Elemental": "Elemental power",
+      "Element": "Element",
+      "AttackAbility": "Attack ability",
+      "AttackKind": "Attack kind",
+      "AttackTarget": "Against defense of",
+      "AttackRange": "Attack range",
+      "AttackMultiplier": "Damage multiplier",
+      "AttackEdgeMode": "Attack Edge / Trouble",
+      "DamageType": "Damage to",
+      "Equipped": "In use",
+      "Category": "Category",
+      "RecommendedRank": "Recommended Rank",
+      "Reach": "Melee reach",
+      "DamageMultiplierBonus": "Damage multiplier bonus",
+      "RollFormula": "Roll formula",
+      "Rule": "Rule",
+      "Restriction": "Restriction",
+      "Multiple": "Can be taken more than once",
+      "Rarity": "Rarity",
+      "Examples": "Examples",
+      "SuggestedOccupation": "Suggested occupation",
+      "MinimumRank": "Minimum Rank",
+      "Limitation": "Limitation",
+      "Quantity": "Quantity",
+      "Weight": "Weight",
+      "TabPower": "Power",
+      "TabWeapon": "Weapon",
+      "TabTrait": "Trait",
+      "TabTag": "Tag",
+      "TabOrigin": "Origin",
+      "TabOccupation": "Occupation",
+      "TabItem": "Item",
+      "Grants": {
+        "traits": "Grants traits",
+        "tags": "Grants tags",
+        "powers": "Grants powers"
       },
-      "uiTextSize": {
-        "name": "Text size",
-        "hint": "Makes all the letters on the sheet bigger.",
-        "normal": "Normal",
-        "large": "Large",
-        "xlarge": "Extra large"
+      "Field": {
+        "action": "Action",
+        "trigger": "Trigger",
+        "duration": "Duration",
+        "range": "Range",
+        "cost": "Cost"
       }
+    }
+  },
+  "TYPES": {
+    "Actor": {
+      "character": "Character",
+      "npc": "NPC"
+    },
+    "Item": {
+      "item": "Item",
+      "weapon": "Weapon",
+      "trait": "Trait",
+      "tag": "Tag",
+      "origin": "Origin",
+      "occupation": "Occupation",
+      "power": "Power"
     }
   }
 }

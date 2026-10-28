@@ -1,0 +1,26 @@
+<ol class="mm-item-list">
+  <li class="flexrow item mm-item-header">
+    <span>{{localize "MARVEL_MULTIVERSE.Sheet.Weapons"}}</span>
+    <hr />
+    <div class="item-controls">
+      <a class="item-control item-create" title="{{localize 'MARVEL_MULTIVERSE.Sheet.Create'}}" data-type="weapon">
+        <i class="fas fa-plus"></i>
+      </a>
+    </div>
+  </li>
+  {{#each weapons as |item|}}
+    <li class="flexrow item mm-item" data-item-id="{{item._id}}">
+      <div class="item-name mm-item-name">
+        <a class="rollable" data-roll-type="item" data-tooltip="{{localize 'MARVEL_MULTIVERSE.Sheet.UseItem'}}">{{item.name}}</a>
+      </div>
+      <div class="item-controls">
+        <a class="item-control item-edit" title="{{localize 'MARVEL_MULTIVERSE.Sheet.Edit'}}">
+          <i class="fas fa-edit"></i>
+        </a>
+        <a class="item-control item-delete" title="{{localize 'MARVEL_MULTIVERSE.Sheet.Delete'}}">
+          <i class="fas fa-trash"></i>
+        </a>
+      </div>
+    </li>
+  {{/each}}
+</ol>

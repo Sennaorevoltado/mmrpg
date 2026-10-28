@@ -1,0 +1,78 @@
+<div class="flexcol">
+  <div class="flexrow -nowrap -gap-md">
+    <div class="mm-styled-field -flex-relative -sm">
+      <label class="mm-styled-label -align-left"><span>{{localize "MARVEL_MULTIVERSE.Sheet.Occupation"}}</span></label>
+      <div class="mm-styled-input">
+        {{> "systems/mmrpg/templates/actor/parts/actor-occupation.hbs"}}
+      </div>
+    </div>
+    <div class="mm-styled-field -flex-relative -sm">
+      <label class="mm-styled-label -align-left"><span>{{localize "MARVEL_MULTIVERSE.Sheet.Origin"}}</span></label>
+      <div class="mm-styled-input">
+        {{> "systems/mmrpg/templates/actor/parts/actor-origin.hbs"}}
+      </div>
+    </div>
+  </div>
+  <div class="flexrow -nowrap -gap-md">
+    <div class="mm-styled-field -flex-relative -sm">
+      <label class="mm-styled-label -align-left" for="system.realname"><span>{{localize "MARVEL_MULTIVERSE.Sheet.RealName"}}</span></label>
+      <div class="mm-styled-input">
+        <input type="text" id="system.realname" name="system.realname" value="{{system.realname}}" data-dtype="String"/>
+      </div>
+    </div>
+    <div class="mm-styled-field -flex-relative -sm">
+      <label class="mm-styled-label -align-left" for="system.gender"><span>{{localize "MARVEL_MULTIVERSE.Sheet.Gender"}}</span></label>
+      <div class="mm-styled-input">
+        <input type="text" id="system.gender" name="system.gender" value="{{system.gender}}" data-dtype="String"/>
+      </div>
+    </div>
+    <div class="mm-styled-field -flex-relative -sm">
+      <label class="mm-styled-label -align-left"><span>{{localize "MARVEL_MULTIVERSE.Sheet.Size"}}</span></label>
+      <div class="mm-styled-input">
+        <select name="system.size">
+          {{selectOptions sizeSelection selected=system.size blank=""}}
+        </select>
+      </div>
+    </div>
+  </div>
+  <div class="flexrow -nowrap -gap-md">
+    <div class="mm-styled-field -flex-relative -sm">
+      <label class="mm-styled-label -align-left" for="system.height"><span>{{localize "MARVEL_MULTIVERSE.Sheet.Height"}}</span></label>
+      <div class="mm-styled-input">
+        <input type="text" id="system.height" name="system.height" value="{{system.height}}" data-dtype="String"/>
+      </div>
+    </div>
+    <div class="mm-styled-field -flex-relative -sm">
+      <label class="mm-styled-label -align-left" for="system.weight"><span>{{localize "MARVEL_MULTIVERSE.Sheet.Weight"}}</span></label>
+      <div class="mm-styled-input">
+        <input type="text" id="system.weight" name="system.weight" value="{{system.weight}}" data-dtype="String"/>
+      </div>
+    </div>
+    <div class="mm-styled-field -flex-relative -sm">
+      <label class="mm-styled-label -align-left" for="system.eyes"><span>{{localize "MARVEL_MULTIVERSE.Sheet.Eyes"}}</span></label>
+      <div class="mm-styled-input">
+        <input type="text" id="system.eyes" name="system.eyes" value="{{system.eyes}}" data-dtype="String"/>
+      </div>
+    </div>
+    <div class="mm-styled-field -flex-relative -sm">
+      <label class="mm-styled-label -align-left" for="system.hair"><span>{{localize "MARVEL_MULTIVERSE.Sheet.Hair"}}</span></label>
+      <div class="mm-styled-input">
+        <input type="text" id="system.hair" name="system.hair" value="{{system.hair}}" data-dtype="String"/>
+      </div>
+    </div>
+  </div>
+  <div class="flexrow -nowrap -gap-md">
+    <div class="mm-styled-field -flex-relative -sm">
+      <label class="mm-styled-label -align-left" for="system.teams"><span>{{localize "MARVEL_MULTIVERSE.Sheet.Teams"}}</span></label>
+      <div class="mm-styled-input">
+        <input type="text" id="system.teams" name="system.teams" value="{{system.teams}}" data-dtype="String"/>
+      </div>
+    </div>
+    <div class="mm-styled-field -flex-relative -sm">
+      <label class="mm-styled-label -align-left" for="system.base"><span>{{localize "MARVEL_MULTIVERSE.Sheet.Base"}}</span></label>
+      <div class="mm-styled-input">
+        <input type="text" id="system.base" name="system.base" value="{{system.base}}" data-dtype="String"/>
+      </div>
+    </div>
+  </div>
+</div>

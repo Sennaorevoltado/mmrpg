@@ -19,7 +19,7 @@ const outArg = process.argv.indexOf("--out");
 const outDir = path.resolve(root, outArg > 0 ? process.argv[outArg + 1] : "dist");
 
 /** O que entra no pacote (relativo à raiz do projeto). */
-const INCLUDE = ["system.json", "module", "templates", "styles", "fonts", "lang", "README.md", "LICENSE", "NOTICE"];
+const INCLUDE = ["system.json", "mmrpg.mjs", "module", "templates", "css", "fonts", "icons", "lang", "README.md", "LICENSE", "NOTICE"];
 
 const manifest = JSON.parse(fs.readFileSync(path.join(root, "system.json"), "utf8"));
 
@@ -115,7 +115,7 @@ function writeZip(entries) {
 /* ---- Execução ---- */
 
 const files = INCLUDE.flatMap(listFiles);
-const missing = ["system.json", "module/mmrpg.mjs", "styles/mmrpg.css"].filter((f) => !files.includes(f));
+const missing = ["system.json", "mmrpg.mjs", "css/mmrpg.css", "lang/pt-BR.json", "lang/en.json"].filter((f) => !files.includes(f));
 if (missing.length) {
   console.error(`Arquivos obrigatórios ausentes: ${missing.join(", ")}`);
   process.exit(1);

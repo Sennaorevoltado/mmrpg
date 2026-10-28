@@ -1,17 +1,47 @@
 /**
  * Compatibilidade entre as versões 13 e 14 do Foundry.
  *
- * O sistema foi escrito para a v14. Este arquivo concentra as diferenças de API que o
- * suporte (experimental) à v13 exige, para que o resto do código não precise saber a versão.
- *
- * Diferença tratada aqui: o registro de fichas. Na v13 usa-se DocumentSheetConfig e a ficha
- * padrão do núcleo é a antiga (AppV1); na v14 usa-se a coleção e a ficha padrão é a ApplicationV2.
+ * As fichas deste sistema usam a API antiga de janelas (ApplicationV1: ActorSheet e ItemSheet),
+ * que o Foundry mantém na v13 e na v14, mas marca como obsoleta. Este arquivo concentra tudo o
+ * que muda de uma versão para outra, para que o resto do código não precise saber a versão.
  */
 
 /** Geração do Foundry em execução (13, 14...). Sem `game.release`, assume 14. */
 export function foundryGeneration() {
   const generation = Number(globalThis.game?.release?.generation);
   return Number.isFinite(generation) && generation > 0 ? generation : 14;
+}
+
+/** Classes de ficha da API antiga (ApplicationV1), onde quer que a versão em uso as ponha. */
+export function legacySheets() {
+  return {
+    ActorSheet: foundry.appv1?.sheets?.ActorSheet ?? globalThis.ActorSheet,
+    ItemSheet: foundry.appv1?.sheets?.ItemSheet ?? globalThis.ItemSheet,
+  };
+}
+
+/** Renderiza um template Handlebars. */
+export function renderTemplate(path, data) {
+  const fn = foundry.applications?.handlebars?.renderTemplate ?? globalThis.renderTemplate;
+  return fn(path, data);
+}
+
+/** Pré-carrega templates Handlebars. */
+export function loadTemplates(paths) {
+  const fn = foundry.applications?.handlebars?.loadTemplates ?? globalThis.loadTemplates;
+  return fn(paths);
+}
+
+/**
+ * O Foundry entrega o HTML de uma janela antiga como jQuery ou como elemento, dependendo da
+ * versão. O sistema trabalha só com elementos do DOM.
+ *
+ * @param {HTMLElement|{0: HTMLElement}} html
+ * @returns {HTMLElement}
+ */
+export function rootOf(html) {
+  if (html instanceof HTMLElement) return html;
+  return html?.[0] ?? html;
 }
 
 /** Registra um Handlebars helper apenas se o núcleo ainda não o tiver. */
@@ -35,16 +65,20 @@ export function registerDocumentSheet(documentName, scope, sheetClass, options) 
   const DocumentSheetConfig = foundry.applications.apps?.DocumentSheetConfig;
   const documentClass = documentName === "Actor" ? globalThis.Actor : globalThis.Item;
 
-  if (foundryGeneration() < 14 && typeof DocumentSheetConfig?.registerSheet === "function") {
-    DocumentSheetConfig.registerSheet(documentClass, scope, sheetClass, options);
-    return;
-  }
-  collection.registerSheet(scope, sheetClass, options);
+  const hasConfig = typeof DocumentSheetConfig?.registerSheet === "function";
+  const hasCollection = typeof collection?.registerSheet === "function";
+  const viaConfig = () => DocumentSheetConfig.registerSheet(documentClass, scope, sheetClass, options);
+  const viaCollection = () => collection.registerSheet(scope, sheetClass, options);
+
+  // Cada versão prefere um caminho; se ele não existir, tenta o outro.
+  if (foundryGeneration() < 14 && hasConfig) return viaConfig();
+  if (hasCollection) return viaCollection();
+  if (hasConfig) return viaConfig();
+  throw new Error("mmrpg | não achei como registrar fichas nesta versão do Foundry.");
 }
 
 /**
- * Tira as fichas padrão do núcleo. Na v13 a ficha padrão é a antiga (AppV1);
- * na v14 é a ActorSheetV2/ItemSheetV2. Tenta as duas, sem falhar se alguma não existir.
+ * Tira as fichas padrão do núcleo. Tenta a antiga e a nova, sem falhar se alguma não existir.
  */
 export function unregisterCoreSheets(documentName) {
   const collections = foundry.documents.collections;
@@ -68,4 +102,21 @@ export function unregisterCoreSheets(documentName) {
       console.debug(`mmrpg | não foi possível retirar a ficha padrão (${sheetClass.name}):`, err);
     }
   }
+}
+
+/**
+ * Pergunta "sim ou não" ao usuário. A v13 e a v14 trazem o DialogV2; antes dele existia só o Dialog.
+ *
+ * @param {object} options
+ * @param {string} options.title
+ * @param {string} options.content   HTML já escapado
+ * @returns {Promise<boolean>}
+ */
+export async function confirmDialog({ title, content }) {
+  const DialogV2 = foundry.applications?.api?.DialogV2;
+  const body = `<p>${content}</p>`;
+  if (typeof DialogV2?.confirm === "function") {
+    return Boolean(await DialogV2.confirm({ window: { title }, content: body, rejectClose: false, modal: true }));
+  }
+  return Boolean(await globalThis.Dialog.confirm({ title, content: body }));
 }

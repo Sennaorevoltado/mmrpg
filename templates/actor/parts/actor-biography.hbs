@@ -1,0 +1,18 @@
+<div class="mm-styled-container">
+  <h3>{{localize "MARVEL_MULTIVERSE.Sheet.History"}}</h3>
+  <div class="mm-input">
+    {{editor system.history target="system.history" button=false engine="prosemirror" collaborate=false editable=editable}}
+  </div>
+</div>
+<div class="mm-styled-container">
+  <h3>{{localize "MARVEL_MULTIVERSE.Sheet.Personality"}}</h3>
+  <div class="mm-input">
+    {{editor system.personality target="system.personality" button=false engine="prosemirror" collaborate=false editable=editable}}
+  </div>
+</div>
+<div class="mm-styled-container">
+  <h3 data-tooltip="{{localize 'MARVEL_MULTIVERSE.Sheet.FeaturesLong'}}">{{localize "MARVEL_MULTIVERSE.Sheet.Features"}}</h3>
+  <div class="mm-input">
+    {{editor system.distinguishingFeatures target="system.distinguishingFeatures" button=false engine="prosemirror" collaborate=false editable=editable}}
+  </div>
+</div>

@@ -131,6 +131,11 @@ MMRPG.damageResources = {
   focus: "MMRPG.Resource.focus"
 };
 
+MMRPG.damageWhen = {
+  hit: "MMRPG.DamageWhen.hit",
+  fantastic: "MMRPG.DamageWhen.fantastic"
+};
+
 MMRPG.healingResources = {
   health: "MMRPG.Resource.health",
   focus: "MMRPG.Resource.focus",
@@ -217,6 +222,11 @@ MMRPG.statuses = [
   { id: "poisoned", img: "icons/svg/poison.svg" },
   { id: "corroding", img: "icons/svg/acid.svg" },
   { id: "frightened", img: "icons/svg/terror.svg" },
+  { id: "bleeding", img: "icons/svg/blood.svg" },
+  { id: "grabbed", img: "icons/svg/restrain.svg" },
+  { id: "demoralized", img: "icons/svg/downgrade.svg" },
+  { id: "unconscious", img: "icons/svg/unconscious.svg" },
+  { id: "shattered", img: "icons/svg/bones.svg" },
   { id: "dead", img: "icons/svg/skull.svg" }
 ];
 

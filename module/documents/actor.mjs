@@ -4,6 +4,7 @@
 
 import { MMRPG } from "../config.mjs";
 import { damagePool, healPool, toInt } from "../rules/index.mjs";
+import { changeData } from "../helpers/compat.mjs";
 
 export default class MMRPGActor extends Actor {
   /* -------------------------------------------- */
@@ -54,10 +55,13 @@ export default class MMRPGActor extends Actor {
       if (!grant.uuid) continue;
       const doc = await fromUuid(grant.uuid);
       if (!doc || !MMRPG.grantableItemTypes.includes(doc.type)) continue;
-      const exists = this.items.some((i) => i.type === doc.type && i.name === doc.name);
+      const note = (grant.note ?? "").trim();
+      const finalName = note ? `${doc.name}: ${note}` : doc.name;
+      const exists = this.items.some((i) => i.type === doc.type && i.name === finalName);
       if (exists) continue;
       const obj = doc.toObject();
       delete obj._id;
+      obj.name = finalName;
       foundry.utils.setProperty(obj, "flags.mmrpg.grantedBy", source.id);
       toCreate.push(obj);
     }
@@ -162,7 +166,7 @@ export default class MMRPGActor extends Actor {
 
     const changes = (def.changes ?? [])
       .filter((c) => c.key)
-      .map((c) => ({ key: c.key, type: c.type, mode: CHANGE_MODES[c.type] ?? 2, value: String(c.value), priority: null }));
+      .map((c) => changeData(c));
 
     // Já existe um efeito igual vindo desta ação? Renova em vez de duplicar.
     const existing = this.effects.find((e) => e.getFlag("mmrpg", "effectId") === def.id && e.origin === origin);
@@ -195,11 +199,3 @@ export default class MMRPGActor extends Actor {
   }
 }
 
-/** Modos numéricos equivalentes aos tipos de alteração (compatibilidade entre versões do Foundry). */
-const CHANGE_MODES = {
-  multiply: CONST.ACTIVE_EFFECT_MODES?.MULTIPLY ?? 1,
-  add: CONST.ACTIVE_EFFECT_MODES?.ADD ?? 2,
-  downgrade: CONST.ACTIVE_EFFECT_MODES?.DOWNGRADE ?? 3,
-  upgrade: CONST.ACTIVE_EFFECT_MODES?.UPGRADE ?? 4,
-  override: CONST.ACTIVE_EFFECT_MODES?.OVERRIDE ?? 5
-};

@@ -99,7 +99,17 @@ export default class ActionData extends foundry.abstract.DataModel {
         flat: int(0),
         resource: choice(keys(MMRPG.damageResources), "health"),
         element: optionalChoice(keys(MMRPG.elements)),
-        fantasticFactor: new f.NumberField({ required: true, nullable: false, initial: 2, min: 1 })
+        fantasticFactor: new f.NumberField({ required: true, nullable: false, initial: 2, min: 1 }),
+        /** Fração do dano em qualquer acerto (1 = inteiro, 0,5 = metade). O Fantástico multiplica por cima. */
+        scale: new f.NumberField({ required: true, nullable: false, initial: 1, min: 0 }),
+        /** Quando o dano é causado: em qualquer acerto ("hit") ou só no Sucesso Fantástico ("fantastic"). */
+        when: choice(keys(MMRPG.damageWhen), "hit"),
+        /** Dano fixo extra por ponto de Foco gasto (0,5 = +1 a cada 2 pontos). */
+        perFocus: new f.NumberField({ required: true, nullable: false, initial: 0, min: 0 }),
+        /** O dano ignora a Redução de Dano do alvo. */
+        ignoreReduction: new f.BooleanField({ required: true, initial: false }),
+        /** Qual Redução de Dano do alvo vale (vazio = a do recurso atingido). Ex.: dano ao Foco com a Redução da Saúde. */
+        reductionFrom: optionalChoice(keys(MMRPG.damageResources))
       }),
 
       healing: new f.SchemaField({
@@ -109,7 +119,9 @@ export default class ActionData extends foundry.abstract.DataModel {
         target: choice(["self", "targets"], "targets"),
         ability: optionalChoice(ABILITY_KEYS),
         multiplierBonus: int(0),
-        flat: int(0)
+        flat: int(0),
+        /** Cura fixa extra por ponto de Foco gasto. */
+        perFocus: new f.NumberField({ required: true, nullable: false, initial: 0, min: 0 })
       }),
 
       effects: new f.ArrayField(
@@ -142,7 +154,9 @@ export default class ActionData extends foundry.abstract.DataModel {
       cost: new f.SchemaField({
         focus: int(0, { min: 0 }),
         karma: int(0, { min: 0 }),
-        health: int(0, { min: 0 })
+        health: int(0, { min: 0 }),
+        /** O Foco informado é o mínimo: quem usa pode gastar mais (veja `perFocus`). */
+        scalable: new f.BooleanField({ required: true, initial: false })
       }),
 
       uses: new f.SchemaField({

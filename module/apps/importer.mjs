@@ -4,7 +4,8 @@
 
 import { MMRPG } from "../config.mjs";
 import { ITEM_TYPES, countByType, parseContent } from "../helpers/content-format.mjs";
-import { exportItems, importItems } from "../helpers/importer.mjs";
+import { DESTINATIONS, exportItems, exportPackItems, importItems } from "../helpers/importer.mjs";
+import { existingPacks } from "../helpers/compendia.mjs";
 
 const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
 
@@ -62,7 +63,16 @@ export default class ContentImporter extends HandlebarsApplicationMixin(Applicat
       counts: Object.entries(counts).map(([type, count]) => ({ label: loc(`TYPES.Item.${type}`), count })),
       hasItems: !!this.#parsed?.items.length,
       report: this.#report,
+      reportPacks: this.#report?.packs?.join(", ") ?? "",
       exportTypes: ITEM_TYPES.map((type) => ({ type, label: loc(`TYPES.Item.${type}`) })),
+      destinationOptions: [
+        { value: DESTINATIONS.compendia, label: loc("MMRPG.Importer.destPacks") },
+        { value: DESTINATIONS.world, label: loc("MMRPG.Importer.destWorld") }
+      ],
+      exportFromOptions: [
+        { value: DESTINATIONS.world, label: loc("MMRPG.Importer.fromWorld") },
+        { value: DESTINATIONS.compendia, label: loc("MMRPG.Importer.fromPacks") }
+      ],
       duplicateOptions: [
         { value: "skip", label: loc("MMRPG.Importer.dupSkip") },
         { value: "update", label: loc("MMRPG.Importer.dupUpdate") },
@@ -92,20 +102,29 @@ export default class ContentImporter extends HandlebarsApplicationMixin(Applicat
   static async #onImport() {
     if (!this.#parsed?.items.length) return;
     const onDuplicate = this.element.querySelector("[name=onDuplicate]")?.value ?? "skip";
-    this.#report = await importItems(this.#parsed.items, { onDuplicate });
+    const destination = this.element.querySelector("[name=destination]")?.value ?? DESTINATIONS.world;
+    this.#report = await importItems(this.#parsed.items, { onDuplicate, destination });
     ui.notifications.info(
       loc("MMRPG.Importer.done", { created: this.#report.created, updated: this.#report.updated, skipped: this.#report.skipped })
     );
     this.render();
   }
 
-  static #onExport() {
+  static async #onExport() {
     const types = [...this.element.querySelectorAll("[name=exportType]:checked")].map((el) => el.value);
     if (!types.length) {
       ui.notifications.warn(loc("MMRPG.Importer.pickTypes"));
       return;
     }
-    const data = exportItems(types, { source: game.world.title });
+    const from = this.element.querySelector("[name=exportFrom]")?.value ?? DESTINATIONS.world;
+    if (from === DESTINATIONS.compendia && !existingPacks(types).length) {
+      ui.notifications.warn(loc("MMRPG.Importer.noPacks"));
+      return;
+    }
+    const data =
+      from === DESTINATIONS.compendia
+        ? await exportPackItems(types, { source: game.world.title })
+        : exportItems(types, { source: game.world.title });
     foundry.utils.saveDataToFile(JSON.stringify(data, null, 2), "application/json", "mmrpg-conteudo.json");
   }
 }

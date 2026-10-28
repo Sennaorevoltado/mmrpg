@@ -71,6 +71,12 @@ function effectLabel(card, id) {
   return game.i18n.localize("MMRPG.Effect.generic");
 }
 
+/** Rótulo da fração do dano no cálculo do cartão ("" quando o dano é inteiro). */
+function scaleLabel(scale) {
+  if (scale === undefined || scale === 1) return "";
+  return scale === 0.5 ? "½" : String(scale);
+}
+
 function damageView(card, d, marvelValue) {
   if (!d) return null;
   return {
@@ -81,6 +87,7 @@ function damageView(card, d, marvelValue) {
     additive: d.base - toInt(marvelValue) * d.effectiveMultiplier,
     marvelValue,
     doubled: d.doubled,
+    scaleLabel: scaleLabel(d.scale),
     reduction: d.reduction,
     zero: d.effectiveMultiplier === 0
   };

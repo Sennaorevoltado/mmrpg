@@ -50,6 +50,16 @@
       "effectWhen": "Quando dispara",
       "effects": "Efeitos",
       "element": "Elemento",
+      "damageWhen": "Dano quando",
+      "ignoreReduction": "Ignora a Redução de Dano",
+      "reductionFrom": "Redução de Dano que vale",
+      "sameAsResource": "A do recurso atingido",
+      "perFocus": "Fixo por Foco gasto",
+      "perFocusHint": "Valor fixo somado por ponto de Foco gasto (0,5 = +1 a cada 2 pontos). Usado com \"Foco é mínimo\".",
+      "scalable": "Foco é mínimo",
+      "scalableHint": "O Foco informado é o mínimo: ao usar a ação, o jogador escolhe quanto gastar.",
+      "damageScale": "Fração do dano",
+      "damageScaleHint": "1 = dano inteiro; 0,5 = metade do dano em qualquer acerto. O Fantástico multiplica por cima.",
       "fantasticFactor": "Fator do Fantástico",
       "flat": "Bônus fixo",
       "healing": "Cura",
@@ -140,6 +150,8 @@
     },
     "Dialog": {
       "bonus": "Bônus ou penalidade",
+      "focusSpent": "Foco a gastar",
+      "focusSpentHint": "O mínimo é o custo da ação; gastar mais aumenta o efeito, se o poder permitir.",
       "deleteItem": "Excluir \"{name}\"?",
       "deleteTitle": "Excluir item",
       "edgeInherited": "Já vem da ficha",
@@ -162,6 +174,10 @@
     "EffectTarget": {
       "self": "Si mesmo",
       "targets": "Alvos"
+    },
+    "DamageWhen": {
+      "fantastic": "Só no Sucesso Fantástico",
+      "hit": "Em qualquer acerto"
     },
     "EffectWhen": {
       "always": "Sempre",
@@ -193,18 +209,28 @@
       "marvel": "Dado Marvel × multiplicador"
     },
     "Importer": {
+      "destPacks": "Compêndios do mundo (um por tipo)",
+      "destWorld": "Itens do mundo",
+      "destination": "Destino",
+      "destinationHint": "Os compêndios do mundo são criados na hora, um por tipo (Poderes, Traços, Origens...). Você pode arrastar os itens deles para qualquer ficha.",
       "done": "Importação concluída: {created} criados, {updated} atualizados, {skipped} ignorados.",
       "dupCreate": "Criar cópia",
       "dupSkip": "Ignorar",
       "dupUpdate": "Atualizar o existente",
-      "export": "Exportar itens do mundo",
+      "export": "Exportar",
+      "exportFrom": "Exportar de",
       "exportTitle": "Exportar",
       "file": "Arquivo de conteúdo (.json)",
+      "fromPacks": "Compêndios do mundo",
+      "fromWorld": "Itens do mundo",
       "hint": "Importe e exporte o seu próprio conteúdo (poderes, traços, tags, origens…).",
       "importTitle": "Importar",
       "intro": "Este sistema não traz conteúdo dos livros. Monte um arquivo no formato descrito em docs/IMPORTACAO.md com o seu próprio material e importe aqui.",
+      "noPacks": "Não há compêndios do sistema neste mundo. Importe primeiro para os compêndios.",
       "onDuplicate": "Se já existir um item com o mesmo tipo e nome",
       "open": "Importar conteúdo",
+      "packLocked": "O compêndio {pack} está bloqueado. Destrave-o (botão direito no compêndio) e tente de novo.",
+      "packsUsed": "Compêndios usados",
       "pickTypes": "Marque ao menos um tipo.",
       "report": "Criados: {created}. Atualizados: {updated}. Ignorados: {skipped}.",
       "run": "Importar",
@@ -221,6 +247,7 @@
       "duration": "Duração",
       "effectsHint": "Efeitos marcados como transferidos valem para o personagem que possui o item.",
       "examples": "Exemplos",
+      "grantNote": "Observação (ex.: tipo)",
       "grants": "Concede",
       "grantsHint": "Arraste traços, tags e poderes para cá. Eles são criados na ficha quando o item é adicionado a um personagem.",
       "level": "Nível",
@@ -259,7 +286,17 @@
       "full": "Igual à corrida",
       "half": "Metade da corrida",
       "rank": "Base × Rank",
+      "runRank": "Corrida × Rank",
       "triple": "Triplo da corrida"
+    },
+    "Pack": {
+      "gear": "Equipamentos",
+      "occupation": "Ocupações",
+      "origin": "Origens",
+      "power": "Poderes",
+      "tag": "Tags",
+      "trait": "Traços",
+      "weapon": "Armas"
     },
     "PowerSet": {
       "basic": "Básicos",
@@ -389,20 +426,25 @@
       "titanic": "Titânico"
     },
     "Status": {
+      "bleeding": "Sangrando",
       "blinded": "Cego",
       "burning": "Em chamas",
       "corroding": "Corroendo",
       "dead": "Derrotado",
       "deafened": "Surdo",
+      "demoralized": "Desmoralizado",
       "frightened": "Amedrontado",
+      "grabbed": "Agarrado",
       "none": "Nenhuma",
       "paralyzed": "Paralisado",
       "pinned": "Imobilizado",
       "poisoned": "Envenenado",
       "prone": "Caído",
+      "shattered": "Estilhaçado",
       "slowed": "Lento",
       "stunned": "Atordoado",
-      "surprised": "Surpreso"
+      "surprised": "Surpreso",
+      "unconscious": "Inconsciente"
     },
     "Tabs": {
       "actions": "Ações",

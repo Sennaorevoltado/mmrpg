@@ -115,6 +115,26 @@
         <select name="damage.element" {{#unless editable}}disabled{{/unless}}>{{mmrpgOptions elementOptions a.damage.element}}</select>
       </label>
       <label class="mmrpg-field">
+        <span>{{localize "MMRPG.Action.damageWhen"}}</span>
+        <select name="damage.when" {{#unless editable}}disabled{{/unless}}>{{mmrpgOptions damageWhenOptions a.damage.when}}</select>
+      </label>
+      <label class="mmrpg-field">
+        <span>{{localize "MMRPG.Action.reductionFrom"}}</span>
+        <select name="damage.reductionFrom" {{#unless editable}}disabled{{/unless}}>{{mmrpgOptions reductionFromOptions a.damage.reductionFrom}}</select>
+      </label>
+      <label class="mmrpg-field inline">
+        <input type="checkbox" name="damage.ignoreReduction" {{#if a.damage.ignoreReduction}}checked{{/if}} {{#unless editable}}disabled{{/unless}}>
+        <span>{{localize "MMRPG.Action.ignoreReduction"}}</span>
+      </label>
+      <label class="mmrpg-field" title="{{localize 'MMRPG.Action.perFocusHint'}}">
+        <span>{{localize "MMRPG.Action.perFocus"}}</span>
+        <input type="number" name="damage.perFocus" value="{{a.damage.perFocus}}" min="0" step="0.5" {{#unless editable}}disabled{{/unless}}>
+      </label>
+      <label class="mmrpg-field" title="{{localize 'MMRPG.Action.damageScaleHint'}}">
+        <span>{{localize "MMRPG.Action.damageScale"}}</span>
+        <input type="number" name="damage.scale" value="{{a.damage.scale}}" min="0" step="0.25" {{#unless editable}}disabled{{/unless}}>
+      </label>
+      <label class="mmrpg-field">
         <span>{{localize "MMRPG.Action.fantasticFactor"}}</span>
         <input type="number" name="damage.fantasticFactor" value="{{a.damage.fantasticFactor}}" min="1" step="0.5" {{#unless editable}}disabled{{/unless}}>
       </label>
@@ -152,6 +172,10 @@
       <label class="mmrpg-field">
         <span>{{localize "MMRPG.Action.flat"}}</span>
         <input type="number" name="healing.flat" value="{{a.healing.flat}}" step="1" {{#unless editable}}disabled{{/unless}}>
+      </label>
+      <label class="mmrpg-field" title="{{localize 'MMRPG.Action.perFocusHint'}}">
+        <span>{{localize "MMRPG.Action.perFocus"}}</span>
+        <input type="number" name="healing.perFocus" value="{{a.healing.perFocus}}" min="0" step="0.5" {{#unless editable}}disabled{{/unless}}>
       </label>
     </div>
   </fieldset>
@@ -233,6 +257,10 @@
       <label class="mmrpg-field">
         <span>{{localize "MMRPG.Resource.focus"}}</span>
         <input type="number" name="cost.focus" value="{{a.cost.focus}}" min="0" step="1" {{#unless editable}}disabled{{/unless}}>
+      </label>
+      <label class="mmrpg-field inline" title="{{localize 'MMRPG.Action.scalableHint'}}">
+        <input type="checkbox" name="cost.scalable" {{#if a.cost.scalable}}checked{{/if}} {{#unless editable}}disabled{{/unless}}>
+        <span>{{localize "MMRPG.Action.scalable"}}</span>
       </label>
       <label class="mmrpg-field">
         <span>{{localize "MMRPG.Resource.karma"}}</span>

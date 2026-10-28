@@ -23,15 +23,19 @@ export function messageModeChoices() {
  * @param {string} p.summary         Linha de resumo (ex.: "Melee +3").
  * @param {number} [p.edgeMode=0]    Modo já vindo da ficha/ação (apenas informativo).
  * @param {boolean} [p.showBonus=true]
- * @returns {Promise<{ edge: string, bonus: number, messageMode: string }|null>}
+ * @param {boolean} [p.showEdge=true]   Mostra Edge/Trouble (ações sem rolagem não precisam).
+ * @param {{ min: number, max: number }|null} [p.focus]  Foco a gastar, quando o custo é um mínimo.
+ * @returns {Promise<{ edge: string, bonus: number, messageMode: string, focus: number|null }|null>}
  */
-export async function promptRollConfig({ title, summary = "", edgeMode = 0, showBonus = true } = {}) {
+export async function promptRollConfig({ title, summary = "", edgeMode = 0, showBonus = true, showEdge = true, focus = null } = {}) {
   const current = defaultMessageMode();
   const content = await foundry.applications.handlebars.renderTemplate(`${MMRPG.path}/templates/dialog/roll-config.hbs`, {
     summary,
     inheritedEdgeLabel: edgeMode === 1 ? MMRPG.edgeModes.edge : edgeMode === -1 ? MMRPG.edgeModes.trouble : "",
     edgeChoices: MMRPG.edgeModes,
     showBonus,
+    showEdge,
+    focus,
     modes: messageModeChoices().map((m) => ({ ...m, selected: m.value === current }))
   });
 
@@ -50,6 +54,7 @@ export async function promptRollConfig({ title, summary = "", edgeMode = 0, show
         return {
           edge: data.edge || "normal",
           bonus: Math.trunc(Number(data.bonus)) || 0,
+          focus: focus ? Math.trunc(Number(data.focus)) || focus.min : null,
           messageMode: data.messageMode || current
         };
       }

@@ -14,6 +14,7 @@ import { execFileSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 import Handlebars from "handlebars";
 import { MMRPG } from "../module/config.mjs";
+import { ITEM_TYPES } from "../module/helpers/content-format.mjs";
 import { walk, collectConfigKeys, collectLiteralKeys, flatten } from "./lib/keys.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
@@ -199,6 +200,8 @@ for (const [k, files] of collectLiteralKeys(root)) used.set(k, new Set([...(used
 for (const [doc, types] of Object.entries(system.documentTypes)) {
   for (const t of Object.keys(types)) used.set(`TYPES.${doc}.${t}`, new Set(["system.json"]));
 }
+// Nomes dos compêndios: um rótulo por tipo de item (chave montada em helpers/compendia.mjs).
+for (const t of ITEM_TYPES) used.set(`MMRPG.Pack.${t}`, new Set(["helpers/compendia.mjs"]));
 
 for (const code of langCodes) {
   for (const [key, files] of used) {

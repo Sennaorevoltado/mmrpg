@@ -1,6 +1,6 @@
 {
   "name": "mmrpg",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "private": true,
   "description": "Sistema não oficial de Marvel Multiverse RPG para Foundry VTT (v14; v13 experimental)",
   "type": "module",
@@ -8,7 +8,8 @@
     "test": "node --test \"tests/*.test.mjs\"",
     "validate": "node scripts/validate.mjs",
     "check": "npm run test && npm run validate",
-    "package": "node scripts/package.mjs"
+    "package": "node scripts/package.mjs",
+    "check:content": "node scripts/validate-content.mjs"
   },
   "devDependencies": {
     "handlebars": "^4.7.8"

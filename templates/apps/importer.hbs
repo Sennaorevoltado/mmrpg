@@ -19,6 +19,15 @@
           {{#each counts}}<li><strong>{{count}}</strong> {{label}}</li>{{/each}}
         </ul>
         <div class="form-group">
+          <label>{{localize "MMRPG.Importer.destination"}}</label>
+          <div class="form-fields">
+            <select name="destination">
+              {{#each destinationOptions}}<option value="{{value}}">{{label}}</option>{{/each}}
+            </select>
+          </div>
+          <p class="hint">{{localize "MMRPG.Importer.destinationHint"}}</p>
+        </div>
+        <div class="form-group">
           <label>{{localize "MMRPG.Importer.onDuplicate"}}</label>
           <div class="form-fields">
             <select name="onDuplicate">
@@ -35,6 +44,7 @@
     {{#if report}}
       <div class="mmrpg-report">
         <p>{{localize "MMRPG.Importer.report" created=report.created updated=report.updated skipped=report.skipped}}</p>
+        {{#if reportPacks}}<p>{{localize "MMRPG.Importer.packsUsed"}}: {{reportPacks}}</p>{{/if}}
         {{#each report.failed}}<p class="mmrpg-error">{{this}}</p>{{/each}}
         {{#each report.unresolved}}<p class="mmrpg-warning">{{localize "MMRPG.Importer.unresolved"}}: {{this}}</p>{{/each}}
       </div>
@@ -43,6 +53,14 @@
 
   <fieldset>
     <legend>{{localize "MMRPG.Importer.exportTitle"}}</legend>
+    <div class="form-group">
+      <label>{{localize "MMRPG.Importer.exportFrom"}}</label>
+      <div class="form-fields">
+        <select name="exportFrom">
+          {{#each exportFromOptions}}<option value="{{value}}">{{label}}</option>{{/each}}
+        </select>
+      </div>
+    </div>
     <div class="mmrpg-check-grid">
       {{#each exportTypes}}
         <label class="mmrpg-field inline">

@@ -111,6 +111,11 @@ export default class ActionEditor extends HandlebarsApplicationMixin(Application
       targetTypeOptions: options(MMRPG.targetTypes),
       areaShapeOptions: options(MMRPG.areaShapes),
       damageResourceOptions: options(MMRPG.damageResources),
+      damageWhenOptions: options(MMRPG.damageWhen),
+      reductionFromOptions: [
+        { value: "", label: loc("MMRPG.Action.sameAsResource") },
+        ...Object.entries(MMRPG.damageResources).map(([value, label]) => ({ value, label: loc(label) }))
+      ],
       healingResourceOptions: options(MMRPG.healingResources),
       healingModeOptions: options(MMRPG.healingModes),
       healingTargetOptions: [

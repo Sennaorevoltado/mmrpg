@@ -130,6 +130,29 @@ export async function createChatMessage(data, mode) {
   return ChatMessage.create(applyRollModeV13({ ...data }, chosen));
 }
 
+/** Modos numéricos do Foundry equivalentes aos tipos de alteração. */
+const CHANGE_MODES = { multiply: 1, add: 2, downgrade: 3, upgrade: 4, override: 5 };
+
+/**
+ * Dados de uma alteração de Active Effect, com o tipo (v14) e o modo numérico (v13) juntos.
+ * O núcleo ignora o campo que sua versão não usa.
+ * @param {{ key: string, type?: string, value: *, priority?: number|null }} change
+ */
+export function changeData(change) {
+  const type = change.type ?? "add";
+  const modes = globalThis.CONST?.ACTIVE_EFFECT_MODES ?? {};
+  const mode = { multiply: modes.MULTIPLY, add: modes.ADD, downgrade: modes.DOWNGRADE, upgrade: modes.UPGRADE, override: modes.OVERRIDE }[type];
+  const priority = Number.isFinite(Number(change.priority)) && change.priority !== null && change.priority !== "" ? Math.trunc(Number(change.priority)) : null;
+  return { key: change.key, type, mode: mode ?? CHANGE_MODES[type] ?? 2, value: String(change.value), priority };
+}
+
+/** Tipo de alteração (nomes do sistema) de uma alteração do núcleo, em qualquer versão. */
+export function changeTypeOf(change) {
+  if (typeof change.type === "string" && change.type in CHANGE_MODES) return change.type;
+  const found = Object.entries(CHANGE_MODES).find(([, mode]) => mode === Number(change.mode));
+  return found ? found[0] : "add";
+}
+
 /** Registra um Handlebars helper apenas se o núcleo ainda não o tiver. */
 export function registerHelperIfMissing(name, fn) {
   if (typeof Handlebars === "undefined") return;

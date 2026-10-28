@@ -8,11 +8,12 @@
  *  - double: o dobro da corrida
  *  - triple: o triplo da corrida
  *  - rank:   valor base (mínimo 1) × Rank
+ *  - runRank: corrida × Rank (voo do poder Flight)
  */
 
 import { toInt } from "./abilities.mjs";
 
-export const MOVEMENT_MODES = Object.freeze(["fixed", "half", "full", "double", "triple", "rank"]);
+export const MOVEMENT_MODES = Object.freeze(["fixed", "half", "full", "double", "triple", "rank", "runRank"]);
 
 /**
  * @typedef {{ base: number, bonus?: number, mode: string }} MovementEntry
@@ -47,6 +48,9 @@ export function computeMovement(entries, rank) {
         break;
       case "rank":
         value = Math.max(1, toInt(entry.base)) * toInt(rank);
+        break;
+      case "runRank":
+        value = run * Math.max(1, toInt(rank));
         break;
       default:
         value = toInt(entry.base);

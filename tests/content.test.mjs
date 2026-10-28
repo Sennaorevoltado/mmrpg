@@ -123,3 +123,56 @@ test("ação que não é objeto é recusada", () => {
   assert.equal(r.items.length, 0);
   assert.equal(r.errors.length, 1);
 });
+
+test("resolveGrants preserva a observação da concessão", () => {
+  const known = { Connections: "Item.c", Rich: "Item.r" };
+  const lookup = (type, name) => (known[name] ? { uuid: known[name], name, type } : null);
+  const { grants, unresolved } = resolveGrants(
+    [
+      { type: "trait", name: "Connections", note: " Criminal " },
+      { type: "trait", name: "Connections", note: "Police" },
+      { type: "trait", name: "Inexistente", note: "x" },
+      { type: "tag", name: "Rich" }
+    ],
+    lookup
+  );
+  assert.deepEqual(grants.map((g) => g.note), ["Criminal", "Police", "x", ""]);
+  assert.deepEqual(unresolved, ["trait:Inexistente"]);
+  assert.equal(grants[0].uuid, grants[1].uuid, "o mesmo item serve a duas observações");
+});
+
+test("efeitos passivos do item: validação e valores padrão", () => {
+  const file = (effects) => ({
+    format: "mmrpg-content",
+    version: 1,
+    items: [{ type: "power", name: "Mighty Teste", effects }]
+  });
+
+  const ok = parseContent(file([{ changes: [{ key: "system.abilities.mle.multiplierBonus", type: "upgrade", value: 2 }, { key: "system.health.reduction", value: "1" }] }]));
+  assert.deepEqual(ok.errors, []);
+  const [item] = ok.items;
+  assert.equal(item.effects.length, 1);
+  assert.equal(item.effects[0].transfer, true, "efeito do item transfere ao ator por padrão");
+  assert.equal(item.effects[0].disabled, false);
+  assert.deepEqual(item.effects[0].changes, [
+    { key: "system.abilities.mle.multiplierBonus", type: "upgrade", value: "2" },
+    { key: "system.health.reduction", type: "add", value: "1" }
+  ]);
+
+  const semEfeitos = parseContent({ format: "mmrpg-content", version: 1, items: [{ type: "power", name: "Sem Efeitos" }] });
+  assert.equal(semEfeitos.items[0].effects, undefined, "sem o campo, nada é enviado (a atualização não apaga efeitos)");
+
+  for (const bad of [
+    "texto",
+    [42],
+    [{ changes: "x" }],
+    [{ changes: [{ type: "add", value: 1 }] }],
+    [{ changes: [{ key: "a", type: "mágico", value: 1 }] }],
+    [{ changes: [{ key: "a", type: "add" }] }]
+  ]) {
+    const r = parseContent(file(bad));
+    assert.equal(r.items.length, 0, JSON.stringify(bad));
+    assert.equal(r.errors.length, 1, JSON.stringify(bad));
+  }
+});
+

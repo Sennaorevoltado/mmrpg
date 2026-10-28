@@ -104,9 +104,9 @@ export function resolveAction({ action, roll, attacker, targets = [] }) {
 
     // Dano
     let damage = null;
-    if (action.damage?.enabled && rolled && hit) {
+    if (action.damage?.enabled && rolled && hit && (action.damage.when !== "fantastic" || fantastic)) {
       const resource = action.damage.resource === "focus" ? "focus" : "health";
-      const reduction = toInt(t.reduction?.[resource]);
+      const reduction = action.damage.ignoreReduction ? 0 : toInt(t.reduction?.[action.damage.reductionFrom || resource]);
       const result = computeDamage({
         marvelValue: roll.marvelValue,
         multiplier: baseMultiplier,
@@ -114,7 +114,8 @@ export function resolveAction({ action, roll, attacker, targets = [] }) {
         flat: attacker.damageFlat ?? 0,
         fantastic,
         reduction,
-        fantasticFactor: action.damage.fantasticFactor ?? 2
+        fantasticFactor: action.damage.fantasticFactor ?? 2,
+        scale: action.damage.scale ?? 1
       });
       damage = { ...result, resource, reduction };
     }
@@ -160,7 +161,7 @@ export function resolveAction({ action, roll, attacker, targets = [] }) {
 
   // Prévia de dano sem alvos (ex.: nada marcado no mapa)
   let preview = null;
-  if (action.damage?.enabled && rolled && targets.length === 0) {
+  if (action.damage?.enabled && rolled && targets.length === 0 && (action.damage.when !== "fantastic" || fantastic)) {
     const resource = action.damage.resource === "focus" ? "focus" : "health";
     preview = {
       ...computeDamage({
@@ -170,7 +171,8 @@ export function resolveAction({ action, roll, attacker, targets = [] }) {
         flat: attacker.damageFlat ?? 0,
         fantastic,
         reduction: 0,
-        fantasticFactor: action.damage.fantasticFactor ?? 2
+        fantasticFactor: action.damage.fantasticFactor ?? 2,
+        scale: action.damage.scale ?? 1
       }),
       resource,
       reduction: 0
@@ -199,7 +201,8 @@ function resolveHealing(action, roll, attacker) {
   const resource = ["health", "focus", "karma"].includes(h.resource) ? h.resource : "health";
   let amount;
   if (h.mode === "flat" || !roll) {
-    amount = toInt(attacker.healingFlat);
+    // Valor fixo; se houver atributo escolhido, soma a pontuação dele (ex.: "recupera Foco igual à Vigilância").
+    amount = toInt(attacker.healingFlat) + (h.ability ? toInt(attacker.abilities?.[h.ability]) : 0);
   } else {
     const ability = h.ability || action.roll?.ability || "mle";
     amount = computeMarvelHealing({

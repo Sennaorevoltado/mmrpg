@@ -161,6 +161,44 @@ test("dano: multiplicador zerado ou negativo não causa dano", () => {
   assert.equal(computeDamage({ marvelValue: 6, multiplier: 2, abilityValue: 5, reduction: 9 }).amount, 0);
 });
 
+test("dano: fração do dano (metade) e Fantástico por cima", () => {
+  const base = { marvelValue: 5, multiplier: 3, abilityValue: 2 };
+  assert.equal(computeDamage({ ...base, scale: 0.5 }).amount, Math.floor(17 / 2));
+  // Metade em qualquer acerto; no Fantástico dobra, voltando ao dano inteiro.
+  assert.equal(computeDamage({ ...base, scale: 0.5, fantastic: true }).amount, 17);
+  assert.equal(computeDamage({ ...base, scale: 0.5 }).scale, 0.5);
+  assert.equal(computeDamage({ ...base }).scale, 1);
+  assert.equal(computeDamage({ ...base, scale: -1 }).amount, 17, "valor inválido vira 1");
+});
+
+test("dano que ignora a Redução de Dano do alvo", () => {
+  const act = attackAction({
+    damage: { enabled: true, ability: "", resource: "health", multiplierBonus: 0, fantasticFactor: 2, ignoreReduction: true }
+  });
+  const r = resolveAction({
+    action: act,
+    roll: { total: 20, marvelValue: 4, fantastic: false, ultimate: false },
+    attacker,
+    targets: [target("A", 10, { health: 2, focus: 0 })]
+  });
+  assert.equal(r.targets[0].damage.amount, 4 * 2 + 3, "a redução 2 não conta");
+  assert.equal(r.targets[0].damage.reduction, 0);
+});
+
+test("dano ao Foco usando a Redução de Dano à Saúde do alvo", () => {
+  const act = attackAction({
+    damage: { enabled: true, ability: "", resource: "focus", reductionFrom: "health", multiplierBonus: 0, fantasticFactor: 2 }
+  });
+  const r = resolveAction({
+    action: act,
+    roll: { total: 20, marvelValue: 4, fantastic: false, ultimate: false },
+    attacker,
+    targets: [target("A", 10, { health: 1, focus: 0 })]
+  });
+  assert.equal(r.targets[0].damage.resource, "focus");
+  assert.equal(r.targets[0].damage.amount, 4 * 1 + 3, "multiplicador 2 − redução da Saúde 1");
+});
+
 test("dano: bônus fixo entra antes de dobrar", () => {
   const r = computeDamage({ marvelValue: 3, multiplier: 2, abilityValue: 1, flat: 2, fantastic: true });
   assert.equal(r.amount, (3 * 2 + 1 + 2) * 2);
@@ -198,6 +236,10 @@ test("movimento relativo à corrida", () => {
   assert.equal(m.flight, 10);
   assert.equal(m.swingline, 6);
   assert.equal(m.glide, 4);
+
+  // Voo = corrida × Rank, acompanhando bônus de corrida.
+  const f = computeMovement({ run: { base: 5, bonus: 1, mode: "fixed" }, flight: { base: 0, mode: "runRank", bonus: 2 } }, 3);
+  assert.equal(f.flight, 6 * 3 + 2);
 });
 
 // ---------------------------------------------------------------------------
@@ -233,6 +275,35 @@ test("ataque acerta quando o total alcança a defesa", () => {
   assert.equal(r.targets[0].damage.amount, 4 * 2 + 3);
   assert.equal(r.targets[1].hit, false);
   assert.equal(r.targets[1].damage, null);
+});
+
+test("dano só no Fantástico e metade do dano com Fantástico por cima", () => {
+  const onlyFantastic = attackAction({
+    damage: { enabled: true, ability: "", resource: "health", multiplierBonus: 0, fantasticFactor: 2, when: "fantastic" }
+  });
+  const normal = resolveAction({
+    action: onlyFantastic,
+    roll: { total: 20, marvelValue: 4, fantastic: false, ultimate: false },
+    attacker,
+    targets: [target("A", 10)]
+  });
+  assert.equal(normal.targets[0].hit, true);
+  assert.equal(normal.targets[0].damage, null, "acertou, mas o dano é só no Fantástico");
+  const fantastic = resolveAction({
+    action: onlyFantastic,
+    roll: { total: 20, marvelValue: 6, fantastic: true, ultimate: false },
+    attacker,
+    targets: [target("A", 10)]
+  });
+  assert.equal(fantastic.targets[0].damage.amount, (6 * 2 + 3) * 2);
+
+  const half = attackAction({
+    damage: { enabled: true, ability: "", resource: "health", multiplierBonus: 0, fantasticFactor: 2, scale: 0.5 }
+  });
+  const ok = resolveAction({ action: half, roll: { total: 20, marvelValue: 4, fantastic: false, ultimate: false }, attacker, targets: [target("A", 10)] });
+  assert.equal(ok.targets[0].damage.amount, Math.floor((4 * 2 + 3) / 2));
+  const fan = resolveAction({ action: half, roll: { total: 20, marvelValue: 4, fantastic: true, ultimate: false }, attacker, targets: [target("A", 10)] });
+  assert.equal(fan.targets[0].damage.amount, 4 * 2 + 3, "metade × 2 = dano inteiro");
 });
 
 test("Fantástico acerta sempre e dobra o dano", () => {
@@ -354,6 +425,20 @@ test("cura em si mesmo e nos alvos", () => {
   });
   assert.equal(others.targets[0].healing.amount, 5);
   assert.equal(others.targets[0].healing.resource, "focus");
+
+  // Valor fixo + pontuação de um atributo (Regain Focus: Foco igual à Vigilância).
+  const byAbility = resolveAction({
+    action: {
+      roll: { mode: "none", ability: "ego" },
+      damage: { enabled: false },
+      healing: { enabled: true, target: "self", resource: "focus", mode: "flat", ability: "vig" },
+      effects: []
+    },
+    roll: null,
+    attacker,
+    targets: []
+  });
+  assert.equal(byAbility.self.healing.amount, attacker.abilities.vig);
 });
 
 test("cura usa o atributo e o bônus de multiplicador da própria cura", () => {

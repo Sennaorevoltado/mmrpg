@@ -85,6 +85,7 @@ export default class MMRPGItemSheet extends HandlebarsApplicationMixin(ItemSheet
       index,
       name: g.name,
       type: g.type ? loc(`TYPES.Item.${g.type}`) : "",
+      note: g.note ?? "",
       linked: !!g.uuid
     }));
 
@@ -115,6 +116,9 @@ export default class MMRPGItemSheet extends HandlebarsApplicationMixin(ItemSheet
     if (zone && this.isEditable) {
       zone.addEventListener("dragover", (event) => event.preventDefault());
       zone.addEventListener("drop", (event) => this.#onDropGrant(event));
+      for (const input of zone.querySelectorAll("input[data-grant-note]")) {
+        input.addEventListener("change", (event) => this.#onGrantNote(event));
+      }
     }
   }
 
@@ -134,8 +138,18 @@ export default class MMRPGItemSheet extends HandlebarsApplicationMixin(ItemSheet
       return;
     }
     const grants = this.item.system.toObject().grants;
-    if (grants.some((g) => g.uuid === doc.uuid)) return;
-    grants.push({ uuid: doc.uuid, name: doc.name, type: doc.type });
+    if (grants.some((g) => g.uuid === doc.uuid && !g.note)) return;
+    grants.push({ uuid: doc.uuid, name: doc.name, type: doc.type, note: "" });
+    await this.item.update({ "system.grants": grants });
+  }
+
+  /** Edita a observação de uma concessão (ex.: o tipo de Connections). */
+  async #onGrantNote(event) {
+    event.stopPropagation();
+    const index = Number(event.target.dataset.index);
+    const grants = this.item.system.toObject().grants;
+    if (!grants[index]) return;
+    grants[index].note = String(event.target.value ?? "").trim();
     await this.item.update({ "system.grants": grants });
   }
 

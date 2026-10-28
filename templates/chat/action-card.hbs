@@ -20,14 +20,14 @@
       <div class="mmrpg-card-roll-title">
         {{localize abilityLabel}}
         {{#if isAttack}}<span class="mmrpg-muted">{{localize "MMRPG.Card.against"}} {{localize targetDefenseLabel}}</span>{{/if}}
-        {{#if isCheck}}<span class="mmrpg-muted">{{localize "MMRPG.Card.difficulty"}} {{check.difficulty}}</span>{{/if}}
+        {{#if isCheck}}{{#if check.difficulty}}<span class="mmrpg-muted">{{localize "MMRPG.Card.difficulty"}} {{check.difficulty}}</span>{{/if}}{{/if}}
       </div>
       {{> "systems/mmrpg/templates/dice/roll.hbs" roll}}
-      {{#if isCheck}}
+      {{#if isCheck}}{{#if check.difficulty}}
         <div class="mmrpg-outcome {{#if check.success}}success{{else}}failure{{/if}}">
           {{#if check.success}}{{localize "MMRPG.Card.success"}}{{else}}{{localize "MMRPG.Card.failure"}}{{/if}}
         </div>
-      {{/if}}
+      {{/if}}{{/if}}
       {{#if elementFantasticApplies}}
         <div class="mmrpg-note">
           {{localize "MMRPG.Card.elementFantastic"}}: {{localize element.label}}
@@ -57,7 +57,7 @@
               <span class="mmrpg-amount">{{damage.amount}}</span>
               <span>{{localize "MMRPG.Card.damageTo"}} {{damage.resourceLabel}}</span>
               <span class="mmrpg-calc">
-                {{damage.marvelValue}} × {{damage.multiplier}} + {{damage.additive}}{{#if damage.doubled}} × 2{{/if}}
+                {{damage.marvelValue}} × {{damage.multiplier}} + {{damage.additive}}{{#if damage.scaleLabel}} × {{damage.scaleLabel}}{{/if}}{{#if damage.doubled}} × 2{{/if}}
                 {{#if damage.reduction}}({{localize "MMRPG.Card.reduction"}} {{damage.reduction}}){{/if}}
               </span>
               {{#if applied.damage}}<i class="fa-solid fa-check mmrpg-done" title="{{localize 'MMRPG.Card.applied'}}"></i>{{/if}}
@@ -93,7 +93,7 @@
         <div class="mmrpg-line damage">
           <span class="mmrpg-amount">{{preview.amount}}</span>
           <span>{{localize "MMRPG.Card.damageTo"}} {{preview.resourceLabel}}</span>
-          <span class="mmrpg-calc">{{preview.marvelValue}} × {{preview.multiplier}} + {{preview.additive}}{{#if preview.doubled}} × 2{{/if}}</span>
+          <span class="mmrpg-calc">{{preview.marvelValue}} × {{preview.multiplier}} + {{preview.additive}}{{#if preview.scaleLabel}} × {{preview.scaleLabel}}{{/if}}{{#if preview.doubled}} × 2{{/if}}</span>
         </div>
         <p class="mmrpg-muted">{{localize "MMRPG.Card.noTargets"}}</p>
       </div>

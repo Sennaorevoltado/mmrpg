@@ -9,7 +9,9 @@ export function grantsField() {
     new f.SchemaField({
       uuid: new f.StringField({ required: true, blank: true, initial: "" }),
       name: new f.StringField({ required: true, blank: true, initial: "" }),
-      type: new f.StringField({ required: true, blank: true, initial: "" })
+      type: new f.StringField({ required: true, blank: true, initial: "" }),
+      /** Observação que vira parte do nome do item criado (ex.: "Criminal" em "Connections: Criminal"). */
+      note: new f.StringField({ required: true, blank: true, initial: "" })
     })
   );
 }

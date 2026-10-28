@@ -406,8 +406,10 @@ class ActiveEffect {
 }
 
 class BaseDocument {
-  constructor(data = {}, { parent = null } = {}) {
+  constructor(data = {}, { parent = null, pack = null, folder = null } = {}) {
     this.parent = parent;
+    this.pack = pack;
+    this.folder = folder;
     this.id = data._id ?? randomID();
     this.name = data.name ?? "";
     this.type = data.type;
@@ -419,7 +421,10 @@ class BaseDocument {
     this.sheet = { render() {} };
     const Model = CONFIG[this.constructor.documentName].dataModels[this.type];
     this.system = new Model(data.system ?? {}, { parent: this });
-    for (const e of data.effects ?? []) this.effects.set(e._id ?? randomID(), new ActiveEffect(e, { parent: this }));
+    for (const e of data.effects ?? []) {
+      const effect = new ActiveEffect(e, { parent: this });
+      this.effects.set(effect.id, effect);
+    }
     REGISTRY.set(this.uuid, this);
     this.prepareData();
   }
@@ -439,6 +444,7 @@ class BaseDocument {
     return this.constructor.documentName;
   }
   get uuid() {
+    if (this.pack) return `Compendium.${this.pack}.${this.constructor.documentName}.${this.id}`;
     return this.parent ? `${this.parent.uuid}.${this.constructor.documentName}.${this.id}` : `${this.constructor.documentName}.${this.id}`;
   }
   get isOwner() {
@@ -477,7 +483,10 @@ class BaseDocument {
     for (const [k, v] of Object.entries(rest)) {
       if (k === "flags") mergeObject(this.flags, v);
       else if (k === "prototypeToken") mergeObject(this.prototypeToken, v);
-      else this[k] = v;
+      else if (k === "folder") {
+        // No Foundry, `folder` vira o documento da pasta; aqui só os compêndios têm pastas de verdade.
+        this.folder = this.pack ? (game.packs.get(this.pack)?.folders.get(v) ?? null) : v;
+      } else this[k] = v;
     }
     if (system) this.system.updateSource(system);
     this.prepareData();
@@ -520,13 +529,48 @@ class BaseDocument {
   async deleteEmbeddedDocuments(name, ids) {
     const coll = name === "ActiveEffect" ? this.effects : this.items;
     for (const id of ids) coll.delete(id);
+    this.prepareData();
     return ids;
   }
 
   async delete() {
     this.parent?.items?.delete(this.id);
+    this.parent?.prepareData?.();
     return this;
   }
+}
+
+/** Prioridade padrão das alterações de efeito por tipo, como no Foundry. */
+const CHANGE_PRIORITY = { multiply: 10, add: 20, downgrade: 30, upgrade: 40, override: 50 };
+const CHANGE_MODE_NAMES = { 1: "multiply", 2: "add", 3: "downgrade", 4: "upgrade", 5: "override" };
+
+/** Aplica uma alteração de efeito a um ator simulado (conversão pelo tipo do valor atual). */
+function applyChange(actor, change) {
+  const kind = change.type ?? CHANGE_MODE_NAMES[change.mode] ?? "add";
+  const current = getProperty(actor, change.key);
+  if (current === undefined) {
+    if (String(change.key).startsWith("system.")) throw new Error(`Chave de efeito inexistente no ator: ${change.key}`);
+    return;
+  }
+  let delta = change.value;
+  if (typeof current === "number") {
+    delta = Number(change.value);
+    if (!Number.isFinite(delta)) throw new Error(`Valor não numérico em ${change.key}: ${change.value}`);
+  } else if (typeof current === "boolean") {
+    delta = String(change.value) === "true";
+  }
+  let result = current;
+  switch (kind) {
+    case "multiply": result = current * delta; break;
+    case "add": result = typeof current === "number" ? current + delta : String(current) + String(delta); break;
+    case "downgrade": result = Math.min(current, delta); break;
+    case "upgrade": result = Math.max(current, delta); break;
+    case "override": result = delta; break;
+  }
+  // Não usa setProperty: ele troca por {} tudo que não é objeto simples (como o modelo de dados do sistema).
+  const parts = String(change.key).split(".");
+  const holder = parts.slice(0, -1).reduce((obj, part) => obj[part], actor);
+  holder[parts.at(-1)] = result;
 }
 
 class Actor extends BaseDocument {
@@ -538,6 +582,32 @@ class Actor extends BaseDocument {
       const item = new CONFIG.Item.documentClass(i, { parent: this });
       this.items.set(item.id, item);
     }
+    this.prepareData();
+  }
+
+  prepareData() {
+    this.system.reset();
+    this.system.prepareBaseData?.();
+    this.applyActiveEffects();
+    this.system.prepareDerivedData?.();
+  }
+
+  /** Efeitos do ator e efeitos transferidos pelos itens, na ordem de prioridade. */
+  applyActiveEffects() {
+    const effects = [...this.effects.contents];
+    for (const item of this.items?.contents ?? []) {
+      for (const e of item.effects.contents) if (e.transfer) effects.push(e);
+    }
+    const changes = [];
+    for (const effect of effects) {
+      if (effect.disabled) continue;
+      for (const c of effect.changes ?? []) {
+        const kind = c.type ?? CHANGE_MODE_NAMES[c.mode] ?? "add";
+        changes.push({ ...c, priority: c.priority ?? CHANGE_PRIORITY[kind] });
+      }
+    }
+    changes.sort((a, b) => a.priority - b.priority);
+    for (const change of changes) applyChange(this, change);
   }
   static async create(data) {
     const actor = new CONFIG.Actor.documentClass(deepClone(data));
@@ -565,13 +635,57 @@ class Item extends BaseDocument {
   get actor() {
     return this.parent instanceof Actor ? this.parent : null;
   }
-  static async create(data) {
+  static async create(data, options = {}) {
+    if (options.pack) {
+      const pack = game.packs.get(options.pack);
+      if (!pack) throw new Error(`Compêndio inexistente: ${options.pack}`);
+      if (pack.locked) throw new Error(`Compêndio bloqueado: ${options.pack}`);
+      const folder = data.folder ? pack.folders.get(data.folder) ?? null : null;
+      if (data.folder && !folder) throw new Error(`Pasta inexistente no compêndio: ${data.folder}`);
+      const item = new CONFIG.Item.documentClass(deepClone({ ...data, folder: undefined }), { pack: pack.collection, folder });
+      await item._preCreate(data, options, game.user);
+      pack.documents.set(item.id, item);
+      pack.index.set(item.id, { _id: item.id, uuid: item.uuid, name: item.name, type: item.type });
+      return item;
+    }
     const item = new CONFIG.Item.documentClass(deepClone(data));
-    await item._preCreate(data, {}, game.user);
+    await item._preCreate(data, options, game.user);
     game.items.set(item.id, item);
     return item;
   }
 }
+
+/** Compêndio simulado: documentos, índice e pastas. */
+class CompendiumPack {
+  constructor({ name, label, type }) {
+    this.collection = `world.${name}`;
+    this.title = label;
+    this.metadata = { name, label, type, packageType: "world" };
+    this.locked = false;
+    this.documents = new Collection();
+    this.index = new Collection();
+    this.folders = new Collection();
+  }
+  async getIndex() {
+    return this.index;
+  }
+  async getDocuments() {
+    return this.documents.contents;
+  }
+  async getDocument(id) {
+    return this.documents.get(id) ?? null;
+  }
+}
+
+const CompendiumCollection = {
+  async createCompendium(metadata) {
+    if (!metadata?.name || !metadata?.label || metadata?.type !== "Item") throw new Error("metadados de compêndio inválidos");
+    if (game.packs.has(`world.${metadata.name}`)) throw new Error("compêndio já existe");
+    const pack = new CompendiumPack(metadata);
+    game.packs.set(pack.collection, pack);
+    return pack;
+  }
+};
 
 class Combatant {}
 
@@ -877,7 +991,16 @@ export function installFoundry({ lang = "pt-BR", generation = Number(process.env
   g.Combatant = Combatant;
   g.ChatMessage = ChatMessage;
   g.ActiveEffect = ActiveEffect;
-  g.Folder = { create: async (d) => ({ id: randomID(), ...d }) };
+  g.Folder = {
+    create: async (d, options = {}) => {
+      if (!options.pack) return { id: randomID(), ...d };
+      const pack = game.packs.get(options.pack);
+      if (!pack || pack.locked) throw new Error(`Compêndio indisponível: ${options.pack}`);
+      const folder = { id: randomID(), name: d.name, type: d.type, folder: d.folder ? pack.folders.get(d.folder) ?? null : null };
+      pack.folders.set(folder.id, folder);
+      return folder;
+    }
+  };
   g.Macro = { create: async (d) => ({ id: randomID(), ...d }) };
 
   g.foundry = {
@@ -893,7 +1016,7 @@ export function installFoundry({ lang = "pt-BR", generation = Number(process.env
     abstract: { DataModel, TypeDataModel },
     data: { fields: { DataField, StringField, HTMLField, NumberField, BooleanField, ObjectField, SchemaField, ArrayField, EmbeddedDataField } },
     dice: { terms: { Die } },
-    documents: { collections: { Actors: sheetRegistry("Actor"), Items: sheetRegistry("Item") } },
+    documents: { collections: { Actors: sheetRegistry("Actor"), Items: sheetRegistry("Item"), CompendiumCollection } },
     ...(generation < 14 ? { appv1: { sheets: { ActorSheet: LegacyActorSheet, ItemSheet: LegacyItemSheet } } } : {}),
     applications: {
       api: { ApplicationV2, HandlebarsApplicationMixin, DialogV2 },
@@ -972,6 +1095,7 @@ export function installFoundry({ lang = "pt-BR", generation = Number(process.env
     actors: new Collection(),
     items: new Collection(),
     messages: new Collection(),
+    packs: new Collection(),
     macros: { find: () => null },
     folders: { find: () => null },
     combat: null,

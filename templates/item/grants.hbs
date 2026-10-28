@@ -7,13 +7,14 @@
         <li class="mmrpg-item">
           <div class="mmrpg-item-main">
             <div class="mmrpg-item-title">
-              <span class="mmrpg-item-name">{{name}}</span>
+              <span class="mmrpg-item-name">{{name}}{{#if note}}: {{note}}{{/if}}</span>
               <span class="mmrpg-muted">{{type}}</span>
               {{#unless linked}}<span class="mmrpg-chip warn">{{localize "MMRPG.Item.unlinked"}}</span>{{/unless}}
             </div>
           </div>
           {{#if ../editable}}
             <div class="mmrpg-item-controls">
+              <input type="text" class="mmrpg-grant-note" data-grant-note data-index="{{index}}" value="{{note}}" placeholder="{{localize 'MMRPG.Item.grantNote'}}">
               <button type="button" class="mmrpg-icon-button" data-action="removeGrant" data-index="{{index}}" title="{{localize 'MMRPG.Sheet.delete'}}">
                 <i class="fa-solid fa-trash"></i>
               </button>

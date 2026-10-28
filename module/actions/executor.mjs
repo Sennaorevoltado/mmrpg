@@ -13,6 +13,7 @@ import { makeCard, postCard, renderCheckCard } from "./card.mjs";
 import { requestApply } from "./apply.mjs";
 import { MMRPG } from "../config.mjs";
 import { createChatMessage } from "../helpers/compat.mjs";
+import { toInt } from "../rules/abilities.mjs";
 
 /** O clique pede execução direta, sem diálogo? (Shift) */
 function isFastForward(event) {
@@ -74,9 +75,10 @@ function warnRange(actor, action) {
  * @param {object} [options]
  * @param {Event} [options.event]
  * @param {boolean} [options.fastForward]
+ * @param {number} [options.focus]       Foco a gastar, quando o custo da ação é um mínimo (padrão: o mínimo).
  * @returns {Promise<ChatMessage|null>}
  */
-export async function useAction(item, actionId, { event, fastForward } = {}) {
+export async function useAction(item, actionId, { event, fastForward, focus } = {}) {
   const actor = item.actor;
   if (!actor) {
     ui.notifications.warn(game.i18n.localize("MMRPG.Warn.noActor"));
@@ -98,22 +100,41 @@ export async function useAction(item, actionId, { event, fastForward } = {}) {
   const targets = collectTargets(actor, action);
   warnRange(actor, action);
 
-  // Configuração da rolagem
-  let config = { edge: "normal", bonus: 0, messageMode: defaultMessageMode() };
+  // Configuração da rolagem (e do Foco gasto, quando o custo é um mínimo)
+  let config = { edge: "normal", bonus: 0, messageMode: defaultMessageMode(), focus: null };
   const rolls = action.roll.mode !== "none";
-  if (rolls && !(fastForward ?? isFastForward(event))) {
+  const scalable = !!action.cost.scalable && action.cost.focus > 0;
+  const focusRange = scalable ? { min: action.cost.focus, max: Math.max(action.cost.focus, toInt(actor.system.focus.value)) } : null;
+  if ((rolls || scalable) && !(fastForward ?? isFastForward(event))) {
     const ability = actor.system.abilities[action.roll.ability];
-    const summaryParts = [
-      `${game.i18n.localize(`MMRPG.Ability.${action.roll.ability}.long`)} ${formatSigned(rollModifierFor(actor, action))}`
-    ];
+    const summaryParts = rolls
+      ? [`${game.i18n.localize(`MMRPG.Ability.${action.roll.ability}.long`)} ${formatSigned(rollModifierFor(actor, action))}`]
+      : [];
     const chosen = await promptRollConfig({
       title: action.name || item.name,
       summary: summaryParts.join(" "),
-      edgeMode: edgeModeFor(actor, action),
-      showBonus: !!ability
+      edgeMode: rolls ? edgeModeFor(actor, action) : 0,
+      showBonus: rolls && !!ability,
+      showEdge: rolls,
+      focus: focusRange
     });
     if (!chosen) return null;
     config = chosen;
+  }
+
+  // Foco realmente gasto: o mínimo da ação ou o que o jogador escolheu.
+  if (scalable) {
+    const wanted = Math.trunc(Number(focus ?? config.focus ?? focusRange.min)) || focusRange.min;
+    const spent = Math.max(focusRange.min, wanted);
+    if (spent > toInt(actor.system.focus.value)) {
+      ui.notifications.warn(
+        game.i18n.format("MMRPG.Warn.noResource", { resource: game.i18n.localize("MMRPG.Resource.focus") })
+      );
+      return null;
+    }
+    action.cost.focus = spent;
+    if (action.damage.perFocus > 0) action.damage.flat = toInt(action.damage.flat) + Math.floor(spent * action.damage.perFocus);
+    if (action.healing.perFocus > 0) action.healing.flat = toInt(action.healing.flat) + Math.floor(spent * action.healing.perFocus);
   }
 
   await payCost(actor, item, action);

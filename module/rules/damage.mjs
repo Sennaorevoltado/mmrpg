@@ -18,7 +18,8 @@ import { toInt } from "./abilities.mjs";
  * @param {boolean} [p.fantastic=false] A rolagem foi Fantástica?
  * @param {number} [p.reduction=0]      Redução de dano do alvo (subtrai do multiplicador).
  * @param {number} [p.fantasticFactor=2] Fator aplicado em resultados Fantásticos.
- * @returns {{ amount: number, effectiveMultiplier: number, base: number, doubled: boolean }}
+ * @param {number} [p.scale=1]           Fração do dano em qualquer acerto (0,5 = metade); o Fantástico multiplica por cima.
+ * @returns {{ amount: number, effectiveMultiplier: number, base: number, doubled: boolean, scale: number }}
  */
 export function computeDamage({
   marvelValue,
@@ -27,19 +28,22 @@ export function computeDamage({
   flat = 0,
   fantastic = false,
   reduction = 0,
-  fantasticFactor = 2
+  fantasticFactor = 2,
+  scale = 1
 }) {
   const effectiveMultiplier = Math.max(0, toInt(multiplier) - toInt(reduction));
   if (effectiveMultiplier === 0) {
-    return { amount: 0, effectiveMultiplier: 0, base: 0, doubled: false };
+    return { amount: 0, effectiveMultiplier: 0, base: 0, doubled: false, scale: 1 };
   }
   const base = toInt(marvelValue) * effectiveMultiplier + toInt(abilityValue) + toInt(flat);
   const factor = fantastic ? Math.max(1, Number(fantasticFactor) || 1) : 1;
+  const fraction = Number.isFinite(Number(scale)) && Number(scale) >= 0 ? Number(scale) : 1;
   return {
-    amount: Math.max(0, Math.floor(base * factor)),
+    amount: Math.max(0, Math.floor(base * fraction * factor)),
     effectiveMultiplier,
     base,
-    doubled: fantastic && factor > 1
+    doubled: fantastic && factor > 1,
+    scale: fraction
   };
 }
 

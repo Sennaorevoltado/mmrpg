@@ -309,6 +309,7 @@
 .mmrpg-item-actions,
 .mmrpg-badges { display: flex; flex-wrap: wrap; gap: 0.3rem; }
 .mmrpg-item-controls { display: flex; gap: 0.25rem; }
+.mmrpg-grant-note { width: 10rem; }
 
 .mmrpg-action-button {
   background: var(--mm-surface-2);

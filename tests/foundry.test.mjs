@@ -16,7 +16,8 @@ const { ABILITY_KEYS, defenseScore, damageMultiplier } = await import("../module
 const { requestApply } = await import("../module/actions/apply.mjs");
 const { rollAbilityCheck } = await import("../module/actions/executor.mjs");
 const { rerollDie, placeTemplate } = await import("../module/actions/listeners.mjs");
-const { importItems, exportItems } = await import("../module/helpers/importer.mjs");
+const { importItems, exportItems, exportPackItems } = await import("../module/helpers/importer.mjs");
+const compendia = await import("../module/helpers/compendia.mjs");
 const { parseContent } = await import("../module/helpers/content-format.mjs");
 const compat = await import("../module/helpers/compat.mjs");
 const { defaultMessageMode, messageModeChoices } = await import("../module/actions/roll-config.mjs");
@@ -322,6 +323,66 @@ test("usos limitados são consumidos e bloqueiam a ação quando acabam", async 
   assert.equal(env.notices.warn.length, 1);
 });
 
+test("custo mínimo de Foco: gasta o que o jogador escolher e soma o valor fixo por Foco", async () => {
+  const { hero } = await makeScene();
+  hero.system.updateSource({ health: { value: 5 } });
+  hero.prepareData();
+  const [power] = await hero.createEmbeddedDocuments("Item", [
+    {
+      name: "Toque Curativo",
+      type: "power",
+      system: {
+        powerSet: "healing",
+        actions: [
+          {
+            id: "tocar",
+            target: { type: "self" },
+            roll: { mode: "none" },
+            healing: { enabled: true, mode: "flat", resource: "health", target: "self", perFocus: 1 },
+            cost: { focus: 4, scalable: true }
+          },
+          {
+            id: "raio",
+            roll: { mode: "attack", ability: "mle", targetDefense: "agl" },
+            damage: { enabled: true, perFocus: 0.5 },
+            cost: { focus: 5, scalable: true }
+          }
+        ]
+      }
+    }
+  ]);
+  assert.deepEqual(power.system.validate(), []);
+
+  // Sem informar o Foco, gasta o mínimo.
+  const min = await power.use("tocar", { fastForward: true });
+  assert.equal(hero.system.focus.value, 6);
+  assert.equal(min.getFlag("mmrpg", "card").action.healing.flat, 4);
+
+  // Informando mais Foco, gasta tudo e a cura cresce.
+  const more = await power.use("tocar", { fastForward: true, focus: 6 });
+  assert.equal(hero.system.focus.value, 0);
+  const card = more.getFlag("mmrpg", "card");
+  assert.equal(card.action.cost.focus, 6);
+  assert.equal(card.action.healing.flat, 6);
+  await requestApply(more, { scope: "self" });
+  assert.equal(hero.system.health.value, 11);
+
+  // Mais Foco do que a ficha tem: recusa e não cobra nada.
+  hero.system.updateSource({ focus: { value: 5 } });
+  hero.prepareData();
+  env.notices.warn.length = 0;
+  assert.equal(await power.use("tocar", { fastForward: true, focus: 9 }), null);
+  assert.equal(env.notices.warn.length, 1);
+  assert.equal(hero.system.focus.value, 5);
+
+  // Dano: +1 a cada 2 de Foco (0,5 por ponto), contando todo o Foco gasto.
+  hero.system.updateSource({ focus: { value: 20, max: 20 } });
+  hero.prepareData();
+  const atk = await power.use("raio", { fastForward: true, focus: 11 });
+  assert.equal(hero.system.focus.value, 9);
+  assert.equal(atk.getFlag("mmrpg", "card").action.damage.flat, 5);
+});
+
 test("custo acima dos recursos bloqueia a ação", async () => {
   const { hero, villain, power } = await makeScene();
   hero.system.updateSource({ focus: { value: 1 } });
@@ -609,6 +670,285 @@ test("importar e exportar conteúdo preserva ações, concessões e ids", async 
   const roundTrip = parseContent(exported);
   assert.deepEqual(roundTrip.errors, []);
   assert.ok(roundTrip.items.some((i) => i.name === "Poder Importado"));
+});
+
+const COMPENDIA_FILE = {
+  format: "mmrpg-content",
+  version: 1,
+  source: "teste de compêndios",
+  items: [
+    { type: "trait", name: "Traço do Compêndio", folder: "Gerais", system: { restriction: "nenhuma" } },
+    { type: "power", name: "Poder do Compêndio", folder: "Telecinese", system: { powerSet: "basic", actions: [{ roll: { mode: "attack", ability: "mle" }, damage: { enabled: true }, uses: { max: 2 } }] } },
+    { type: "power", name: "Outro Poder", folder: "Telecinese/Avançado", system: { powerSet: "basic" } },
+    { type: "origin", name: "Origem do Compêndio", system: { grants: [{ type: "trait", name: "Traço do Compêndio" }, { type: "power", name: "Poder do Compêndio" }] } },
+    { type: "tag", name: "Tag do Compêndio", system: {} }
+  ]
+};
+
+test("importar para compêndios cria um compêndio por tipo, com pastas, e liga as concessões", async () => {
+  const parsed = parseContent(COMPENDIA_FILE);
+  assert.deepEqual(parsed.errors, []);
+  const worldBefore = game.items.size;
+
+  const report = await importItems(parsed.items, { destination: "compendia" });
+  assert.deepEqual(report.failed, []);
+  assert.deepEqual(report.unresolved, []);
+  assert.equal(report.created, 5);
+  assert.equal(game.items.size, worldBefore, "nada vai para os itens do mundo");
+
+  // Um compêndio por tipo usado, com o nome e o rótulo certos.
+  for (const type of ["trait", "power", "origin", "tag"]) {
+    const pack = game.packs.get(compendia.packIdFor(type));
+    assert.ok(pack, `compêndio de ${type}`);
+    assert.equal(pack.title, game.i18n.localize(`MMRPG.Pack.${type}`));
+  }
+  assert.equal(game.packs.has(compendia.packIdFor("weapon")), false, "só cria os tipos usados");
+  assert.deepEqual(report.packs.sort(), ["Origens", "Poderes", "Tags", "Traços"]);
+
+  // Itens no compêndio certo, válidos, marcados como importados e dentro das pastas.
+  const powers = game.packs.get("world.mmrpg-power");
+  assert.equal(powers.documents.size, 2);
+  const power = powers.documents.contents.find((d) => d.name === "Poder do Compêndio");
+  assert.deepEqual(power.system.validate(), []);
+  assert.equal(power.getFlag("mmrpg", "imported"), true);
+  assert.equal(power.actions[0].uses.value, 2);
+  assert.equal(power.folder.name, "Telecinese");
+  assert.ok(power.uuid.startsWith("Compendium.world.mmrpg-power.Item."));
+  const nested = powers.documents.contents.find((d) => d.name === "Outro Poder");
+  assert.equal(nested.folder.name, "Avançado");
+  assert.equal(nested.folder.folder.name, "Telecinese", "pasta dentro de pasta");
+  assert.equal(powers.folders.size, 2, "a pasta Telecinese é reaproveitada");
+
+  // A Origem concede itens que estão em OUTROS compêndios.
+  const origin = game.packs.get("world.mmrpg-origin").documents.contents[0];
+  assert.deepEqual(
+    origin.system.grants.map((g) => g.uuid.split(".").slice(0, 3).join(".")),
+    ["Compendium.world.mmrpg-trait", "Compendium.world.mmrpg-power"]
+  );
+
+  // Arrastar a Origem do compêndio para uma ficha cria os itens concedidos.
+  const actor = await Actor.create({ name: "Recebe Origem", type: "character" });
+  await actor.createEmbeddedDocuments("Item", [origin.toObject()]);
+  const names = actor.items.map((i) => i.name).sort();
+  assert.deepEqual(names, ["Origem do Compêndio", "Poder do Compêndio", "Traço do Compêndio"]);
+});
+
+test("importar de novo para compêndios respeita ignorar, atualizar e copiar", async () => {
+  const parsed = parseContent(COMPENDIA_FILE);
+  const skipped = await importItems(parsed.items, { destination: "compendia", onDuplicate: "skip" });
+  assert.equal(skipped.created, 0);
+  assert.equal(skipped.skipped, 5);
+  assert.deepEqual(skipped.packs, [], "não cria nada, não menciona compêndios");
+
+  const changed = structuredClone(COMPENDIA_FILE);
+  changed.items[1].system.powerSet = "basic";
+  changed.items[1].system.description = "<p>Texto novo</p>";
+  const updated = await importItems(parseContent(changed).items, { destination: "compendia", onDuplicate: "update" });
+  assert.deepEqual(updated.failed, []);
+  assert.equal(updated.updated, 5);
+  const power = game.packs.get("world.mmrpg-power").documents.contents.find((d) => d.name === "Poder do Compêndio");
+  assert.equal(power.system.description, "<p>Texto novo</p>");
+  assert.equal(game.packs.get("world.mmrpg-power").documents.size, 2, "atualizou, não duplicou");
+
+  const copies = await importItems(parsed.items.slice(0, 1), { destination: "compendia", onDuplicate: "duplicate" });
+  assert.equal(copies.created, 1);
+  assert.equal(game.packs.get("world.mmrpg-trait").documents.size, 2);
+});
+
+test("compêndio bloqueado: o relatório lista a falha e nada quebra", async () => {
+  const pack = game.packs.get("world.mmrpg-tag");
+  pack.locked = true;
+  const parsed = parseContent({ ...COMPENDIA_FILE, items: [{ type: "tag", name: "Tag Nova", system: {} }] });
+  const report = await importItems(parsed.items, { destination: "compendia" });
+  pack.locked = false;
+  assert.equal(report.created, 0);
+  assert.equal(report.failed.length, 1);
+  assert.ok(report.failed[0].includes("Destrave"), report.failed[0]);
+  assert.equal(pack.documents.size, 1);
+});
+
+test("exportar dos compêndios devolve o mesmo conteúdo, com pastas e concessões por nome", async () => {
+  const file = await exportPackItems(["power", "trait", "origin", "tag"], { source: "teste" });
+  const roundTrip = parseContent(file);
+  assert.deepEqual(roundTrip.errors, []);
+  const byName = new Map(roundTrip.items.map((i) => [i.name, i]));
+  assert.ok(byName.has("Poder do Compêndio") && byName.has("Origem do Compêndio") && byName.has("Tag do Compêndio"));
+  assert.deepEqual(byName.get("Outro Poder").folder, ["Telecinese", "Avançado"]);
+  const grants = file.items.find((i) => i.name === "Origem do Compêndio").system.grants;
+  assert.deepEqual(grants.map((g) => [g.type, g.name]), [["trait", "Traço do Compêndio"], ["power", "Poder do Compêndio"]]);
+  assert.ok(grants.every((g) => !g.uuid), "sem uuid: funciona em outro mundo");
+
+  // Só os tipos pedidos e só os compêndios que existem.
+  const onlyTags = await exportPackItems(["tag", "weapon"]);
+  assert.deepEqual(onlyTags.items.map((i) => i.name), ["Tag do Compêndio"]);
+});
+
+test("janela de importação renderiza com destino e origem da exportação", async () => {
+  const app = new (await import("../module/apps/importer.mjs")).default();
+  const context = await app._prepareContext();
+  assert.deepEqual(context.destinationOptions.map((o) => o.value), ["compendia", "world"]);
+  assert.deepEqual(context.exportFromOptions.map((o) => o.value), ["world", "compendia"]);
+  const html = await foundry.applications.handlebars.renderTemplate(`${MMRPG.path}/templates/apps/importer.hbs`, {
+    ...context,
+    parsed: parseContent(COMPENDIA_FILE),
+    hasItems: true,
+    reportPacks: "Poderes, Traços"
+  });
+  assertClean(html, "janela de importação (compêndios)");
+  assert.ok(html.includes('name="destination"') && html.includes('name="exportFrom"'));
+  assert.ok(html.includes("Poderes, Traços"));
+});
+
+test("concessões com observação criam itens com nome composto e não duplicam", async () => {
+  const file = {
+    format: "mmrpg-content",
+    version: 1,
+    items: [
+      { type: "trait", name: "Conexões Teste", system: { description: "<p>base</p>" } },
+      {
+        type: "occupation",
+        name: "Ocupação com Observações",
+        system: {
+          grants: [
+            { type: "trait", name: "Conexões Teste", note: "Criminal" },
+            { type: "trait", name: "Conexões Teste", note: "Polícia" }
+          ]
+        }
+      }
+    ]
+  };
+  const report = await importItems(parseContent(file).items, { destination: "compendia" });
+  assert.deepEqual(report.failed, []);
+  assert.deepEqual(report.unresolved, []);
+  const occupation = game.packs.get("world.mmrpg-occupation").documents.contents.find((d) => d.name === "Ocupação com Observações");
+  assert.deepEqual(occupation.system.grants.map((g) => g.note), ["Criminal", "Polícia"]);
+  assert.equal(occupation.system.grants[0].uuid, occupation.system.grants[1].uuid);
+
+  const actor = await Actor.create({ name: "Com Observações", type: "character" });
+  await actor.createEmbeddedDocuments("Item", [occupation.toObject()]);
+  assert.deepEqual(actor.items.map((i) => i.name).sort(), ["Conexões Teste: Criminal", "Conexões Teste: Polícia", "Ocupação com Observações"]);
+  const created = actor.items.find((i) => i.name === "Conexões Teste: Criminal");
+  assert.equal(created.system.description, "<p>base</p>", "mantém o texto do item original");
+
+  // Receber a ocupação de novo não duplica.
+  await actor.grantItems(occupation);
+  assert.equal(actor.items.size, 3);
+
+  // A exportação mantém a observação.
+  const exported = await exportPackItems(["occupation"]);
+  const grants = exported.items.find((i) => i.name === "Ocupação com Observações").system.grants;
+  assert.deepEqual(grants, [
+    { type: "trait", name: "Conexões Teste", note: "Criminal" },
+    { type: "trait", name: "Conexões Teste", note: "Polícia" }
+  ]);
+});
+
+test("efeitos passivos importados viram Active Effects do item e voltam na exportação", async () => {
+  const file = {
+    format: "mmrpg-content",
+    version: 1,
+    items: [
+      {
+        type: "power",
+        name: "Poder com Efeito",
+        folder: "Teste",
+        system: { description: "<p>x</p>", powerSet: "basic" },
+        effects: [
+          {
+            name: "Bônus de teste",
+            changes: [
+              { key: "system.abilities.mle.multiplierBonus", type: "upgrade", value: 2 },
+              { key: "system.health.reduction", type: "upgrade", value: 1 }
+            ]
+          }
+        ]
+      }
+    ]
+  };
+  const parsed = parseContent(file);
+  assert.deepEqual(parsed.errors, []);
+  const report = await importItems(parsed.items, { destination: "compendia" });
+  assert.deepEqual(report.failed, []);
+
+  const pack = game.packs.get("world.mmrpg-power");
+  const power = pack.documents.contents.find((d) => d.name === "Poder com Efeito");
+  assert.equal(power.effects.size, 1);
+  const effect = power.effects.contents[0];
+  assert.equal(effect.name, "Bônus de teste");
+  assert.equal(effect.transfer, true);
+  assert.equal(effect.changes.length, 2);
+  assert.equal(effect.changes[0].type, "upgrade", "tipo da v14");
+  assert.equal(effect.changes[0].mode, 4, "modo numérico da v13 (UPGRADE)");
+  assert.equal(effect.changes[0].value, "2");
+  assert.equal(effect.getFlag("mmrpg", "imported"), true);
+
+  // Reimportar com "atualizar" troca os efeitos importados, sem duplicar.
+  file.items[0].effects[0].changes = [{ key: "system.abilities.mle.multiplierBonus", type: "upgrade", value: 3 }];
+  const again = await importItems(parseContent(file).items, { destination: "compendia", onDuplicate: "update" });
+  assert.deepEqual(again.failed, []);
+  const updated = game.packs.get("world.mmrpg-power").documents.contents.find((d) => d.name === "Poder com Efeito");
+  assert.equal(updated.effects.size, 1);
+  assert.equal(updated.effects.contents[0].changes.length, 1);
+  assert.equal(updated.effects.contents[0].changes[0].value, "3");
+
+  // Atualizar sem o campo "effects" não apaga os efeitos que já existem.
+  delete file.items[0].effects;
+  await importItems(parseContent(file).items, { destination: "compendia", onDuplicate: "update" });
+  const kept = game.packs.get("world.mmrpg-power").documents.contents.find((d) => d.name === "Poder com Efeito");
+  assert.equal(kept.effects.size, 1);
+
+  // Exportação devolve os efeitos no formato do arquivo.
+  const exported = await exportPackItems(["power"]);
+  const row = exported.items.find((i) => i.name === "Poder com Efeito");
+  assert.deepEqual(row.effects, [
+    { name: "Bônus de teste", transfer: true, disabled: false, changes: [{ key: "system.abilities.mle.multiplierBonus", type: "upgrade", value: "3" }] }
+  ]);
+  const roundTrip = parseContent(exported);
+  assert.deepEqual(roundTrip.errors, []);
+});
+
+test("efeitos passivos dos itens alteram o ator: upgrade não acumula, prioridade e movimento", async () => {
+  const hero = await Actor.create({ name: "Passivos", type: "character", system: { rank: 2 } });
+  const base = hero.system.abilities.mle.multiplier;
+  const effectOf = (name, changes) => ({ name, transfer: true, changes: changes.map(compat.changeData) });
+  const power = (name, changes) => ({
+    name,
+    type: "power",
+    system: { powerSet: "basic" },
+    effects: [effectOf(name, changes)]
+  });
+
+  await hero.createEmbeddedDocuments("Item", [
+    power("Mighty 1", [{ key: "system.abilities.mle.multiplierBonus", type: "upgrade", value: 1 }]),
+    power("Mighty 3", [{ key: "system.abilities.mle.multiplierBonus", type: "upgrade", value: 3 }]),
+    power("Sturdy 2", [{ key: "system.health.reduction", type: "upgrade", value: 2 }]),
+    power("Reinforced Skeleton", [{ key: "system.health.reduction", type: "upgrade", value: 1 }])
+  ]);
+  assert.equal(hero.system.abilities.mle.multiplier, base + 3, "upgrade fica com o maior valor, sem somar");
+  assert.equal(hero.system.health.reduction, 2, "redução não acumula entre poderes numerados");
+
+  // Voo = corrida × Rank.
+  await hero.createEmbeddedDocuments("Item", [
+    power("Flight 1", [
+      { key: "system.movement.flight.active", type: "override", value: "true" },
+      { key: "system.movement.flight.mode", type: "override", value: "runRank" }
+    ])
+  ]);
+  assert.equal(hero.system.movement.flight.active, true);
+  assert.equal(hero.system.movement.flight.value, hero.system.movement.run.value * 2);
+
+  // Dois efeitos de override: o de maior prioridade vence, qualquer que seja a ordem.
+  await hero.createEmbeddedDocuments("Item", [
+    power("Jump 2", [{ key: "system.movement.jump.mode", type: "override", value: "runRank", priority: 60 }]),
+    power("Jump 1", [{ key: "system.movement.jump.mode", type: "override", value: "full" }])
+  ]);
+  assert.equal(hero.system.movement.jump.mode, "runRank");
+  assert.equal(hero.system.movement.jump.value, hero.system.movement.run.value * 2);
+
+  // Removendo o item, o bônus some.
+  const sturdy = hero.items.find((i) => i.name === "Sturdy 2");
+  await hero.deleteEmbeddedDocuments("Item", [sturdy.id]);
+  assert.equal(hero.system.health.reduction, 1, "sobra o Reinforced Skeleton");
 });
 
 test("o arquivo de exemplo importa sem erros e todos os itens são válidos", async () => {

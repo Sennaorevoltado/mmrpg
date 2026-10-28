@@ -10,7 +10,7 @@ module/
   dice/         dado Marvel e rolagem d616 (ligam as regras puras aos dados do Foundry)
   actions/      motor de ações: do clique ao cartão de chat e à aplicação do resultado
   apps/         janelas (ApplicationV2): fichas, editor de ação, importador, manobra de equipe
-  helpers/      handlebars, configurações, status, combate, macros, socket, importação
+  helpers/      handlebars, configurações, status, combate, macros, socket, importação, compêndios, compatibilidade v13/v14
   config.mjs    CONFIG.MMRPG: listas e chaves (nenhum texto de livro)
   mmrpg.mjs     ponto de entrada: registra tudo nos hooks init/ready
 templates/      Handlebars (fichas, itens, cartões de chat, diálogos)

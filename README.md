@@ -1,6 +1,6 @@
 # Marvel Multiverse RPG (não oficial) para Foundry VTT
 
-Sistema de fã para jogar **Marvel Multiverse RPG** no Foundry VTT **v14** (alvo principal) e **v13** (experimental, desde a v0.1.1). Foi organizado a partir da ideia de que *quase todo poder é um ataque ou um teste de atributo que aplica dano ou um efeito*: cada poder, arma ou equipamento carrega uma **lista de ações**, e cada ação descreve sozinha a rolagem, o dano/cura, os efeitos e o custo.
+Sistema de fã para jogar **Marvel Multiverse RPG** no Foundry VTT **v14** (alvo principal) e **v13** (experimental). Foi organizado a partir da ideia de que *quase todo poder é um ataque ou um teste de atributo que aplica dano ou um efeito*: cada poder, arma ou equipamento carrega uma **lista de ações**, e cada ação descreve sozinha a rolagem, o dano/cura, os efeitos e o custo.
 
 > **Este sistema não traz conteúdo dos livros.** Não há poderes, traços, tags, origens ou ocupações prontos. Você cria o seu material ou **importa um arquivo seu** (veja [docs/IMPORTACAO.md](docs/IMPORTACAO.md)). O arquivo [examples/exemplo-conteudo.json](examples/exemplo-conteudo.json) é inventado e só mostra o formato.
 
@@ -10,7 +10,7 @@ Projeto não oficial, sem vínculo com a Marvel, a Disney ou a Foundry Gaming. C
 
 Este sistema foi escrito **sem acesso a um Foundry de verdade, nem v14 nem v13**. O que foi feito para reduzir o risco:
 
-- Mais de 100 testes automáticos (`npm test`): regras do d616, formato de importação e um **Foundry simulado** que carrega o sistema inteiro, usa ações, posta e aplica cartões, renderiza fichas e janelas. A bateria roda duas vezes, uma com o simulador na geração 14 e outra na 13.
+- Mais de 130 testes automáticos (`npm test`): regras do d616, formato de importação e um **Foundry simulado** que carrega o sistema inteiro, usa ações, posta e aplica cartões, renderiza fichas e janelas. A bateria roda duas vezes, uma com o simulador na geração 14 e outra na 13.
 - Um validador estático (`npm run validate`): confere o manifesto, a sintaxe, os templates, as ligações `data-action` ↔ código, as traduções e a ausência de emojis.
 
 Isso pega erros de código e de dados, mas **não substitui um teste num mundo real**. A primeira rodada de testes no Foundry, na ordem:
@@ -44,7 +44,7 @@ Os pontos abaixo só um teste real confirma, tanto na v13 quanto na v14: arrasta
 
 **Por zip:** rode `npm run package` e extraia `dist/mmrpg-<versão>.zip` em `Data/systems/mmrpg`.
 
-**Por URL de manifesto:** depois de publicar o projeto no GitHub e criar uma tag (`git tag v0.1.1 && git push --tags`), o workflow em `.github/workflows/release.yml` gera o release com `system.json` e o zip. A URL a colar em *Instalar sistema* é
+**Por URL de manifesto:** depois de publicar o projeto no GitHub e criar uma tag (`git tag v0.2.0 && git push --tags`), o workflow em `.github/workflows/release.yml` gera o release com `system.json` e o zip. A URL a colar em *Instalar sistema* é
 `https://github.com/<usuário>/<repositório>/releases/latest/download/system.json`.
 
 ## O que o sistema faz
@@ -53,26 +53,27 @@ Os pontos abaixo só um teste real confirma, tanto na v13 quanto na v14: arrasta
 - Rolagem `1d6 + dado Marvel + 1d6 + modificador`. A face 1 do dado Marvel aparece como **M**, conta 6 e é um resultado **Fantástico**. Dois 6 com o M formam um **Ultimate**.
 - **Edge / Trouble**: re-rola um dado e mantém o melhor / o pior. Marque na ficha (por atributo ou na iniciativa), na ação ou no diálogo de rolagem. Edge e Trouble juntos se anulam. No chat há um botão para escolher o dado a re-rolar.
 - Defesa = 10 + atributo (mais bônus). Acerta quem iguala ou supera a defesa; o Fantástico acerta sempre.
-- Dano = valor do dado Marvel × (multiplicador − redução do alvo) + atributo; o Fantástico multiplica o dano (fator configurável por ação).
+- Dano = valor do dado Marvel × (multiplicador − redução do alvo) + atributo; o Fantástico multiplica o dano (fator configurável por ação). Cada ação ainda pode reduzir o dano por **escala** (por exemplo, metade no acerto comum e cheio no Fantástico), dar dano **só no Fantástico**, **ignorar a redução** do alvo ou usar a redução de outro recurso.
 - Iniciativa = d616 + Vigilância (mais bônus), com Edge/Trouble automáticos.
 
 **Ações (o centro do sistema)**
 - Cada item de poder, arma ou equipamento tem uma lista de ações.
-- Uma ação define: ativação; alvo (marcados, si mesmo ou área, com alcance e gabarito); rolagem (nenhuma, **ataque** contra uma defesa ou **teste** contra dificuldade fixa); **dano** (atributo, bônus, recurso atingido, elemento); **cura** (pelo dado Marvel ou valor fixo; Saúde, Foco ou Karma); **efeitos** (condição e/ou modificações de Active Effect, com gatilho e duração em rodadas); **custo** (Foco, Karma, Saúde) e **usos limitados**.
+- Uma ação define: ativação; alvo (marcados, si mesmo ou área, com alcance e gabarito); rolagem (nenhuma, **ataque** contra uma defesa ou **teste** contra dificuldade fixa); **dano** (atributo, bônus, recurso atingido, elemento); **cura** (pelo dado Marvel ou valor fixo; Saúde, Foco ou Karma); **efeitos** (condição e/ou modificações de Active Effect, com gatilho e duração em rodadas); **custo** (Foco, Karma, Saúde; o Foco pode ser **escalável**, com o jogador escolhendo quanto gastar e o dano ou a cura crescendo por Foco) e **usos limitados**.
 - O **cartão de chat** mostra a rolagem, a defesa de cada alvo, acerto/erro, dano calculado (com a conta à mostra), cura e efeitos. Botões: aplicar por alvo, só dano, só efeitos, em si mesmo, aplicar tudo, re-rolar um dado, posicionar o gabarito de área no mapa.
 - Jogadores aplicam resultados em atores que não são deles **pedindo ao GM ativo** (socket). O GM relê o cartão gravado na mensagem e recalcula os valores: o jogador não escolhe quantidades.
 - Opção de mundo **Aplicar resultados automaticamente** para quem prefere não clicar.
 
 **Fichas e dados**
-- Personagem e NPC: seis atributos (defesa, ataque, bônus fora de combate e multiplicador calculados), Saúde, Foco e Karma, redução de dano, iniciativa, movimento (corrida, escalada, natação, voo, etc., cada um com modo de cálculo: fixo, metade, cheio, dobro, triplo ou Rank), tamanho, detalhes, biografia.
+- Personagem e NPC: seis atributos (defesa, ataque, bônus fora de combate e multiplicador calculados), Saúde, Foco e Karma, redução de dano, iniciativa, movimento (corrida, escalada, natação, voo, etc., cada um com modo de cálculo: fixo, metade, cheio, dobro, triplo, Rank ou corrida × Rank), tamanho, detalhes, biografia.
 - Abas: principal, poderes (agrupados por conjunto de poder), traços e tags, equipamentos, modificadores, efeitos, biografia.
 - Itens: poder, traço, tag, origem, ocupação, arma e equipamento. **Origens e ocupações concedem itens**: ao entrar na ficha, criam os itens ligados.
-- 12 condições + derrotado como status effects do Foundry. NPC chega a 0 de Saúde → derrotado (opção de mundo).
+- **Efeitos passivos nos itens**: um poder numerado (Mighty, Sturdy, Flight…) pode trazer Active Effects que valem enquanto ele estiver na ficha e ajustam atributos, redução de dano, movimento e outros campos. Poderes com vários níveis usam `upgrade`, então vale só o maior.
+- 17 condições + derrotado como status effects do Foundry. NPC chega a 0 de Saúde → derrotado (opção de mundo).
 - Efeitos com duração em rodadas expiram sozinhos quando o combate chega à rodada certa, e somem quando o combate termina.
 - **Manobra de equipe**: janela que cobra o Foco de cada integrante selecionado e posta um cartão. O texto das regras da manobra não está incluído.
 - Macros: arraste uma ação da ficha para a barra de atalhos.
 
-**Importar/exportar**: janela *Importar conteúdo* (menu de configurações do sistema e botão no diretório de itens) para o seu próprio JSON. Exporta os itens do mundo no mesmo formato.
+**Importar/exportar**: janela *Importar conteúdo* (menu de configurações do sistema e botão no diretório de itens) para o seu próprio JSON. Pode importar para os **itens do mundo** ou para **compêndios do mundo**, um por tipo (poderes, traços, origens, tags, ocupações, armas, equipamentos), e exporta no mesmo formato.
 
 ## Primeiros passos
 
@@ -118,8 +119,8 @@ Todos os textos da interface estão em [lang/pt-BR.json](lang/pt-BR.json) (e `en
 - **Tamanho** é só um rótulo: o sistema não aplica bônus numéricos, para não inventar valores. Use os modificadores.
 - **Saúde/Foco máximos** são manuais.
 - **Texto de regras** de poderes, traços, manobras de equipe, etc.: nada é distribuído.
-- Gabaritos de área são posicionados no token do atacante, sem arrastar.
-- Sem compêndios pré-montados.
+- Gabaritos de área são posicionados no token do atacante, sem arrastar. Tamanhos de área e alcances são lidos em **casas**: configure a grade da cena com 1 unidade por casa.
+- Sem compêndios pré-montados no repositório. Quem tem o texto dos livros monta o próprio arquivo e importa.
 
 ## Desenvolvimento
 

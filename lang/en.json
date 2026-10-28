@@ -50,6 +50,16 @@
       "effectWhen": "When it triggers",
       "effects": "Effects",
       "element": "Element",
+      "damageWhen": "Damage when",
+      "ignoreReduction": "Ignores Damage Reduction",
+      "reductionFrom": "Damage Reduction used",
+      "sameAsResource": "The one of the resource hit",
+      "perFocus": "Flat per Focus spent",
+      "perFocusHint": "Flat amount added per Focus point spent (0.5 = +1 per 2 points). Used with \"Focus is a minimum\".",
+      "scalable": "Focus is a minimum",
+      "scalableHint": "The Focus shown is the minimum: when using the action, the player chooses how much to spend.",
+      "damageScale": "Damage fraction",
+      "damageScaleHint": "1 = full damage; 0.5 = half damage on any hit. The Fantastic factor multiplies on top.",
       "fantasticFactor": "Fantastic factor",
       "flat": "Flat bonus",
       "healing": "Healing",
@@ -140,6 +150,8 @@
     },
     "Dialog": {
       "bonus": "Bonus or penalty",
+      "focusSpent": "Focus to spend",
+      "focusSpentHint": "The minimum is the action's cost; spending more increases the effect if the power allows it.",
       "deleteItem": "Delete \"{name}\"?",
       "deleteTitle": "Delete item",
       "edgeInherited": "Already from the sheet",
@@ -162,6 +174,10 @@
     "EffectTarget": {
       "self": "Self",
       "targets": "Targets"
+    },
+    "DamageWhen": {
+      "fantastic": "Only on a Fantastic success",
+      "hit": "On any hit"
     },
     "EffectWhen": {
       "always": "Always",
@@ -193,18 +209,28 @@
       "marvel": "Marvel die × multiplier"
     },
     "Importer": {
+      "destPacks": "World compendiums (one per type)",
+      "destWorld": "World items",
+      "destination": "Destination",
+      "destinationHint": "World compendiums are created on the spot, one per type (Powers, Traits, Origins...). You can drag their items onto any sheet.",
       "done": "Import finished: {created} created, {updated} updated, {skipped} skipped.",
       "dupCreate": "Create a copy",
       "dupSkip": "Skip",
       "dupUpdate": "Update the existing one",
-      "export": "Export world items",
+      "export": "Export",
+      "exportFrom": "Export from",
       "exportTitle": "Export",
       "file": "Content file (.json)",
+      "fromPacks": "World compendiums",
+      "fromWorld": "World items",
       "hint": "Import and export your own content (powers, traits, tags, origins…).",
       "importTitle": "Import",
       "intro": "This system ships no book content. Build a file in the format described in docs/IMPORTACAO.md with your own material and import it here.",
+      "noPacks": "There are no system compendiums in this world. Import into compendiums first.",
       "onDuplicate": "If an item with the same type and name exists",
       "open": "Import content",
+      "packLocked": "The compendium {pack} is locked. Unlock it (right-click the compendium) and try again.",
+      "packsUsed": "Compendiums used",
       "pickTypes": "Select at least one type.",
       "report": "Created: {created}. Updated: {updated}. Skipped: {skipped}.",
       "run": "Import",
@@ -221,6 +247,7 @@
       "duration": "Duration",
       "effectsHint": "Effects flagged as transferred apply to the character who owns the item.",
       "examples": "Examples",
+      "grantNote": "Note (e.g. type)",
       "grants": "Grants",
       "grantsHint": "Drag traits, tags and powers here. They are created on the sheet when this item is added to a character.",
       "level": "Level",
@@ -259,7 +286,17 @@
       "full": "Same as run",
       "half": "Half of run",
       "rank": "Base × Rank",
+      "runRank": "Run × Rank",
       "triple": "Triple run"
+    },
+    "Pack": {
+      "gear": "Gear",
+      "occupation": "Occupations",
+      "origin": "Origins",
+      "power": "Powers",
+      "tag": "Tags",
+      "trait": "Traits",
+      "weapon": "Weapons"
     },
     "PowerSet": {
       "basic": "Basic",
@@ -389,20 +426,25 @@
       "titanic": "Titanic"
     },
     "Status": {
+      "bleeding": "Bleeding",
       "blinded": "Blinded",
       "burning": "Burning",
       "corroding": "Corroding",
       "dead": "Defeated",
       "deafened": "Deafened",
+      "demoralized": "Demoralized",
       "frightened": "Frightened",
+      "grabbed": "Grabbed",
       "none": "None",
       "paralyzed": "Paralyzed",
       "pinned": "Pinned",
       "poisoned": "Poisoned",
       "prone": "Prone",
+      "shattered": "Shattered",
       "slowed": "Slowed",
       "stunned": "Stunned",
-      "surprised": "Surprised"
+      "surprised": "Surprised",
+      "unconscious": "Unconscious"
     },
     "Tabs": {
       "actions": "Actions",

@@ -2,3 +2,7 @@ node_modules/
 dist/
 *.log
 .DS_Store
+
+# Conteúdo de livros (traduzido ou transcrito) é só para uso pessoal: nunca vai para o repositório.
+conteudo-privado/
+*.privado.json

@@ -1,0 +1,21 @@
+<div class="mmrpg-sheet mm-budget">
+  <p class="mm-hint">{{localize "MMRPG.Budget.hint"}}</p>
+  <ul class="mm-budget-list">
+    <li class="mm-budget-row mm-budget-head" aria-hidden="true">
+      <span>{{localize "MMRPG.Sheet.rank"}}</span>
+      <span>{{localize "MMRPG.Budget.points"}}</span>
+      <span>{{localize "MMRPG.Budget.cap"}}</span>
+    </li>
+    {{#each rows}}
+      <li class="mm-budget-row">
+        <b>{{rank}}</b>
+        <input type="number" step="1" min="0" name="points-{{rank}}" value="{{points}}" placeholder="&mdash;" aria-label="{{localize 'MMRPG.Budget.pointsOf' rank=rank}}">
+        <input type="number" step="1" min="0" name="cap-{{rank}}" value="{{cap}}" placeholder="&mdash;" aria-label="{{localize 'MMRPG.Budget.capOf' rank=rank}}">
+      </li>
+    {{/each}}
+  </ul>
+  <footer class="mm-form-actions">
+    <button type="button" data-action="resetBudget">{{localize "MMRPG.Budget.reset"}}</button>
+    <button type="submit" class="is-primary">{{localize "MMRPG.Budget.save"}}</button>
+  </footer>
+</div>

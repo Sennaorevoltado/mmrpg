@@ -1,0 +1,68 @@
+<div class="mmrpg-sheet mm-body">
+  <section class="mm-panel mm-abilities">
+    <header class="mm-panel-head">
+      <h3>{{localize "MMRPG.Sheet.abilities"}}</h3>
+      {{#if canToggleMode}}
+        <div class="mm-mode" role="group" aria-label="{{localize 'MMRPG.Creation.mode'}}" title="{{localize 'MMRPG.Creation.modeHint'}}">
+          <button type="button" data-action="setMode" data-mode="guided" aria-pressed="{{guided}}" class="{{#if guided}}is-on{{/if}}">{{localize "MMRPG.Creation.modeGuided"}}</button>
+          <button type="button" data-action="setMode" data-mode="free" aria-pressed="{{#if guided}}false{{else}}true{{/if}}" class="{{#unless guided}}is-on{{/unless}}">{{localize "MMRPG.Creation.modeFree"}}</button>
+        </div>
+      {{/if}}
+    </header>
+
+    {{#if guided}}
+      <div class="mm-status" data-status="{{creation.status}}">
+        <div class="mm-points"><b>{{creation.pointsNumber}}</b><span>{{creation.pointsLabel}}</span></div>
+        <div class="mm-cap"><span>{{localize "MMRPG.Creation.cap"}}</span><b>{{creation.capNumber}}</b></div>
+      </div>
+      {{#if (eq creation.status "unset")}}
+        <p class="mm-notice">
+          {{creation.undefinedText}}
+          {{#if isGM}}
+            <button type="button" class="mm-link" data-action="openBudget">{{localize "MMRPG.Creation.defineBudget"}}</button>
+          {{else}}
+            {{localize "MMRPG.Creation.askGM"}}
+          {{/if}}
+        </p>
+      {{/if}}
+      {{#if creation.overCapCount}}
+        <p class="mm-notice is-warn">{{creation.overCapText}}</p>
+      {{/if}}
+    {{/if}}
+
+    <ul class="mm-ability-list">
+      <li class="mm-ability-row mm-ability-head" aria-hidden="true">
+        <span></span>
+        <span>{{localize "MMRPG.Sheet.score"}}</span>
+        <span>{{localize "MMRPG.Sheet.defense"}}</span>
+        <span>{{localize "MMRPG.Sheet.noncombat"}}</span>
+      </li>
+      {{#each abilities}}
+        <li class="mm-ability-row{{#if overCap}} is-over{{/if}}" data-ability="{{key}}">
+          <span class="mm-ability-name"><b>{{label}}</b><abbr>{{abbr}}</abbr></span>
+          <span class="mm-stepper">
+            <button type="button" class="mm-step" data-action="adjustAbility" data-ability="{{key}}" data-delta="-1" aria-label="{{localize 'MMRPG.Creation.decrease' ability=label}}" {{#unless canDecrease}}disabled{{/unless}}>&minus;</button>
+            <input class="mm-score" type="number" step="1" name="system.abilities.{{key}}.value" value="{{value}}" aria-label="{{label}}" {{#unless ../editable}}disabled{{/unless}}>
+            <button type="button" class="mm-step is-plus" data-action="adjustAbility" data-ability="{{key}}" data-delta="1" aria-label="{{localize 'MMRPG.Creation.increase' ability=label}}" {{#unless canIncrease}}disabled{{/unless}}>+</button>
+          </span>
+          <span class="mm-box" title="{{localize 'MMRPG.Sheet.defense'}}">{{defense}}</span>
+          <span class="mm-box is-noncom" title="{{localize 'MMRPG.Sheet.noncombat'}}">{{mmrpgSigned noncom}}</span>
+        </li>
+      {{/each}}
+    </ul>
+
+    {{#if guided}}
+      <div class="mm-adjust">
+        <label>
+          <span>{{localize "MMRPG.Creation.bonusPoints"}}</span>
+          <input type="number" step="1" name="system.creation.bonusPoints" value="{{creation.bonusPoints}}" {{#unless editable}}disabled{{/unless}}>
+        </label>
+        <label>
+          <span>{{localize "MMRPG.Creation.bonusCap"}}</span>
+          <input type="number" step="1" name="system.creation.bonusCap" value="{{creation.bonusCap}}" {{#unless editable}}disabled{{/unless}}>
+        </label>
+        <p class="mm-hint">{{localize "MMRPG.Creation.bonusHint"}}</p>
+      </div>
+    {{/if}}
+  </section>
+</div>

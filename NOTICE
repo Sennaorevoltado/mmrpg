@@ -14,8 +14,8 @@ delas são reproduzidos abaixo, como as licenças exigem.
 -----------------------------------------------------------------------------------
 1. Gaia: Prelúdio — https://github.com/LPfontes/gaia-preludio
    Referência de organização para um sistema não oficial em Foundry v14: regras
-   separadas do restante do código, classes de documentos definidas de antemão,
-   convenções de interface (por exemplo, sem emojis) e estrutura de projeto.
+   separadas do restante do código, convenções de interface (por exemplo, sem emojis)
+   e estrutura de projeto.
 
    MIT License
 
@@ -42,10 +42,8 @@ delas são reproduzidos abaixo, como as licenças exigem.
 -----------------------------------------------------------------------------------
 2. marvel-multiverse (sistema da comunidade para Foundry VTT)
    — https://github.com/mjording/marvel-multiverse
-   Referência para a mecânica do d616, as listas de atributos, conjuntos de poderes,
-   elementos e condições, e para o fluxo de ataque, dano e cura. A linguagem visual das
-   fichas (painéis vermelhos com cantos cortados, campos creme, rótulos sobre a borda)
-   se inspira na ficha desse sistema; o CSS aqui é próprio e nenhuma imagem dele foi copiada.
+   Referência para a mecânica do d616 e para a lista de atributos. O visual, o CSS e os
+   textos desta ficha são próprios; nenhuma imagem desse sistema foi copiada.
 
    MIT License
 

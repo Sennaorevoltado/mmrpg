@@ -1,20 +1,16 @@
 /**
  * Aparência das fichas: opções de leitura que cada jogador escolhe para si (escopo "client").
  *
- * - tema: "Livro" (claro, como a ficha impressa; padrão) ou escuro;
- * - tamanho do texto: normal, grande, muito grande;
- * - densidade: confortável ou compacta;
- * - descrições: fechadas (só um resumo) ou abertas.
+ * - tema: claro (como o papel impresso; padrão) ou escuro;
+ * - tamanho do texto: normal, grande, muito grande.
  */
 
 import { MMRPG } from "../config.mjs";
 
 /** Opções válidas de cada configuração e o padrão. */
 export const APPEARANCE = {
-  uiTheme: { choices: ["book", "dark"], initial: "book", attr: "mmTheme" },
-  uiTextSize: { choices: ["normal", "large", "xlarge"], initial: "normal", attr: "mmText" },
-  uiDensity: { choices: ["comfortable", "compact"], initial: "comfortable", attr: "mmDensity" },
-  uiDescriptions: { choices: ["collapsed", "open"], initial: "collapsed", attr: "mmDescriptions" }
+  uiTheme: { choices: ["light", "dark"], initial: "light", attr: "mmTheme" },
+  uiTextSize: { choices: ["normal", "large", "xlarge"], initial: "normal", attr: "mmText" }
 };
 
 const loc = (key) => game.i18n.localize(key);
@@ -38,7 +34,7 @@ export function registerAppearanceSettings() {
 /**
  * Valores atuais. Qualquer erro de leitura (configuração ainda não registrada, valor antigo)
  * cai no padrão: a ficha tem que abrir sempre.
- * @returns {{ uiTheme: string, uiTextSize: string, uiDensity: string, uiDescriptions: string }}
+ * @returns {{ uiTheme: string, uiTextSize: string }}
  */
 export function getAppearance() {
   const out = {};
@@ -53,11 +49,6 @@ export function getAppearance() {
     out[key] = value;
   }
   return out;
-}
-
-/** As descrições começam abertas? */
-export function descriptionsOpenByDefault() {
-  return getAppearance().uiDescriptions === "open";
 }
 
 /**
@@ -77,7 +68,7 @@ function openWindows() {
   return apps.filter((app) => app?.element?.classList?.contains("mmrpg"));
 }
 
-/** Reaplica a aparência (e redesenha, para as descrições abertas/fechadas) nas janelas abertas. */
+/** Reaplica a aparência e redesenha as janelas abertas (também usado quando o orçamento muda). */
 export function refreshOpenWindows() {
   for (const app of openWindows()) {
     applyAppearance(app.element);

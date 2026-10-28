@@ -1,11 +1,2 @@
-export { default as ActionData } from "./action.mjs";
 export { default as CharacterData } from "./character.mjs";
 export { default as NpcData } from "./npc.mjs";
-export { default as PowerData } from "./power.mjs";
-export { default as TraitData } from "./trait.mjs";
-export { default as TagData } from "./tag.mjs";
-export { default as OriginData } from "./origin.mjs";
-export { default as OccupationData } from "./occupation.mjs";
-export { default as WeaponData } from "./weapon.mjs";
-export { default as GearData } from "./gear.mjs";
-export { default as FormData } from "./form.mjs";

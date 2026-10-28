@@ -19,7 +19,7 @@ const outArg = process.argv.indexOf("--out");
 const outDir = path.resolve(root, outArg > 0 ? process.argv[outArg + 1] : "dist");
 
 /** O que entra no pacote (relativo à raiz do projeto). */
-const INCLUDE = ["system.json", "module", "templates", "styles", "fonts", "lang", "docs", "examples", "README.md", "LICENSE", "NOTICE"];
+const INCLUDE = ["system.json", "module", "templates", "styles", "fonts", "lang", "README.md", "LICENSE", "NOTICE"];
 
 const manifest = JSON.parse(fs.readFileSync(path.join(root, "system.json"), "utf8"));
 
